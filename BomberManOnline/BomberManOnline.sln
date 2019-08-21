@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2016
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BomberManOnline", "BomberManOnline\BomberManOnline.vcxproj", "{F9AF8C50-97A1-4124-BE7A-E44356DD3BC4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BomberManServer", "BomberManServer\BomberManServer.vcxproj", "{0F7A4714-A294-4BA5-BEDA-A5144B562B10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{F9AF8C50-97A1-4124-BE7A-E44356DD3BC4}.Release|x64.Build.0 = Release|x64
 		{F9AF8C50-97A1-4124-BE7A-E44356DD3BC4}.Release|x86.ActiveCfg = Release|Win32
 		{F9AF8C50-97A1-4124-BE7A-E44356DD3BC4}.Release|x86.Build.0 = Release|Win32
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Debug|x64.ActiveCfg = Debug|x64
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Debug|x64.Build.0 = Debug|x64
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Debug|x86.ActiveCfg = Debug|Win32
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Debug|x86.Build.0 = Debug|Win32
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Release|x64.ActiveCfg = Release|x64
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Release|x64.Build.0 = Release|x64
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Release|x86.ActiveCfg = Release|Win32
+		{0F7A4714-A294-4BA5-BEDA-A5144B562B10}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
