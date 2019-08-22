@@ -13,10 +13,48 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{dc4446ee-519e-43e0-91f0-05f6e293ea53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\XMLParser">
+      <UniqueIdentifier>{d0d8686f-4161-4bdc-8ee1-52e9a1508f67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\NetworkHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Base64.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxml.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxmlerror.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxmlparser.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\XMLParser.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\NetworkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Base64.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\tinyxml.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\XMLParser.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
