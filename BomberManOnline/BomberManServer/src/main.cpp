@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include "Server.h"
 
@@ -10,6 +9,8 @@ int main()
 		std::cout << "Failed to start server\n";
 		return -1;
 	}
+
+	server->run();
 	
 	return 0;
 }

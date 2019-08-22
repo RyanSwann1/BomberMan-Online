@@ -127,6 +127,7 @@
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Client.h" />
     <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Utilities\NonCopyable.h" />
   </ItemGroup>
