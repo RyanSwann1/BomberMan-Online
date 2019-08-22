@@ -17,4 +17,3 @@ std::unique_ptr<Level> Level::create(const std::string & levelName)
 	
 	return std::unique_ptr<Level>();
 }
-
