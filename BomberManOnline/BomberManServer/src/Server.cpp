@@ -1,4 +1,5 @@
 #include "Server.h"
+#include "XMLParser.h"
 #include <iostream>
 
 constexpr size_t MAX_CLIENTS = 4;
@@ -12,15 +13,21 @@ Server::Server()
 	m_clients.reserve(MAX_CLIENTS);
 }
 
-
-
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
 {
 	std::unique_ptr<Server> server = std::make_unique<Server>();
-	if (server->m_tcpListener.listen(portNumber, ipAddress))
+	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
+		server->m_levelName = "Level1.tmx";
+		if (!XMLParser::loadMapAsServer(server->m_levelName, server->m_mapDimensions, server->m_collisionLayer, server->m_spawnPositions))
+		{
+			return std::unique_ptr<Server>();
+		}
+
+
+
 
 		return server;
 	}

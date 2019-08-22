@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Server.h"
 
+//https://gamedev.stackexchange.com/questions/119342/authoritative-server-movement-and-collision
+
 int main()
 {
 	std::unique_ptr<Server> server = Server::create(sf::IpAddress::LocalHost, 55001);
