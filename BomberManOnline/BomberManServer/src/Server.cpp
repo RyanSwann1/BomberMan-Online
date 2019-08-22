@@ -45,6 +45,10 @@ void Server::run()
 			{
 				addNewClient();
 			}
+			else
+			{
+				listen();
+			}
 		}
 	}
 }
@@ -56,5 +60,20 @@ void Server::addNewClient()
 	{
 		m_clients.emplace_back(std::move(tcpSocket));
 		std::cout << "New client added to server\n";
+	}
+}
+
+void Server::listen()
+{
+	for (auto& client : m_clients)
+	{
+		if (m_socketSelector.isReady(*client))
+		{
+			sf::Packet receivedPacket;
+			if (client->receive(receivedPacket) == sf::Socket::Done)
+			{
+
+			}
+		}
 	}
 }

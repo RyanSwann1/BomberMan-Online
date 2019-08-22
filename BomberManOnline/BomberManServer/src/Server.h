@@ -5,17 +5,6 @@
 #include <memory>
 #include <vector>
 
-enum class eServerMessageType
-{
-	eInvalidRequest = 0
-};
-
-struct ServerMessage
-{
-	eServerMessageType type;
-	int messsageID;
-};
-
 class Server : private NonCopyable
 {
 public:
@@ -35,4 +24,5 @@ private:
 	std::vector<sf::Vector2i> m_spawnPositions;
 
 	void addNewClient();
+	void listen();
 };
