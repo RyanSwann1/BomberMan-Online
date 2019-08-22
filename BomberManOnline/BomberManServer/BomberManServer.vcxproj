@@ -125,15 +125,12 @@
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
     <ClCompile Include="..\Shared\XMLParser.cpp" />
-    <ClCompile Include="Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
     <ClInclude Include="..\Shared\XMLParser.h" />
-    <ClInclude Include="Level.h" />
-    <ClInclude Include="src\Client.h" />
     <ClInclude Include="src\Server.h" />
     <ClInclude Include="src\Utilities\NonCopyable.h" />
   </ItemGroup>

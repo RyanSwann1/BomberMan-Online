@@ -26,9 +26,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			return std::unique_ptr<Server>();
 		}
 
-
-
-
 		return server;
 	}
 	else

@@ -30,9 +30,6 @@
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Server.h">
@@ -41,17 +38,11 @@
     <ClInclude Include="src\Utilities\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Client.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\XMLParser.h">
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
       <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
