@@ -1,0 +1,543 @@
+<?xml version="1.0"?>
+<TextureAtlas imagePath="TileSheet_surface.png">
+	<SubTexture name="bomb_party_v4 (3).png_0" x="0" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1" x="16" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_2" x="32" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_3" x="48" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_4" x="64" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_5" x="80" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_6" x="96" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_7" x="112" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_8" x="128" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_9" x="144" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_10" x="160" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_11" x="176" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12" x="192" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_13" x="208" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_14" x="224" y="208" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_15" x="0" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_16" x="16" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_17" x="32" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_18" x="48" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_19" x="64" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_110" x="80" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_111" x="96" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_112" x="112" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_113" x="128" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_114" x="144" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_115" x="160" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_116" x="176" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_117" x="192" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_118" x="208" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_119" x="224" y="224" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_120" x="0" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121" x="16" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_122" x="32" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_123" x="48" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_124" x="64" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_125" x="80" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_126" x="96" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_127" x="112" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_128" x="128" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_129" x="144" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1210" x="160" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1211" x="176" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212" x="192" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1213" x="208" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1214" x="224" y="240" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1215" x="0" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1216" x="16" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1217" x="32" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1218" x="48" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1219" x="64" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12110" x="80" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12111" x="96" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12112" x="112" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12113" x="128" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12114" x="144" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12115" x="160" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12116" x="176" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12117" x="192" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12118" x="208" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12119" x="224" y="256" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12120" x="0" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12121" x="16" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12122" x="32" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12123" x="48" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12124" x="64" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12125" x="80" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12126" x="96" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12127" x="112" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12128" x="128" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_12129" x="144" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121210" x="160" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121211" x="176" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121212" x="192" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121213" x="208" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121214" x="224" y="272" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121215" x="0" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121216" x="16" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121217" x="32" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121218" x="48" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_121219" x="64" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212110" x="80" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212111" x="96" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212112" x="112" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212113" x="128" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212114" x="144" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212115" x="160" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212116" x="176" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212117" x="192" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212118" x="208" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+	<SubTexture name="bomb_party_v4 (3).png_1212119" x="224" y="288" width="16" height="16">
+		<Collider>
+			<Rectangle name="BoundingRect" type="0" left="0" right="16" top="0" bottom="16" />
+			<Circle name="BoundingCircle" type="0" radius="11.313708" y="8.000000" x="8.000000" />
+		</Collider>
+	</SubTexture>
+</TextureAtlas>
