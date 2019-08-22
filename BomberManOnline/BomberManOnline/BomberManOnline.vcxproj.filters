@@ -59,7 +59,7 @@
     <ClInclude Include="..\Shared\XMLParser.h">
       <Filter>Shared\XMLParser</Filter>
     </ClInclude>
-    <ClInclude Include="Level.h">
+    <ClInclude Include="src\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

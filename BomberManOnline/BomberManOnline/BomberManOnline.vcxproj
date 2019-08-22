@@ -32,7 +32,7 @@
     <ClInclude Include="..\Shared\Base64.h" />
     <ClInclude Include="..\Shared\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser.h" />
-    <ClInclude Include="Level.h" />
+    <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
