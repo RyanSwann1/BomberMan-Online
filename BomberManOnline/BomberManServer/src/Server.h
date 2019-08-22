@@ -25,4 +25,7 @@ private:
 
 	void addNewClient();
 	void listen();
+	void broadcastMessage(sf::Packet& packetToSend);
+
+	void movePlayer(std::unique_ptr<sf::TcpSocket>& client, sf::Vector2i newPosition);
 };

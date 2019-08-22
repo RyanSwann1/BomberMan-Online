@@ -2,5 +2,8 @@
 
 enum class eServerMessageType
 {
-	ePlayerMove = 0
+	eInvalidRequest = 0,
+	eValidRequest, 
+	ePlayerMove,
+	eNewPlayerPosition
 };
