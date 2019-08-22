@@ -42,6 +42,9 @@
     <ClCompile Include="..\Shared\XMLParser.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
+    <ClCompile Include="src\Level.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -55,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\XMLParser.h">
       <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

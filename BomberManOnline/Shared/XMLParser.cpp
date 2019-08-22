@@ -2,8 +2,9 @@
 #include "Base64.h"
 #include "tinyxml.h"
 #include <assert.h>
+#include "Level.h"
 
-std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
+std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
@@ -42,7 +43,8 @@ std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 //	return true;
 //}
 
-bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<std::vector<int>>& tileData, std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2i>& spawnPositions)
+bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<TileLayer>& tileLayers, 
+	std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2i>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -52,7 +54,7 @@ bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapD
 
 	const auto& rootElement = xmlFile.RootElement();
 	mapDimensions = parseMapSize(*rootElement);
-	tileData = parseTileData(*rootElement, mapDimensions);
+	tileLayers = parseTileLayers(*rootElement, mapDimensions);
 	spawnPositions = parsePlayerSpawnPositions(*rootElement, parseTileSize(*rootElement));
 	collisionLayer = parseCollisionLayer(*rootElement, parseTileSize(*rootElement).x);
 
@@ -113,9 +115,9 @@ std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElem
 	return tileData;
 }
 
-std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, const sf::Vector2i mapSize)
+std::vector<TileLayer> parseTileLayers(const TiXmlElement & rootElement, const sf::Vector2i mapSize)
 {
-	std::vector<std::vector<int>> tileData;
+	std::vector<TileLayer> tileLayers;
 	for (const auto* tileLayerElement = rootElement.FirstChildElement();
 		tileLayerElement != nullptr; tileLayerElement = tileLayerElement->NextSiblingElement())
 	{
@@ -124,11 +126,12 @@ std::vector<std::vector<int>> parseTileData(const TiXmlElement & rootElement, co
 			continue;
 		}
 
-		tileData = decodeTileLayer(*tileLayerElement, mapSize);
+
+		tileLayers.emplace_back(std::move(decodeTileLayer(*tileLayerElement, mapSize)));
 	}
 
-	assert(!tileData.empty());
-	return tileData;
+	assert(!tileLayers.empty());
+	return tileLayers;
 }
 
 sf::Vector2i parseMapSize(const TiXmlElement & rootElement)

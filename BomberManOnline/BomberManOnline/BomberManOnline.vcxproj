@@ -24,6 +24,7 @@
     <ClCompile Include="..\Shared\tinyxmlerror.cpp" />
     <ClCompile Include="..\Shared\tinyxmlparser.cpp" />
     <ClCompile Include="..\Shared\XMLParser.cpp" />
+    <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
   </ItemGroup>
@@ -31,6 +32,7 @@
     <ClInclude Include="..\Shared\Base64.h" />
     <ClInclude Include="..\Shared\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
