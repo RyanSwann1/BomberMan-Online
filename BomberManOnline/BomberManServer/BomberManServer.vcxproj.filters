@@ -16,6 +16,9 @@
     <Filter Include="Shared">
       <UniqueIdentifier>{e4e487a0-9dda-412e-b1c6-d1dd25a84518}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shared\XMLParser">
+      <UniqueIdentifier>{6c8cdaa9-ce3b-4306-b27b-758d6be856fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -24,11 +27,23 @@
     <ClCompile Include="src\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\XMLParser.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
       <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Base64.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxml.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxmlerror.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\tinyxmlparser.cpp">
+      <Filter>Shared\XMLParser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\XMLParser.cpp">
+      <Filter>Shared\XMLParser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -38,11 +53,20 @@
     <ClInclude Include="src\Utilities\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\XMLParser.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
       <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ServerMessageType.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Base64.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\tinyxml.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\XMLParser.h">
+      <Filter>Shared\XMLParser</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

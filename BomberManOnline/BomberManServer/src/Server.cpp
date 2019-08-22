@@ -1,6 +1,7 @@
 #include "Server.h"
 #include "XMLParser.h"
 #include <iostream>
+#include "ServerMessageType.h"
 
 constexpr size_t MAX_CLIENTS = 4;
 
@@ -72,7 +73,7 @@ void Server::listen()
 			sf::Packet receivedPacket;
 			if (client->receive(receivedPacket) == sf::Socket::Done)
 			{
-
+				
 			}
 		}
 	}

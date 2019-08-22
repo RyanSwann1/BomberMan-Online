@@ -2,7 +2,6 @@
 #include "Base64.h"
 #include "tinyxml.h"
 #include <assert.h>
-#include "Utilities.h"
 
 std::vector<std::vector<int>> parseTileData(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
@@ -12,36 +11,36 @@ std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, i
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
-bool XMLParser::loadTextureDetails(const std::string& filePath, std::string& imagePath, std::vector<FrameDetails>& frames)
-{
-	TiXmlDocument xmlFile;
-	if (!xmlFile.LoadFile(filePath))
-	{
-		return false;
-	}
-
-	const auto& rootElement = xmlFile.RootElement();
-	imagePath = rootElement->Attribute("imagePath");
-
-	int i = 0; //Acts as the frame ID for each iteration
-	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
-	{
-		int height = 0;
-		e->Attribute("height", &height);
-		int width = 0;
-		e->Attribute("width", &width);
-		int y = 0;
-		e->Attribute("y", &y);
-		int x = 0;
-		e->Attribute("x", &x);
-		int frameID = i;
-		++i;
-		
-		frames.emplace_back(height, width, y, x, frameID);	
-	}
-
-	return true;
-}
+//bool XMLParser::loadTextureDetails(const std::string& filePath, std::string& imagePath, std::vector<FrameDetails>& frames)
+//{
+//	TiXmlDocument xmlFile;
+//	if (!xmlFile.LoadFile(filePath))
+//	{
+//		return false;
+//	}
+//
+//	const auto& rootElement = xmlFile.RootElement();
+//	imagePath = rootElement->Attribute("imagePath");
+//
+//	int i = 0; //Acts as the frame ID for each iteration
+//	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
+//	{
+//		int height = 0;
+//		e->Attribute("height", &height);
+//		int width = 0;
+//		e->Attribute("width", &width);
+//		int y = 0;
+//		e->Attribute("y", &y);
+//		int x = 0;
+//		e->Attribute("x", &x);
+//		int frameID = i;
+//		++i;
+//		
+//		frames.emplace_back(height, width, y, x, frameID);	
+//	}
+//
+//	return true;
+//}
 
 bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<std::vector<int>>& tileData, std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2i>& spawnPositions)
 {
