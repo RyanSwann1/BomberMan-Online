@@ -1,9 +1,15 @@
 
 #include <iostream>
+#include "Server.h"
 
 int main()
 {
-	std::cout << "Hello World\n";
-	char c;
-	std::cin >> c;
+	std::unique_ptr<Server> server = Server::create(sf::IpAddress::LocalHost, 55001);
+	if (!server)
+	{
+		std::cout << "Failed to start server\n";
+		return -1;
+	}
+	
+	return 0;
 }
