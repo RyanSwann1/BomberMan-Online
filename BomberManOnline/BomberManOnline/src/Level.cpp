@@ -20,6 +20,7 @@ void TileLayer::render(sf::RenderWindow & window, sf::Vector2i levelDimensions) 
 			{
 				sf::Sprite tileSprite(tileSheet.getTexture(), tileSheet.getFrameRect(tileID));
 				tileSprite.setPosition(x * tileSheet.getTileSize(), y * tileSheet.getTileSize());
+				tileSprite.setScale(sf::Vector2f(2.0f, 2.0f));
 				window.draw(tileSprite);
 			}
 		}
@@ -42,7 +43,7 @@ std::unique_ptr<Level> Level::create(const std::string & levelName)
 	}
 }
 
-void Level::render(sf::RenderWindow & window)
+void Level::render(sf::RenderWindow & window) const
 {
 	for (const auto& tileLayer : m_tileLayers)
 	{

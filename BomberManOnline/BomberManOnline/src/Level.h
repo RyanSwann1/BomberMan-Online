@@ -20,7 +20,7 @@ class Level : private NonCopyable
 public:
 	static std::unique_ptr<Level> create(const std::string& levelName);
 
-	void render(sf::RenderWindow& window);
+	void render(sf::RenderWindow& window) const;
 
 private:
 	Level() {}
@@ -29,6 +29,9 @@ private:
 	std::vector<sf::Vector2i> m_collisionLayer;
 	std::vector<TileLayer> m_tileLayers;
 	std::vector<sf::Vector2i> m_spawnPositions;
+	
+
+	
 	//Bomb
 	//Players
 	//Pick ups

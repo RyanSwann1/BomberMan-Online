@@ -51,6 +51,9 @@
     <ClCompile Include="src\Resources.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -78,6 +81,12 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\FrameDetails.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Direction.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
