@@ -82,7 +82,7 @@
       <PreprocessorDefinitions>TIXML_USE_STL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(ProjectDir)SFML\lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)SFML-lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-window-d.lib;sfml-graphics-d.lib;sfml-system-d.lib;sfml-network-d.lib;winmm.lib;opengl32.lib;freetype.lib;vorbis.lib;vorbisenc.lib;vorbisfile.lib;openal32.lib;sfml-audio-d.lib;flac.lib;ogg.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -124,21 +124,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
-    <ClCompile Include="..\Shared\Base64.cpp" />
-    <ClCompile Include="..\Shared\tinyxml.cpp" />
-    <ClCompile Include="..\Shared\tinyxmlerror.cpp" />
-    <ClCompile Include="..\Shared\tinyxmlparser.cpp" />
-    <ClCompile Include="..\Shared\XMLParser.cpp" />
+    <ClCompile Include="..\Shared\XMLParser\Base64.cpp" />
+    <ClCompile Include="..\Shared\XMLParser\tinyxml.cpp" />
+    <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp" />
+    <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp" />
+    <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
-    <ClInclude Include="..\Shared\Base64.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
+    <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
-    <ClInclude Include="..\Shared\tinyxml.h" />
-    <ClInclude Include="..\Shared\XMLParser.h" />
+    <ClInclude Include="..\Shared\TileLayer.h" />
+    <ClInclude Include="..\Shared\XMLParser\Base64.h" />
+    <ClInclude Include="..\Shared\XMLParser\tinyxml.h" />
+    <ClInclude Include="..\Shared\XMLParser\XMLParser.h" />
     <ClInclude Include="src\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

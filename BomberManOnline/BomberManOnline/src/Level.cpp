@@ -1,33 +1,7 @@
 #include "Level.h"
-#include "XMLParser.h"
+#include "XMLParser/XMLParser.h"
 #include "Resources.h"
 
-//Tile Layer
-TileLayer::TileLayer(std::vector<std::vector<int>>&& tileLayer)
-	: m_tileLayer(std::move(tileLayer))
-{}
-
-void TileLayer::render(sf::RenderWindow & window, sf::Vector2i levelDimensions) const
-{
-	auto& tileSheet = Textures::getInstance().getTileSheet();
-
-	for (int y = 0; y < levelDimensions.y; ++y)
-	{
-		for (int x = 0; x < levelDimensions.x; ++x)
-		{
-			int tileID = m_tileLayer[y][x];
-			if (tileID > 0)
-			{
-				sf::Sprite tileSprite(tileSheet.getTexture(), tileSheet.getFrameRect(tileID));
-				tileSprite.setPosition(x * tileSheet.getTileSize(), y * tileSheet.getTileSize());
-				tileSprite.setScale(sf::Vector2f(2.0f, 2.0f));
-				window.draw(tileSprite);
-			}
-		}
-	}
-}
-
-//Level
 std::unique_ptr<Level> Level::create(const std::string & levelName)
 {
 	Level* level = new Level;
@@ -43,10 +17,29 @@ std::unique_ptr<Level> Level::create(const std::string & levelName)
 	}
 }
 
+const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
+{
+	return m_collisionLayer;
+}
+
 void Level::render(sf::RenderWindow & window) const
 {
+	const auto& tileSheet = Textures::getInstance().getTileSheet();
 	for (const auto& tileLayer : m_tileLayers)
 	{
-		tileLayer.render(window, m_levelDimensions);
+		for (int y = 0; y < m_levelDimensions.y; ++y)
+		{
+			for (int x = 0; x < m_levelDimensions.x; ++x)
+			{
+				int tileID = tileLayer.m_tileLayer[y][x];
+				if (tileID > 0)
+				{
+					sf::Sprite tileSprite(Textures::getInstance().getTileSheet().getTexture(), tileSheet.getFrameRect(tileID));
+					tileSprite.setPosition(x * tileSheet.getTileSize(), y * tileSheet.getTileSize());
+
+					window.draw(tileSprite);
+				}
+			}
+		}
 	}
 }

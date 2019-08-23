@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include <utility>
 #include <assert.h>
-#include "XMLParser.h"
+#include "XMLParser/XMLParser.h"
 
 std::unique_ptr<Texture> Texture::load(const std::string & levelName, const std::string& imageFileName)
 {

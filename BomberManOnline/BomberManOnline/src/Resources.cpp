@@ -1,6 +1,6 @@
 #include "Resources.h"
 #include <assert.h>
-#include "XMLParser.h"
+#include "XMLParser/XMLParser.h"
 #include <iostream>
 
 bool Textures::loadAllTextures()

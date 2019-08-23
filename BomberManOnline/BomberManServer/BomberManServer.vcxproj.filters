@@ -30,19 +30,19 @@
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Base64.cpp">
+    <ClCompile Include="..\Shared\XMLParser\Base64.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\tinyxml.cpp">
+    <ClCompile Include="..\Shared\XMLParser\tinyxml.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\tinyxmlerror.cpp">
+    <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\tinyxmlparser.cpp">
+    <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\XMLParser.cpp">
+    <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,16 +56,22 @@
     <ClInclude Include="..\Shared\ServerMessageType.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Base64.h">
-      <Filter>Shared\XMLParser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\tinyxml.h">
-      <Filter>Shared\XMLParser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\XMLParser.h">
-      <Filter>Shared\XMLParser</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\NonCopyable.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\TileLayer.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\XMLParser\Base64.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\XMLParser\tinyxml.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\XMLParser\XMLParser.h">
+      <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ServerMessages.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

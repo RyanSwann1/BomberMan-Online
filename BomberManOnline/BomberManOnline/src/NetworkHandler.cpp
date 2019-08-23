@@ -1,5 +1,6 @@
 #include "NetworkHandler.h"
 #include <assert.h>
+#include <iostream>
 
 bool NetworkHandler::connectToServer()
 {
@@ -11,4 +12,13 @@ bool NetworkHandler::connectToServer()
 
 	m_connectedToServer = true;
 	return true;
+}
+
+void NetworkHandler::sendMessageToServer(sf::Packet & packetToSend)
+{
+	assert(m_connectedToServer);
+	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+	{
+		std::cout << "Failed to send message\n";
+	}
 }

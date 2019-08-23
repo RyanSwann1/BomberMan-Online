@@ -5,14 +5,24 @@
 
 struct Player
 {
-	Player()
-		: m_position(2, 2),
+	Player(int tileSize)
+		: m_position(3 * tileSize, 3 * tileSize),
+		m_newPosition(3 * tileSize, 3 * tileSize),
 		m_movementSpeed(5.0f),
-		m_sprite()
-	{}
+		m_shape(sf::Vector2f(tileSize, tileSize)),
+		m_AABB(m_position, sf::Vector2f(tileSize, tileSize))
+	{
+		m_previousPosition = m_position;
+		m_shape.setPosition(m_position);
+		m_shape.setFillColor(sf::Color::Red);
+	}
 
 	sf::Vector2f m_position;
+	sf::Vector2f m_previousPosition;
+	sf::Vector2f m_newPosition;
 	eDirection m_movementDirection;
 	float m_movementSpeed;
-	sf::Sprite m_sprite;
+	sf::RectangleShape m_shape;
+	sf::FloatRect m_AABB;
+	bool m_moving;
 };

@@ -1,6 +1,9 @@
 #pragma once
 
 #include <SFML/Network.hpp>
+#include "ServerMessageType.h"
+#include <vector>
+#include <thread>
 
 class NetworkHandler
 {
@@ -12,6 +15,7 @@ public:
 	}
 
 	bool connectToServer();
+	void sendMessageToServer(sf::Packet& packetToSend);
 
 private:
 	NetworkHandler() {}
