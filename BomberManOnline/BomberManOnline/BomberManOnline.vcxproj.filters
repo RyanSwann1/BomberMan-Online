@@ -45,6 +45,12 @@
     <ClCompile Include="src\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -61,6 +67,15 @@
     </ClInclude>
     <ClInclude Include="src\Level.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Resources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NonCopyable.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

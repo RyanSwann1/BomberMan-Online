@@ -1,5 +1,4 @@
 #include "Texture.h"
-#include "Global.h"
 #include <utility>
 #include <assert.h>
 
@@ -14,15 +13,20 @@ FrameDetails::FrameDetails(int height, int width, int y, int x, int ID)
 
 std::unique_ptr<Texture> Texture::load(const std::string & fileName, std::vector<FrameDetails>&& frames)
 {
-	std::unique_ptr<Texture> texture = std::make_unique<Texture>();
-	if (texture->init(fileName, std::move(frames)))
-	{
-		return texture;
-	}
-	else
-	{
-		return std::unique_ptr<Texture>();
-	}
+	Texture* texture = new Texture();
+
+	std::unique_ptr<Texture> uniqueTexture = std::unique_ptr<Texture>(texture);
+	if(uniqueTexture->init())
+	//if (texture->init(fileName, std::move(frames)))
+	//{
+	//	return texture;
+	//}
+	//else
+	//{
+	//	return std::unique_ptr<Texture>();
+	//}
+
+	return uniqueTexture;
 }
 
 const FrameDetails & Texture::getFrame(int frameID) const

@@ -1,9 +1,9 @@
 #pragma once
 
+#include "NonCopyable.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <string>
-#include "Utilities/NonCopyable.h"
 
 struct FrameDetails
 {
@@ -19,7 +19,6 @@ struct FrameDetails
 class Texture : private NonCopyable
 {
 public:	
-	Texture() {}
 	static std::unique_ptr<Texture> load(const std::string& fileName, std::vector<FrameDetails>&& frames);
 
 	const FrameDetails& getFrame(int frameID) const;
@@ -28,7 +27,7 @@ public:
 	const std::vector<FrameDetails>& getFrames() const;
 
 private:
-	
+	Texture() {}
 	sf::Texture m_texture;
 	std::vector<FrameDetails> m_frames;
 	bool m_textureSet = false;

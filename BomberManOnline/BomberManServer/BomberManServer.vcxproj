@@ -135,11 +135,11 @@
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
     <ClInclude Include="..\Shared\Base64.h" />
+    <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
     <ClInclude Include="..\Shared\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser.h" />
     <ClInclude Include="src\Server.h" />
-    <ClInclude Include="src\Utilities\NonCopyable.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
