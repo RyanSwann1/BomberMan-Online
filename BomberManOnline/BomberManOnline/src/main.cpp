@@ -18,9 +18,6 @@ int main()
 		return -1;
 	}
 
-
-
-
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -31,5 +28,9 @@ int main()
 				window.close();
 			}
 		}
+
+		window.clear(sf::Color::Black);
+		level->render(window);
+		window.display();
 	}
 }
