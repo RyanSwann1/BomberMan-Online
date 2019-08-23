@@ -2,14 +2,13 @@
 #include "Base64.h"
 #include "tinyxml.h"
 #include <assert.h>
-#include "Level.h"
 #include "FrameDetails.h"
+#include "TileLayer.h"
 
 std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
-
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
