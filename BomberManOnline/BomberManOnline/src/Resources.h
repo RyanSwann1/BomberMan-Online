@@ -1,9 +1,8 @@
 #pragma once
 
-#include <memory>
 #include "Texture.h"
 
-class Textures
+class Textures : private NonCopyable
 {
 public:
 	static Textures& getInstance()
@@ -12,9 +11,8 @@ public:
 		return instance;
 	}
 
-	bool loadAllTextures();
-
 	const Texture& getTileSheet() const;
+	bool loadAllTextures();
 
 private:
 	std::unique_ptr<Texture> m_tileSheet;

@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\Base64.h" />
+    <ClInclude Include="..\Shared\FrameDetails.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser.h" />

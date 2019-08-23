@@ -21,13 +21,17 @@ void TileLayer::render(sf::RenderWindow & window, sf::Vector2i levelDimensions) 
 //Level
 std::unique_ptr<Level> Level::create(const std::string & levelName)
 {
-	Level level;
-	if (XMLParser::loadMapAsClient(level.m_levelName, level.m_mapDimensions, level.m_tileLayers, level.m_collisionLayer, level.m_spawnPositions))
+	Level* level = new Level;
+	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
+	uniqueLevel->m_levelName = levelName;
+	if (XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_mapDimensions, level->m_tileLayers, level->m_collisionLayer, level->m_spawnPositions))
 	{
-		return std::make_unique<Level>(level);
+		return uniqueLevel;
 	}
-	
-	return std::unique_ptr<Level>();
+	else
+	{
+		return std::unique_ptr<Level>();
+	}
 }
 
 void Level::render(sf::RenderWindow & window)

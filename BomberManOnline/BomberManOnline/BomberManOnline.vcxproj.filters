@@ -77,5 +77,8 @@
     <ClInclude Include="..\Shared\NonCopyable.h">
       <Filter>Shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\FrameDetails.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
