@@ -3,6 +3,7 @@
 #include "tinyxml.h"
 #include <assert.h>
 #include "Level.h"
+#include "FrameDetails.h"
 
 std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
@@ -12,35 +13,35 @@ std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, i
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
-bool XMLParser::loadTextureDetails(const std::string& filePath, std::string& imagePath, std::vector<FrameDetails>& frames)
+bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textureSize, int& columns, const std::string& levelFileName, const std::string& textureFileName)
 {
-	TiXmlDocument xmlFile;
-	if (!xmlFile.LoadFile(filePath))
+	TiXmlDocument file;
+	bool fileLoaded = file.LoadFile(levelFileName);
+	assert(fileLoaded);
+	bool textureDetailsFound = false;
+
+	const auto& rootElement = file.RootElement();
+	for (const auto* tileSheetElement = rootElement->FirstChildElement();
+		tileSheetElement != nullptr; tileSheetElement = tileSheetElement->NextSiblingElement())
 	{
-		return false;
+		if (tileSheetElement->Value() != std::string("tileset"))
+		{
+			continue;
+		}
+
+		if (tileSheetElement->Attribute("name") == textureFileName)
+		{
+			tileSheetElement->FirstChildElement()->Attribute("width", &textureSize.x);
+			tileSheetElement->FirstChildElement()->Attribute("height", &textureSize.y);
+			tileSheetElement->Attribute("tilewidth", &tileSize.x);
+			tileSheetElement->Attribute("tileheight", &tileSize.y);
+			columns = textureSize.x / tileSize.x;
+			
+			textureDetailsFound = true;
+		}
 	}
 
-	const auto& rootElement = xmlFile.RootElement();
-	imagePath = rootElement->Attribute("imagePath");
-
-	int i = 0; //Acts as the frame ID for each iteration
-	for (const TiXmlElement* e = rootElement->FirstChildElement(); e != nullptr; e = e->NextSiblingElement())
-	{
-		int height = 0;
-		e->Attribute("height", &height);
-		int width = 0;
-		e->Attribute("width", &width);
-		int y = 0;
-		e->Attribute("y", &y);
-		int x = 0;
-		e->Attribute("x", &x);
-		int frameID = i;
-		++i;
-		
-		frames.emplace_back(height, width, y, x, frameID);	
-	}
-
-	return true;
+	return textureDetailsFound;
 }
 
 bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<TileLayer>& tileLayers, 
@@ -157,7 +158,7 @@ std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 	std::vector<sf::Vector2i> factionSpawnPositions;
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
-		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("SpawnPositionLayer"))
+		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("Spawn Position Layer"))
 		{
 			continue;
 		}
