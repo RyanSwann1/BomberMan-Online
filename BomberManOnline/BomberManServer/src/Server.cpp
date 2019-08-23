@@ -1,5 +1,5 @@
 #include "Server.h"
-#include "XMLParser.h"
+#include "XMLParser/XMLParser.h"
 #include <iostream>
 #include "ServerMessageType.h"
 
@@ -37,6 +37,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 void Server::run()
 {
+	std::cout << "Started listening\n";
 	while (m_running)
 	{
 		if (m_socketSelector.wait())
@@ -58,6 +59,14 @@ void Server::addNewClient()
 	std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();
 	if (m_tcpListener.accept(*tcpSocket) == sf::Socket::Done)
 	{
+		sf::Packet packetToSend;
+		packetToSend << 0 << m_spawnPositions[0].x << m_spawnPositions[0].y;
+		if (m_clients.back()->send(packetToSend) != sf::Socket::Done)
+		{
+			std::cout << "Failed to send packet to newly connected client\n";
+			return;
+		}
+
 		m_clients.emplace_back(std::move(tcpSocket));
 		std::cout << "New client added to server\n";
 	}

@@ -1,41 +1,9 @@
 #pragma once
 
-#include "Utilities/NonCopyable.h"
+#include "NonCopyable.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
-
-enum class eDirection
-{
-
-};
-
-class Timer
-{
-
-};
-
-//Client
-class Player
-{
-	void generateMovementPath();
-
-	sf::Vector2i position;
-	sf::Vector2i speed;
-	eDirection direction;
-	int health;
-	Timer m_bombSpawnTimer; //expiratio time == 0.1f;
-};
-
-//Server
-class Player
-{
-	sf::Vector2i position;
-	sf::Vector2i speed;
-	eDirection direction;
-	int health;
-	Timer m_bombSpawnTimer;// expiration time == 2.5f;
-};
 
 class Server : private NonCopyable
 {
