@@ -6,7 +6,7 @@
 bool Textures::loadAllTextures()
 {
 	assert(!m_loadedAllTextures);
-	m_tileSheet = Texture::load("level1.tmx", "tilesheet.png");
+	m_tileSheet = Texture::load("level1.tmx", "tilesheet");
 	if (m_tileSheet)
 	{
 		m_loadedAllTextures = true;

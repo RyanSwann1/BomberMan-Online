@@ -25,7 +25,7 @@ public:
 private:
 	Level() {}
 	std::string m_levelName;
-	sf::Vector2i m_mapDimensions;
+	sf::Vector2i m_levelDimensions;
 	std::vector<sf::Vector2i> m_collisionLayer;
 	std::vector<TileLayer> m_tileLayers;
 	std::vector<sf::Vector2i> m_spawnPositions;

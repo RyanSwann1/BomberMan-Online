@@ -1,6 +1,7 @@
 #include "NetworkHandler.h"
 #include <iostream>
 #include "Level.h"
+#include "Resources.h"
 
 int main()
 {
@@ -11,6 +12,11 @@ int main()
 	//	std::cerr << "Couldn't connect to server\n";
 	//	return -1;
 	//}
+
+	if (!Textures::getInstance().loadAllTextures())
+	{
+		return -1;
+	}
 
 	std::unique_ptr<Level> level = Level::create("Level1.tmx");
 	if (!level)
