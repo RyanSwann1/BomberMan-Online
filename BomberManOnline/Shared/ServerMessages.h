@@ -14,8 +14,11 @@ struct PlayerDetails
 
 struct ServerMessageInitialGameData
 {
-
-
 	std::string levelName;
 	std::vector<PlayerDetails> playerSpawnPositions;
+};
+
+struct ServerMessageMovePlayer
+{
+	sf::Vector2f newPosition;
 };

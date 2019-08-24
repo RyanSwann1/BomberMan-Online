@@ -33,8 +33,8 @@
 #include <vector>
 //#include "../../src/NetworkHandler.h"
 
-struct ServerMessage;
-enum class eShipType;
+struct ServerMessageInitialGameData;
+enum class eServerMessageType;
 namespace sf
 {
 class String;
@@ -334,10 +334,18 @@ public:
     ////////////////////////////////////////////////////////////
     Packet& operator <<(const String&       data);
 	
-	friend Packet& operator>>(sf::Packet& packetReceived, std::vector<eShipType>& vect);
-	friend Packet& operator<<(sf::Packet& packetToSend, const std::vector<eShipType>& vect);
-	friend Packet& operator<<(sf::Packet& packetToSend, const ServerMessage& serverMessage);
-	friend Packet& operator>>(sf::Packet& packetReceived, ServerMessage& serverMessage);
+	//friend Packet& operator>>(sf::Packet& packetReceived, std::vector<eShipType>& vect);
+	//friend Packet& operator<<(sf::Packet& packetToSend, const std::vector<eShipType>& vect);
+	//friend Packet& operator<<(sf::Packet& packetToSend, const ServerMessage& serverMessage);
+	//friend Packet& operator>>(sf::Packet& packetReceived, ServerMessage& serverMessage);
+
+
+	friend Packet& operator>>(Packet& packetReceived, eServerMessageType& serverMessageType);
+	friend Packet& operator<<(Packet& packetToSend, const eServerMessageType serverMessageType);
+
+	friend Packet& operator>>(Packet& packetReceived, ServerMessageInitialGameData& messageReceived);
+	friend Packet& operator<<(Packet& packetToSend, const ServerMessageInitialGameData& messageToSend);
+
 
 
 

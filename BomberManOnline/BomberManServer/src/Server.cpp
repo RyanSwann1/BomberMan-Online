@@ -4,6 +4,7 @@
 #include "ServerMessageType.h"
 
 constexpr size_t MAX_CLIENTS = 4;
+constexpr float SOCKET_SELECTOR_TIMEOUT = 0.032f;
 
 Server::Server()
 	: m_tcpListener(),
@@ -40,7 +41,7 @@ void Server::run()
 	std::cout << "Started listening\n";
 	while (m_running)
 	{
-		if (m_socketSelector.wait())
+		if (m_socketSelector.wait(sf::Time::asSeconds(SOCKET_SELECTOR_TIMEOUT))
 		{
 			if (m_socketSelector.isReady(m_tcpListener))
 			{

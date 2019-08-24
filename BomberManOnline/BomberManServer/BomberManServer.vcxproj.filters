@@ -27,9 +27,6 @@
     <ClCompile Include="src\Server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
-      <Filter>Shared</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\XMLParser\Base64.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
@@ -45,13 +42,13 @@
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
+    <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Server.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
-      <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ServerMessageType.h">
       <Filter>Shared</Filter>
@@ -72,6 +69,15 @@
       <Filter>Shared\XMLParser</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ServerMessages.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\PlayerControllerType.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Direction.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

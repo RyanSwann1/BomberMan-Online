@@ -47,6 +47,11 @@ int main()
 	//	return -1;
 	//}
 
+	//65,535
+	sf::Uint16 number = 65536;
+
+	std::cout << static_cast<int>(number) << "\n";
+
 	if (!Textures::getInstance().loadAllTextures())
 	{
 		return -1;
