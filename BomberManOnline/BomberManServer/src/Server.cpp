@@ -2,6 +2,7 @@
 #include "XMLParser/XMLParser.h"
 #include <iostream>
 #include "ServerMessageType.h"
+#include "ServerMessages.h"
 
 constexpr size_t MAX_CLIENTS = 4;
 
@@ -68,6 +69,9 @@ void Server::addNewClient()
 			std::cout << "Client couldn't join server\n";
 			return;
 		}
+
+		packetToSend.clear();
+
 
 		m_clients.emplace_back(std::move(tcpSocket), clientID);
 		std::cout << "New client added to server\n";
