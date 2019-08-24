@@ -59,15 +59,17 @@ void Server::addNewClient()
 	std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();
 	if (m_tcpListener.accept(*tcpSocket) == sf::Socket::Done)
 	{
+		int clientID = static_cast<int>(m_clients.size());
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eInitializeClientID << static_cast<int>(m_clients.size());
-		if (m_clients.back()->send(packetToSend) != sf::Socket::Done)
+		packetToSend << eServerMessageType::eInitializeClientID << clientID;
+		if (tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send packet to newly connected client\n";
+			std::cout << "Client couldn't join server\n";
 			return;
 		}
 
-		m_clients.emplace_back(std::move(tcpSocket));
+		m_clients.emplace_back(std::move(tcpSocket), clientID);
 		std::cout << "New client added to server\n";
 	}
 }
@@ -76,23 +78,21 @@ void Server::listen()
 {
 	for (auto& client : m_clients)
 	{
-		if (m_socketSelector.isReady(*client))
+		if (m_socketSelector.isReady(*client.m_tcpSocket))
 		{
 			sf::Packet receivedPacket;
-			if (client->receive(receivedPacket) == sf::Socket::Done)
+			if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 			{
-				int messageType = 0;
-				receivedPacket >> messageType;
-				switch (static_cast<eServerMessageType>(messageType))
+				eServerMessageType serverMessageType;
+				receivedPacket >> serverMessageType;
+				switch (serverMessageType)
 				{
-				case eServerMessageType::ePlayerMove :
-				{
-					sf::Vector2i newPosition;
-					receivedPacket >> newPosition.x >> newPosition.y;
-					movePlayer(client, newPosition);
+				case eServerMessageType::ePlayerMoveToPosition :
+					
+
+					//movePlayer(client, )
 					break;
 				}
-				}	
 			}
 		}
 	}
@@ -102,36 +102,46 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 {
 	for (auto& client : m_clients)
 	{
-		if (client->send(packetToSend) != sf::Socket::Done)
+		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Cannot send message to client\n";
 		}
 	}
 }
 
-void Server::movePlayer(std::unique_ptr<sf::TcpSocket>& client, sf::Vector2i newPosition)
+void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 {
 	bool collision = false;
 	for (const auto& collidableObject : m_collisionLayer)
 	{
-		if (collidableObject == newPosition)
+		if (collidableObject == sf::Vector2i(newPosition.x, newPosition.y))
 		{
 			collision = true;
+			break;
 		}
 	}
 
 	sf::Packet packetToSend;
 	if (collision)
 	{
-		packetToSend << static_cast<int>(eServerMessageType::eInvalidRequest);
-		if (client->send(packetToSend) == sf::Socket::Done)
+		packetToSend << static_cast<int>(eServerMessageType::eInvalidRequest) << newPosition.x << newPosition.y;
+		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send message to client\n";
 		}
 	}
 	else
 	{
-		packetToSend << static_cast<int>(eServerMessageType::eNewPlayerPosition) << newPosition.x << newPosition.y;
+		client.m_position = newPosition;
+
+		packetToSend << eServerMessageType::eValidRequest << newPosition.x << newPosition.y;
+		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+		{
+			std::cout << "Failed to send message to client\n";
+		}
+
+		sf::Packet globalPacket;
+		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << newPosition.x << newPosition.y;
 		broadcastMessage(packetToSend);
 	}
 }
