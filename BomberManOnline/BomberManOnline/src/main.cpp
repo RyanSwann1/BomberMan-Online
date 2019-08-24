@@ -3,6 +3,7 @@
 #include "Level.h"
 #include "Resources.h"
 #include "Player.h"
+#include "ServerMessages.h"
 #include <algorithm>
 
 //http://www.codersblock.org/blog/multiplayer-fps-part-1
@@ -41,16 +42,11 @@ int main()
 {
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML_WINDOW", sf::Style::Default);
 	
-	//if (!NetworkHandler::getInstance().connectToServer())
-	//{
-	//	std::cerr << "Couldn't connect to server\n";
-	//	return -1;
-	//}
-
-	//65,535
-	sf::Uint16 number = 65536;
-
-	std::cout << static_cast<int>(number) << "\n";
+	if (!NetworkHandler::getInstance().connectToServer())
+	{
+		std::cerr << "Couldn't connect to server\n";
+		return -1;
+	}
 
 	if (!Textures::getInstance().loadAllTextures())
 	{
@@ -70,6 +66,8 @@ int main()
 	float deltaTime = 0;
 	float factor = 0;
 	const auto& collisionLayer = level->getCollisionLayer();
+	int clientID = 0;
+	std::vector<sf::Vector2f> recentPositions;
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -79,6 +77,65 @@ int main()
 			{
 				window.close();
 			}
+		}
+
+		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
+		{
+			for (auto& networkMessage : NetworkHandler::getInstance().getNetworkMessages())
+			{
+				eServerMessageType messageType;
+				networkMessage >> messageType;
+				switch (messageType)
+				{
+				case eServerMessageType::eInitializeClientID :
+					networkMessage >> clientID;
+					break;
+				case eServerMessageType::eInvalidMoveRequest :
+					ServerMessageInvalidMove invalidMoveMessage;
+					networkMessage >> invalidMoveMessage;
+
+					bool clearRemaining = false;
+					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					{
+						if (clearRemaining)
+						{
+							iter = recentPositions.erase(iter);
+						}
+						else if ((*iter) == invalidMoveMessage.invalidPosition)
+						{
+							iter = recentPositions.erase(iter);
+							clearRemaining = true;
+						}
+						else
+						{
+							++iter;
+						}
+					}
+					
+					recentPositions.push_back(invalidMoveMessage.lastValidPosition);
+					player.m_position = recentPositions.back();
+					player.m_previousPosition = recentPositions.back();
+					break;
+				case eServerMessageType::eValidMoveRequest :
+					sf::Vector2f position;
+					networkMessage >> position.x >> position.y;
+					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					{
+						if ((*iter) == position)
+						{
+							iter = recentPositions.erase(iter);
+							break;
+						}
+						else
+						{
+							++iter;
+						}
+					}
+					break;
+				}
+			}
+
+			NetworkHandler::getInstance().getNetworkMessages().clear();
 		}
 
 		//Move player Left

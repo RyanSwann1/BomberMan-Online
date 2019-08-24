@@ -74,10 +74,10 @@
     <ClInclude Include="..\Shared\PlayerControllerType.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
+    <ClInclude Include="..\Shared\Direction.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Direction.h">
+    <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

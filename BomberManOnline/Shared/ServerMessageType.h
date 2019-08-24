@@ -2,8 +2,8 @@
 
 enum class eServerMessageType
 {
-	eInvalidRequest = 0,
-	eValidRequest, 
+	eInvalidMoveRequest = 0,
+	eValidMoveRequest, 
 	eInitializeClientID,
 	eInitialGameData,
 	ePlayerMove,

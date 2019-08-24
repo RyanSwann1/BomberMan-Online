@@ -54,6 +54,9 @@
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp">
       <Filter>Shared\XMLParser</Filter>
     </ClCompile>
+    <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -68,9 +71,6 @@
     <ClInclude Include="src\Resources.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\NonCopyable.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\FrameDetails.h">
       <Filter>Shared</Filter>
     </ClInclude>
@@ -78,9 +78,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Direction.h">
-      <Filter>Shared</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\TileLayer.h">
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ServerMessageType.h">
@@ -94,6 +91,21 @@
     </ClInclude>
     <ClInclude Include="..\Shared\XMLParser\XMLParser.h">
       <Filter>Shared\XMLParser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NonCopyable.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\TileLayer.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ServerMessages.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\PlayerControllerType.h">
+      <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

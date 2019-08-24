@@ -4,7 +4,6 @@
 #include "ServerMessageType.h"
 
 constexpr size_t MAX_CLIENTS = 4;
-constexpr float SOCKET_SELECTOR_TIMEOUT = 0.032f;
 
 Server::Server()
 	: m_tcpListener(),
@@ -41,7 +40,7 @@ void Server::run()
 	std::cout << "Started listening\n";
 	while (m_running)
 	{
-		if (m_socketSelector.wait(sf::Time::asSeconds(SOCKET_SELECTOR_TIMEOUT))
+		if (m_socketSelector.wait())
 		{
 			if (m_socketSelector.isReady(m_tcpListener))
 			{
@@ -89,9 +88,9 @@ void Server::listen()
 				switch (serverMessageType)
 				{
 				case eServerMessageType::ePlayerMoveToPosition :
-					
-
-					//movePlayer(client, )
+					sf::Vector2f newPosition;
+					receivedPacket >> newPosition.x >> newPosition.y;
+					movePlayer(client, newPosition);
 					break;
 				}
 			}
@@ -125,7 +124,7 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	sf::Packet packetToSend;
 	if (collision)
 	{
-		packetToSend << static_cast<int>(eServerMessageType::eInvalidRequest) << newPosition.x << newPosition.y;
+		packetToSend << static_cast<int>(eServerMessageType::eInvalidMoveRequest) << newPosition.x << newPosition.y;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send message to client\n";
@@ -135,7 +134,7 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	{
 		client.m_position = newPosition;
 
-		packetToSend << eServerMessageType::eValidRequest << newPosition.x << newPosition.y;
+		packetToSend << eServerMessageType::eValidMoveRequest << newPosition.x << newPosition.y;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send message to client\n";

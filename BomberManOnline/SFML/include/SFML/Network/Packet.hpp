@@ -31,10 +31,10 @@
 #include <SFML/Network/Export.hpp>
 #include <string>
 #include <vector>
-//#include "../../src/NetworkHandler.h"
 
-struct ServerMessageInitialGameData;
 enum class eServerMessageType;
+struct ServerMessageInvalidMove;
+struct ServerMessageInitialGameData;
 namespace sf
 {
 class String;
@@ -333,21 +333,15 @@ public:
     /// \overload
     ////////////////////////////////////////////////////////////
     Packet& operator <<(const String&       data);
-	
-	//friend Packet& operator>>(sf::Packet& packetReceived, std::vector<eShipType>& vect);
-	//friend Packet& operator<<(sf::Packet& packetToSend, const std::vector<eShipType>& vect);
-	//friend Packet& operator<<(sf::Packet& packetToSend, const ServerMessage& serverMessage);
-	//friend Packet& operator>>(sf::Packet& packetReceived, ServerMessage& serverMessage);
 
+	friend Packet& operator>>(Packet& receivedPacket, eServerMessageType& serverMessage);
+	friend Packet& operator<<(Packet& packetToSend, eServerMessageType serverMessage);
 
-	friend Packet& operator>>(Packet& packetReceived, eServerMessageType& serverMessageType);
-	friend Packet& operator<<(Packet& packetToSend, const eServerMessageType serverMessageType);
+	friend Packet& operator>>(Packet& receivedPacket, ServerMessageInvalidMove& invalidMoveMessage);
+	friend Packet& operator<<(Packet& packetToSend, ServerMessageInvalidMove invalidMoveMessage);
 
-	friend Packet& operator>>(Packet& packetReceived, ServerMessageInitialGameData& messageReceived);
-	friend Packet& operator<<(Packet& packetToSend, const ServerMessageInitialGameData& messageToSend);
-
-
-
+	friend Packet& operator>>(Packet& receivedPacket, ServerMessageInitialGameData& initialGameData);
+	friend Packet& operator<<(Packet& packetToSend, const ServerMessageInitialGameData& initialGameData);
 
 protected:
 
@@ -422,7 +416,6 @@ private:
     std::size_t       m_sendPos; ///< Current send position in the packet (for handling partial sends)
     bool              m_isValid; ///< Reading state of the packet
 };
-
 
 } // namespace sf
 
