@@ -47,9 +47,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-HAPI_SPRITES/
-SFML/
-SFML-2.5.1/
 *HAPI_Log.html
 Clean.bat
 MakeDistributable.bat
