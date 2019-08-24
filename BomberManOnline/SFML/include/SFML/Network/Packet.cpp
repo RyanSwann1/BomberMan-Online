@@ -42,7 +42,7 @@ sf::Packet & sf::operator>>(Packet & receivedPacket, ServerMessageInitialGameDat
 	{
 		int ID = 0;
 		receivedPacket >> ID;
-		sf::Vector2i spawnPosition;
+		sf::Vector2f spawnPosition;
 		receivedPacket >> spawnPosition.x >> spawnPosition.y;
 		int controllerType = 0;
 		receivedPacket >> controllerType;

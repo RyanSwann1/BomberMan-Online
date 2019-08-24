@@ -64,6 +64,7 @@ int main()
 	float factor = 0;
 	const auto& collisionLayer = level->getCollisionLayer();
 	int clientID = 0;
+	bool gameStarted = false;
 	std::vector<sf::Vector2f> recentPositions;
 	while (window.isOpen())
 	{
@@ -100,9 +101,11 @@ int main()
 					player.m_position.x *= tileSize;
 					player.m_position.y *= tileSize;
 					recentPositions.push_back(player.m_position);
+					gameStarted = true;
 				}
 					break;
 				case eServerMessageType::eInvalidMoveRequest :
+				{
 					ServerMessageInvalidMove invalidMoveMessage;
 					networkMessage >> invalidMoveMessage;
 
@@ -123,12 +126,15 @@ int main()
 							++iter;
 						}
 					}
-					
+
 					recentPositions.push_back(invalidMoveMessage.lastValidPosition);
 					player.m_position = recentPositions.back();
 					player.m_previousPosition = recentPositions.back();
+				}
+
 					break;
 				case eServerMessageType::eValidMoveRequest :
+				{
 					sf::Vector2f position;
 					networkMessage >> position.x >> position.y;
 					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
@@ -143,6 +149,8 @@ int main()
 							++iter;
 						}
 					}
+				}
+
 					break;
 				}
 			}
@@ -150,51 +158,66 @@ int main()
 			NetworkHandler::getInstance().getNetworkMessages().clear();
 		}
 
-		//Move player Left
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-			!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x - tileSize, player.m_position.y)))
+		if (gameStarted)
 		{
-			factor = 0;
-			player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
-			player.m_moving = true;
-		}
-		//Move player right
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-			!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x + tileSize, player.m_position.y)))
-		{
-			factor = 0;
-			player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
-			player.m_moving = true;
-		}
-		//Move player up
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-			!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y - tileSize)))
-		{
-			factor = 0;
-			player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
-			player.m_moving = true;
-		}
-		//Move player down
-		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-			!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y + tileSize)))
-		{
-			factor = 0;
-			player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
-			player.m_moving = true;
-		}
-		
-		if (player.m_moving)
-		{
-			factor += deltaTime * player.m_movementSpeed;
-			player.m_position = Interpolate(player.m_previousPosition, player.m_newPosition, factor);
-			player.m_shape.setPosition(player.m_position);
-			if (player.m_position == player.m_newPosition)
+			//Move player Left
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
+				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x - tileSize, player.m_position.y)))
 			{
-				player.m_previousPosition = player.m_newPosition;
-				player.m_position = player.m_newPosition;
-				player.m_moving = false;
+				factor = 0;
+				player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
+				player.m_moving = true;
+			}
+			//Move player right
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
+				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x + tileSize, player.m_position.y)))
+			{
+				factor = 0;
+				player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
+				player.m_moving = true;
+			}
+			//Move player up
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
+				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y - tileSize)))
+			{
+				factor = 0;
+				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
+				player.m_moving = true;
+			}
+			//Move player down
+			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
+				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y + tileSize)))
+			{
+				factor = 0;
+				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
+				player.m_moving = true;
+			}
+
+			if (player.m_moving)
+			{
+				factor += deltaTime * player.m_movementSpeed;
+				player.m_position = Interpolate(player.m_previousPosition, player.m_newPosition, factor);
+				player.m_shape.setPosition(player.m_position);
+				if (player.m_position == player.m_newPosition)
+				{
+					if (recentPositions.size() > size_t(10))
+					{
+						for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+						{
+							recentPositions.erase(iter);
+							break;
+						}
+					}
+
+					recentPositions.push_back(player.m_previousPosition);
+
+					player.m_previousPosition = player.m_newPosition;
+					player.m_position = player.m_newPosition;
+					player.m_moving = false;
+				}
 			}
 		}
+		
 
 		window.clear(sf::Color::Black);
 		level->render(window);
