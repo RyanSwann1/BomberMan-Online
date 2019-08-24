@@ -60,7 +60,7 @@ void Server::addNewClient()
 	if (m_tcpListener.accept(*tcpSocket) == sf::Socket::Done)
 	{
 		sf::Packet packetToSend;
-		packetToSend << 0 << m_spawnPositions[0].x << m_spawnPositions[0].y;
+		packetToSend << eServerMessageType::eInitializeClientID << static_cast<int>(m_clients.size());
 		if (m_clients.back()->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send packet to newly connected client\n";
