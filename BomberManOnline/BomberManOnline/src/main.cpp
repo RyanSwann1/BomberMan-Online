@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "ServerMessages.h"
 #include <algorithm>
+#include <assert.h>
 
 //http://www.codersblock.org/blog/multiplayer-fps-part-1
 
@@ -53,11 +54,7 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Level> level = Level::create("Level1.tmx");
-	if (!level)
-	{
-		return -1;
-	}
+	std::unique_ptr<Level> level;
 
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	Player player(tileSize);
@@ -89,6 +86,21 @@ int main()
 				{
 				case eServerMessageType::eInitializeClientID :
 					networkMessage >> clientID;
+					break;
+
+				case eServerMessageType::eInitialGameData : 
+				{
+					ServerMessageInitialGameData initialGameData;
+					networkMessage >> initialGameData;
+
+					assert(!level);
+					level = Level::create(initialGameData.levelName);
+
+					player.m_position = initialGameData.playerDetails[0].spawnPosition;
+					player.m_position.x *= tileSize;
+					player.m_position.y *= tileSize;
+					recentPositions.push_back(player.m_position);
+				}
 					break;
 				case eServerMessageType::eInvalidMoveRequest :
 					ServerMessageInvalidMove invalidMoveMessage;

@@ -6,13 +6,12 @@
 struct Player
 {
 	Player(int tileSize)
-		: m_position(3 * tileSize, 3 * tileSize),
-		m_newPosition(3 * tileSize, 3 * tileSize),
+		: m_position(),
+		m_newPosition(),
 		m_movementSpeed(2.5f),
 		m_shape(sf::Vector2f(tileSize, tileSize)),
 		m_AABB(m_position, sf::Vector2f(tileSize, tileSize))
 	{
-		m_previousPosition = m_position;
 		m_shape.setPosition(m_position);
 		m_shape.setFillColor(sf::Color::Red);
 	}
