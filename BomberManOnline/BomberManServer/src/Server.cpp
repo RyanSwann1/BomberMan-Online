@@ -120,9 +120,9 @@ void Server::listen()
 				switch (serverMessageType)
 				{
 				case eServerMessageType::ePlayerMoveToPosition :
-					sf::Vector2f newPosition;
-					receivedPacket >> newPosition.x >> newPosition.y;
-					movePlayer(client, newPosition);
+					ServerMessagePlayerMove playerMoveMessage;
+					receivedPacket >> playerMoveMessage;
+					movePlayer(client, playerMoveMessage);
 					break;
 				}
 			}
@@ -141,12 +141,12 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 	}
 }
 
-void Server::movePlayer(Client& client, sf::Vector2f newPosition)
+void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	sf::Packet packetToSend;
-	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, newPosition))
+	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
 	{
-		ServerMessageInvalidMove invalidMoveMessage(newPosition, client.m_position);
+		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_position);
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
@@ -155,18 +155,18 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	}
 	else
 	{
-		client.m_newPosition = newPosition;
+		client.m_newPosition = playerMoveMessage.newPosition;
 		client.m_previousPosition = client.m_position;
 		client.m_moving = true;
 
-		packetToSend << eServerMessageType::eValidMoveRequest << newPosition.x << newPosition.y;
+		packetToSend << eServerMessageType::eValidMoveRequest << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send message to client\n";
 		}
 
 		sf::Packet globalPacket;
-		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << newPosition.x << newPosition.y;
+		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y;
 		broadcastMessage(packetToSend);
 	}
 }

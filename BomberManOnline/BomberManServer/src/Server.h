@@ -33,6 +33,7 @@ struct Client
 	float m_movementSpeed;
 };
 
+struct ServerMessagePlayerMove;
 class Server : private NonCopyable
 {
 public:
@@ -56,7 +57,7 @@ private:
 	void listen();
 	void broadcastMessage(sf::Packet& packetToSend);
 
-	void movePlayer(Client& client, sf::Vector2f newPosition);
+	void movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessage);
 
 	void update(float frameTime);
 };
