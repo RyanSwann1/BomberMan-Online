@@ -13,7 +13,9 @@ struct Client
 	Client(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: m_ID(ID),
 		m_tcpSocket(std::move(tcpSocket)),
+		m_previousPosition(),
 		m_position(startingPosition),
+		m_newPosition(),
 		m_moveDirection(),
 		m_controllerType(controllerType),
 		m_moving(false),
