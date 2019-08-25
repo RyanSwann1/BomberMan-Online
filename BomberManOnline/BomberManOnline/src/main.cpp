@@ -7,6 +7,7 @@
 #include "Bomb.h"
 #include <algorithm>
 #include <assert.h>
+#include "Utilities.h"
 
 //http://www.codersblock.org/blog/multiplayer-fps-part-1
 
@@ -15,35 +16,6 @@
 //https://gamedev.stackexchange.com/questions/6645/lag-compensation-with-networked-2d-games
 
 //https://www.youtube.com/watch?v=aVmqv3z4gnA
-
-sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor)
-{
-	if (factor > 1.f)
-	{
-		factor = 1.f;
-	}
-	else if (factor < 0.f)
-	{
-		factor = 0.f;
-	}
-
-	return pointA + (pointB - pointA) * factor;
-}
-
-bool isPositionCollidable(const Level& level, sf::Vector2f position)
-{
-	auto cIter = std::find_if(level.getCollisionLayer().cbegin(), level.getCollisionLayer().cend(), [position](const auto collidablePosition)
-		{ return collidablePosition == position; });
-	
-	if (cIter == level.getCollisionLayer().cend())
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-}
 
 constexpr size_t MAX_RECENT_POSITIONS = 10;
 constexpr size_t MAX_BOMBS = 50;
@@ -174,10 +146,11 @@ int main()
 		{
 			//Move player Left
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x - tileSize, player.m_position.y)))
+				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x - tileSize, player.m_position.y)))
 			{
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
+				player.m_previousPosition = player.m_position;
 				player.m_moving = true;
 				recentPositions.push_back(player.m_previousPosition);
 
@@ -187,10 +160,11 @@ int main()
 			}
 			//Move player right
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x + tileSize, player.m_position.y)))
+				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x + tileSize, player.m_position.y)))
 			{
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
+				player.m_previousPosition = player.m_position;
 				player.m_moving = true;
 				recentPositions.push_back(player.m_previousPosition);
 			
@@ -200,10 +174,11 @@ int main()
 			}
 			//Move player up
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y - tileSize)))
+				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x, player.m_position.y - tileSize)))
 			{
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
+				player.m_previousPosition = player.m_position;
 				player.m_moving = true;
 				recentPositions.push_back(player.m_previousPosition);
 				
@@ -213,10 +188,11 @@ int main()
 			}
 			//Move player down
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-				!player.m_moving && !isPositionCollidable(*level, sf::Vector2f(player.m_position.x, player.m_position.y + tileSize)))
+				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x, player.m_position.y + tileSize)))
 			{
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
+				player.m_previousPosition = player.m_position;
 				player.m_moving = true;
 				recentPositions.push_back(player.m_previousPosition);
 
@@ -228,7 +204,7 @@ int main()
 			if (player.m_moving)
 			{
 				factor += deltaTime * player.m_movementSpeed;
-				player.m_position = Interpolate(player.m_previousPosition, player.m_newPosition, factor);
+				player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, factor);
 				player.m_shape.setPosition(player.m_position);
 
 				//Reached destination
@@ -243,8 +219,6 @@ int main()
 						}
 					}
 
-					player.m_previousPosition = player.m_newPosition;
-					player.m_position = player.m_newPosition;
 					player.m_moving = false;
 				}
 			}
