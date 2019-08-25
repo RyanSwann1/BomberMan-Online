@@ -26,6 +26,16 @@ struct ServerMessageInitialGameData
 
 struct ServerMessageInvalidMove
 {
+	ServerMessageInvalidMove()
+		: invalidPosition(),
+		lastValidPosition()
+	{}
+
+	ServerMessageInvalidMove(sf::Vector2f invalidPosition, sf::Vector2f lastValidPosition)
+		: invalidPosition(invalidPosition),
+		lastValidPosition(lastValidPosition)
+	{}
+
 	sf::Vector2f invalidPosition;
 	sf::Vector2f lastValidPosition;
 };

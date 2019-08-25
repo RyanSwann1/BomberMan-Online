@@ -168,9 +168,7 @@ std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 			sf::Vector2i spawnPosition;
 			entityElement->Attribute("x", &spawnPosition.x);
 			entityElement->Attribute("y", &spawnPosition.y);
-			//startingPosition.y -= tileSize; //Tiled Hack
-			spawnPosition.x /= 24;
-			spawnPosition.y /= 28;
+			spawnPosition.y -= tileSize.y; //Tiled Hack
 			factionSpawnPositions.emplace_back(sf::Vector2f(static_cast<float>(spawnPosition.x), static_cast<float>(spawnPosition.y)));
 		}
 	}

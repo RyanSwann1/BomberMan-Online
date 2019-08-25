@@ -98,10 +98,8 @@ int main()
 					level = Level::create(initialGameData.levelName);
 
 					player.m_position = initialGameData.playerDetails[0].spawnPosition;
-					player.m_position.x *= tileSize;
-					player.m_position.y *= tileSize;
+					player.m_previousPosition = player.m_position;
 					player.m_shape.setPosition(player.m_position);
-					recentPositions.push_back(player.m_position);
 					gameStarted = true;
 				}
 					break;
@@ -110,27 +108,29 @@ int main()
 					ServerMessageInvalidMove invalidMoveMessage;
 					networkMessage >> invalidMoveMessage;
 
-					bool clearRemaining = false;
-					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
-					{
-						if (clearRemaining)
-						{
-							iter = recentPositions.erase(iter);
-						}
-						else if ((*iter) == invalidMoveMessage.invalidPosition)
-						{
-							iter = recentPositions.erase(iter);
-							clearRemaining = true;
-						}
-						else
-						{
-							++iter;
-						}
-					}
+					//bool clearRemaining = false;
+					//for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					//{
+					//	if (clearRemaining)
+					//	{
+					//		iter = recentPositions.erase(iter);
+					//	}
+					//	else if ((*iter) == invalidMoveMessage.invalidPosition)
+					//	{
+					//		iter = recentPositions.erase(iter);
+					//		clearRemaining = true;
+					//	}
+					//	else
+					//	{
+					//		++iter;
+					//	}
+					//}
 
-					recentPositions.push_back(invalidMoveMessage.lastValidPosition);
-					player.m_position = recentPositions.back();
-					player.m_previousPosition = recentPositions.back();
+					recentPositions.clear();
+
+					//recentPositions.push_back(invalidMoveMessage.lastValidPosition);
+					player.m_position = invalidMoveMessage.lastValidPosition;
+					player.m_previousPosition = invalidMoveMessage.lastValidPosition;
 					player.m_moving = false;
 					factor = 0;
 				}
@@ -217,6 +217,8 @@ int main()
 				factor += deltaTime * player.m_movementSpeed;
 				player.m_position = Interpolate(player.m_previousPosition, player.m_newPosition, factor);
 				player.m_shape.setPosition(player.m_position);
+
+				//Reached destination
 				if (player.m_position == player.m_newPosition)
 				{
 					if (recentPositions.size() > size_t(10))
