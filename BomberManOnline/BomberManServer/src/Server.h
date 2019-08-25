@@ -10,9 +10,12 @@
 
 struct Client
 {
-	Client(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition)
-		: m_tcpSocket(std::move(tcpSocket)),
-		m_ID(ID)
+	Client(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
+		: m_ID(ID),
+		m_tcpSocket(std::move(tcpSocket)),
+		m_position(startingPosition),
+		m_moveDirection(),
+		m_controllerType(controllerType)
 	{}
 
 	int m_ID;

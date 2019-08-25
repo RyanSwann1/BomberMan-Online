@@ -22,5 +22,5 @@ private:
 	sf::Vector2i m_levelDimensions;
 	std::vector<sf::Vector2i> m_collisionLayer;
 	std::vector<TileLayer> m_tileLayers;
-	std::vector<sf::Vector2i> m_spawnPositions;
+	std::vector<sf::Vector2f> m_spawnPositions;
 };

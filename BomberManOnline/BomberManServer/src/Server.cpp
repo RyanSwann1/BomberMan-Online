@@ -80,10 +80,10 @@ void Server::addNewClient()
 		assert(!m_spawnPositions.empty());
 		sf::Vector2f startingPosition = m_spawnPositions.back();
 		m_spawnPositions.pop_back();
-		m_clients.emplace_back(std::move(tcpSocket), clientID);
+		m_clients.emplace_back(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eRemotePlayer);
 		std::cout << "New client added to server\n";
 
-		//TODO: Send once 
+		//TODO: Send once max players have joined
 		packetToSend.clear();
 		packetToSend << eServerMessageType::eInitialGameData;
 		ServerMessageInitialGameData initialGameDataMessage;
@@ -148,6 +148,7 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	sf::Packet packetToSend;
 	if (collision)
 	{
+		std::cout << "Collision\n";
 		packetToSend << static_cast<int>(eServerMessageType::eInvalidMoveRequest) << newPosition.x << newPosition.y;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
@@ -156,6 +157,7 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	}
 	else
 	{
+		std::cout << "No Collision\n";
 		client.m_position = newPosition;
 
 		packetToSend << eServerMessageType::eValidMoveRequest << newPosition.x << newPosition.y;

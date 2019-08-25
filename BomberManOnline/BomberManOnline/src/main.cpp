@@ -100,6 +100,7 @@ int main()
 					player.m_position = initialGameData.playerDetails[0].spawnPosition;
 					player.m_position.x *= tileSize;
 					player.m_position.y *= tileSize;
+					player.m_shape.setPosition(player.m_position);
 					recentPositions.push_back(player.m_position);
 					gameStarted = true;
 				}
@@ -130,6 +131,8 @@ int main()
 					recentPositions.push_back(invalidMoveMessage.lastValidPosition);
 					player.m_position = recentPositions.back();
 					player.m_previousPosition = recentPositions.back();
+					player.m_moving = false;
+					factor = 0;
 				}
 
 					break;
@@ -167,6 +170,10 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
 				player.m_moving = true;
+
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player right
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
@@ -175,6 +182,10 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
 				player.m_moving = true;
+			
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player up
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
@@ -183,6 +194,10 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
 				player.m_moving = true;
+				
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player down
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
@@ -191,6 +206,10 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
 				player.m_moving = true;
+
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 
 			if (player.m_moving)
