@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
+    <ClCompile Include="..\Shared\Timer.cpp" />
     <ClCompile Include="..\Shared\XMLParser\Base64.cpp" />
     <ClCompile Include="..\Shared\XMLParser\tinyxml.cpp" />
     <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp" />
@@ -41,9 +42,11 @@
     <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
+    <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\XMLParser\Base64.h" />
     <ClInclude Include="..\Shared\XMLParser\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser\XMLParser.h" />
+    <ClInclude Include="src\Bomb.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Player.h" />
