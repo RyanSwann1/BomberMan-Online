@@ -67,3 +67,17 @@ sf::Packet & sf::operator<<(Packet & packetToSend, const ServerMessageInitialGam
 
 	return packetToSend;
 }
+
+sf::Packet & sf::operator>>(Packet & receivedPacket, ServerMessagePlayerMove & playerMoveMessage)
+{
+	receivedPacket >> playerMoveMessage.newPosition.x >> playerMoveMessage.newPosition.y >> playerMoveMessage.speed;
+
+	return receivedPacket;
+}
+
+sf::Packet & sf::operator<<(Packet & packetToSend, ServerMessagePlayerMove playerMoveMessage)
+{
+	packetToSend << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y << playerMoveMessage.speed;
+
+	return packetToSend;
+}

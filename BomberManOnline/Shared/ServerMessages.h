@@ -39,3 +39,19 @@ struct ServerMessageInvalidMove
 	sf::Vector2f invalidPosition;
 	sf::Vector2f lastValidPosition;
 };
+
+struct ServerMessagePlayerMove
+{
+	ServerMessagePlayerMove()
+		: newPosition(),
+		speed(0)
+	{}
+
+	ServerMessagePlayerMove(sf::Vector2f newPosition, float speed)
+		: newPosition(newPosition),
+		speed(speed)
+	{}
+
+	sf::Vector2f newPosition;
+	float speed;
+};
