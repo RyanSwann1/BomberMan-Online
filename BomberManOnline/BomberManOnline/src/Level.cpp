@@ -17,7 +17,7 @@ std::unique_ptr<Level> Level::create(const std::string & levelName)
 	}
 }
 
-const std::vector<sf::Vector2i>& Level::getCollisionLayer() const
+const std::vector<sf::Vector2f>& Level::getCollisionLayer() const
 {
 	return m_collisionLayer;
 }

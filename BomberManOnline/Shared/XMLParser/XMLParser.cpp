@@ -8,7 +8,7 @@
 std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
-std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
+std::vector<sf::Vector2f> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
 std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
@@ -44,7 +44,7 @@ bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textur
 }
 
 bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<TileLayer>& tileLayers, 
-	std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions)
+	std::vector<sf::Vector2f>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -61,7 +61,7 @@ bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapD
 	return true;
 }
 
-bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<sf::Vector2i>& collisionLayer, 
+bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<sf::Vector2f>& collisionLayer, 
 	std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
@@ -177,9 +177,9 @@ std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 	return factionSpawnPositions;
 }
 
-std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement & rootElement, int tileSize)
+std::vector<sf::Vector2f> parseCollisionLayer(const TiXmlElement & rootElement, int tileSize)
 {
-	std::vector<sf::Vector2i> collidablePositions;
+	std::vector<sf::Vector2f> collidablePositions;
 	for (const auto* collisionLayerElement = rootElement.FirstChildElement(); collisionLayerElement != nullptr;
 		collisionLayerElement = collisionLayerElement->NextSiblingElement())
 	{
@@ -201,7 +201,7 @@ std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement & rootElement, 
 			collisionElement->Attribute("y", &yPosition);
 			//Hack for Tiled.
 			yPosition -= tileSize;
-			collidablePositions.emplace_back(xPosition, yPosition);
+			collidablePositions.emplace_back(static_cast<float>(xPosition), static_cast<float>(yPosition));
 		}
 	}
 
