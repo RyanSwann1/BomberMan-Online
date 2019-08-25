@@ -16,11 +16,14 @@ struct Client
 		m_position(startingPosition),
 		m_moveDirection(),
 		m_controllerType(controllerType),
-		m_moving(false)
+		m_moving(false),
+		m_movementFactor(0),
+		m_movementSpeed(2.5f)
 	{}
 
 	int m_ID;
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
+	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_position;
 	sf::Vector2f m_newPosition;
 	eDirection m_moveDirection;
@@ -48,7 +51,6 @@ private:
 	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	sf::Clock m_clock;
-	float m_elaspedTime;
 
 	void addNewClient();
 	void listen();
@@ -56,5 +58,5 @@ private:
 
 	void movePlayer(Client& client, sf::Vector2f newPosition);
 
-	void update();
+	void update(float frameTime);
 };

@@ -4,6 +4,7 @@
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
 #include <assert.h>
+#include "Utilities.h"
 
 constexpr size_t MAX_CLIENTS = 4;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
@@ -17,8 +18,7 @@ Server::Server()
 	m_mapDimensions(),
 	m_collisionLayer(),
 	m_spawnPositions(),
-	m_clock(),
-	m_elaspedTime(0)
+	m_clock()
 {
 	m_clients.reserve(MAX_CLIENTS);
 }
@@ -47,14 +47,12 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 void Server::run()
 {
-	m_elaspedTime += m_clock.restart().asSeconds();
-	std::cout << m_elaspedTime << "\n";
 	std::cout << "Started listening\n";
 
 	while (m_running)
 	{
-		//Update game logic
-		std::cout << "Updating game logic\n";
+		float frameTime = m_clock.restart().asSeconds();
+		update(frameTime);
 
 		if (m_socketSelector.wait(TIME_OUT_DURATION))
 		{
@@ -145,20 +143,9 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 
 void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 {
-	bool collision = false;
-	for (const auto& collidableObject : m_collisionLayer)
-	{
-		if (collidableObject == newPosition)
-		{
-			collision = true;
-			break;
-		}
-	}
-
 	sf::Packet packetToSend;
-	if (collision)
+	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 	{
-		std::cout << "Collision\n";
 		ServerMessageInvalidMove invalidMoveMessage(newPosition, client.m_position);
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
@@ -168,9 +155,8 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	}
 	else
 	{
-		std::cout << "No Collision\n";
-		
 		client.m_newPosition = newPosition;
+		client.m_previousPosition = client.m_position;
 		client.m_moving = true;
 
 		packetToSend << eServerMessageType::eValidMoveRequest << newPosition.x << newPosition.y;
@@ -185,10 +171,19 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	}
 }
 
-void Server::update()
+void Server::update(float frameTime)
 {
 	for (auto& client : m_clients)
 	{
+		if (client.m_moving)
+		{
+			client.m_movementFactor += frameTime * client.m_movementSpeed;
+			client.m_position = Utilities::Interpolate(client.m_previousPosition, client.m_newPosition, client.m_movementFactor);
 
+			if (client.m_position == client.m_newPosition)
+			{
+				client.m_moving = false;
+			}
+		}
 	}
 }

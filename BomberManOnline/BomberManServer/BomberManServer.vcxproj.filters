@@ -48,6 +48,9 @@
     <ClCompile Include="..\Shared\Timer.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Utilities.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Server.h">
@@ -84,6 +87,9 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Timer.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Utilities.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
