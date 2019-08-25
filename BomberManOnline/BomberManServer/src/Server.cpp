@@ -6,6 +6,7 @@
 #include <assert.h>
 
 constexpr size_t MAX_CLIENTS = 4;
+const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
 	: m_tcpListener(),
@@ -15,7 +16,9 @@ Server::Server()
 	m_levelName(),
 	m_mapDimensions(),
 	m_collisionLayer(),
-	m_spawnPositions()
+	m_spawnPositions(),
+	m_clock(),
+	m_elaspedTime(0)
 {
 	m_clients.reserve(MAX_CLIENTS);
 }
@@ -47,7 +50,11 @@ void Server::run()
 	std::cout << "Started listening\n";
 	while (m_running)
 	{
-		if (m_socketSelector.wait())
+		m_elaspedTime += m_clock.restart().asSeconds();
+
+		std::cout << m_elaspedTime << "\n";
+
+		if (m_socketSelector.wait(TIME_OUT_DURATION))
 		{
 			if (m_socketSelector.isReady(m_tcpListener))
 			{
@@ -139,7 +146,7 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	bool collision = false;
 	for (const auto& collidableObject : m_collisionLayer)
 	{
-		if (collidableObject == sf::Vector2i(newPosition.x, newPosition.y))
+		if (collidableObject == newPosition)
 		{
 			collision = true;
 			break;

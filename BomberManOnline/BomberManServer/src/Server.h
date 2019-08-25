@@ -40,12 +40,16 @@ private:
 	std::vector<Client> m_clients;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
-	std::vector<sf::Vector2i> m_collisionLayer;
+	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<sf::Vector2f> m_spawnPositions;
+	sf::Clock m_clock;
+	float m_elaspedTime;
 
 	void addNewClient();
 	void listen();
 	void broadcastMessage(sf::Packet& packetToSend);
 
 	void movePlayer(Client& client, sf::Vector2f newPosition);
+
+	void update();
 };

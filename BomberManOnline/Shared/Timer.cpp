@@ -9,7 +9,7 @@ Timer::Timer(float expirationTime)
 
 bool Timer::isExpired() const
 {
-	m_elaspedTime >= m_expirationTime;
+	return m_elaspedTime >= m_expirationTime;
 }
 
 void Timer::setActive(bool active)
