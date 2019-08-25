@@ -108,27 +108,25 @@ int main()
 					ServerMessageInvalidMove invalidMoveMessage;
 					networkMessage >> invalidMoveMessage;
 
-					//bool clearRemaining = false;
-					//for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
-					//{
-					//	if (clearRemaining)
-					//	{
-					//		iter = recentPositions.erase(iter);
-					//	}
-					//	else if ((*iter) == invalidMoveMessage.invalidPosition)
-					//	{
-					//		iter = recentPositions.erase(iter);
-					//		clearRemaining = true;
-					//	}
-					//	else
-					//	{
-					//		++iter;
-					//	}
-					//}
+					bool clearRemaining = false;
+					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					{
+						if (clearRemaining)
+						{
+							iter = recentPositions.erase(iter);
+						}
+						else if ((*iter) == invalidMoveMessage.invalidPosition)
+						{
+							iter = recentPositions.erase(iter);
+							clearRemaining = true;
+						}
+						else
+						{
+							++iter;
+						}
+					}
 
 					recentPositions.clear();
-
-					//recentPositions.push_back(invalidMoveMessage.lastValidPosition);
 					player.m_position = invalidMoveMessage.lastValidPosition;
 					player.m_previousPosition = invalidMoveMessage.lastValidPosition;
 					player.m_moving = false;
@@ -170,6 +168,7 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
 				player.m_moving = true;
+				recentPositions.push_back(player.m_previousPosition);
 
 				sf::Packet packetToSend;
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
@@ -182,6 +181,7 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
 				player.m_moving = true;
+				recentPositions.push_back(player.m_previousPosition);
 			
 				sf::Packet packetToSend;
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
@@ -194,6 +194,7 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
 				player.m_moving = true;
+				recentPositions.push_back(player.m_previousPosition);
 				
 				sf::Packet packetToSend;
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
@@ -206,6 +207,7 @@ int main()
 				factor = 0;
 				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
 				player.m_moving = true;
+				recentPositions.push_back(player.m_previousPosition);
 
 				sf::Packet packetToSend;
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
@@ -230,8 +232,6 @@ int main()
 						}
 					}
 
-					recentPositions.push_back(player.m_previousPosition);
-
 					player.m_previousPosition = player.m_newPosition;
 					player.m_position = player.m_newPosition;
 					player.m_moving = false;
@@ -239,7 +239,6 @@ int main()
 			}
 		}
 		
-
 		window.clear(sf::Color::Black);
 		level->render(window);
 		window.draw(player.m_shape);
