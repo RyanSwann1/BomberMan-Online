@@ -17,18 +17,19 @@ Server::Server()
 
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
 {
-	std::unique_ptr<Server> server = std::make_unique<Server>();
+	Server* server = new Server;
+	std::unique_ptr<Server> uniqueServer = std::unique_ptr<Server>(server);
 	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
-		server->m_socketSelector.add(server->m_tcpListener);
-		server->m_running = true;
-		server->m_levelName = "Level1.tmx";
-		if (!XMLParser::loadMapAsServer(server->m_levelName, server->m_mapDimensions, server->m_collisionLayer, server->m_spawnPositions))
+		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
+		uniqueServer->m_running = true;
+		uniqueServer->m_levelName = "Level1.tmx";
+		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions, uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
 		{
 			return std::unique_ptr<Server>();
 		}
 
-		return server;
+		return uniqueServer;
 	}
 	else
 	{

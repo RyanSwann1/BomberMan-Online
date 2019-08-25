@@ -25,12 +25,12 @@ struct Client
 class Server : private NonCopyable
 {
 public:
-	Server();
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
 	void run();
 
 private:
+	Server();
 	sf::TcpListener m_tcpListener;
 	sf::SocketSelector m_socketSelector;
 	bool m_running;
