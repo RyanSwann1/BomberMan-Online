@@ -155,7 +155,7 @@ int main()
 				recentPositions.push_back(player.m_previousPosition);
 
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player right
@@ -169,7 +169,7 @@ int main()
 				recentPositions.push_back(player.m_previousPosition);
 			
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player up
@@ -183,7 +183,7 @@ int main()
 				recentPositions.push_back(player.m_previousPosition);
 				
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player down
@@ -197,7 +197,7 @@ int main()
 				recentPositions.push_back(player.m_previousPosition);
 
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << player.m_newPosition.x << player.m_newPosition.y;
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 

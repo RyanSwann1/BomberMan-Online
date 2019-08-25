@@ -8,7 +8,7 @@ struct Player
 	Player(int tileSize)
 		: m_position(),
 		m_newPosition(),
-		m_movementSpeed(2.5f),
+		m_movementSpeed(5.5f),
 		m_shape(sf::Vector2f(tileSize, tileSize)),
 		m_AABB(m_position, sf::Vector2f(tileSize, tileSize)),
 		m_moving(false)
