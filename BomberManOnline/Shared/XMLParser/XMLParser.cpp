@@ -10,7 +10,7 @@ sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
 std::vector<sf::Vector2i> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
-std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
+std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
 
 bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textureSize, int& columns, const std::string& levelFileName, const std::string& textureFileName)
 {
@@ -44,7 +44,7 @@ bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textur
 }
 
 bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<TileLayer>& tileLayers, 
-	std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2i>& spawnPositions)
+	std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -61,7 +61,8 @@ bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapD
 	return true;
 }
 
-bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<sf::Vector2i>& collisionLayer, std::vector<sf::Vector2i>& spawnPositions)
+bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<sf::Vector2i>& collisionLayer, 
+	std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -152,9 +153,9 @@ sf::Vector2i parseTileSize(const TiXmlElement & rootElement)
 	return tileSize;
 }
 
-std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
+std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
 {
-	std::vector<sf::Vector2i> factionSpawnPositions;
+	std::vector<sf::Vector2f> factionSpawnPositions;
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
 		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("Spawn Position Layer"))
@@ -170,7 +171,7 @@ std::vector<sf::Vector2i> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 			//startingPosition.y -= tileSize; //Tiled Hack
 			spawnPosition.x /= 24;
 			spawnPosition.y /= 28;
-			factionSpawnPositions.emplace_back(spawnPosition);
+			factionSpawnPositions.emplace_back(sf::Vector2f(static_cast<float>(spawnPosition.x), static_cast<float>(spawnPosition.y)));
 		}
 	}
 
