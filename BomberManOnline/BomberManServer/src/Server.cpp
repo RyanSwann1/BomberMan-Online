@@ -47,12 +47,14 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 void Server::run()
 {
+	m_elaspedTime += m_clock.restart().asSeconds();
+	std::cout << m_elaspedTime << "\n";
 	std::cout << "Started listening\n";
+
 	while (m_running)
 	{
-		m_elaspedTime += m_clock.restart().asSeconds();
-
-		std::cout << m_elaspedTime << "\n";
+		//Update game logic
+		std::cout << "Updating game logic\n";
 
 		if (m_socketSelector.wait(TIME_OUT_DURATION))
 		{
@@ -167,7 +169,9 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 	else
 	{
 		std::cout << "No Collision\n";
-		client.m_position = newPosition;
+		
+		client.m_newPosition = newPosition;
+		client.m_moving = true;
 
 		packetToSend << eServerMessageType::eValidMoveRequest << newPosition.x << newPosition.y;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
@@ -178,5 +182,13 @@ void Server::movePlayer(Client& client, sf::Vector2f newPosition)
 		sf::Packet globalPacket;
 		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << newPosition.x << newPosition.y;
 		broadcastMessage(packetToSend);
+	}
+}
+
+void Server::update()
+{
+	for (auto& client : m_clients)
+	{
+
 	}
 }

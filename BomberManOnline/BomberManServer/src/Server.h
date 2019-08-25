@@ -15,14 +15,19 @@ struct Client
 		m_tcpSocket(std::move(tcpSocket)),
 		m_position(startingPosition),
 		m_moveDirection(),
-		m_controllerType(controllerType)
+		m_controllerType(controllerType),
+		m_moving(false)
 	{}
 
 	int m_ID;
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 	sf::Vector2f m_position;
+	sf::Vector2f m_newPosition;
 	eDirection m_moveDirection;
 	ePlayerControllerType m_controllerType;
+	bool m_moving;
+	float m_movementFactor;
+	float m_movementSpeed;
 };
 
 class Server : private NonCopyable

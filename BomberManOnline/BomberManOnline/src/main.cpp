@@ -4,10 +4,17 @@
 #include "Resources.h"
 #include "Player.h"
 #include "ServerMessages.h"
+#include "Bomb.h"
 #include <algorithm>
 #include <assert.h>
 
 //http://www.codersblock.org/blog/multiplayer-fps-part-1
+
+//https://gamedev.stackexchange.com/questions/151068/networking-how-does-server-fixed-timestep-work
+
+//https://gamedev.stackexchange.com/questions/6645/lag-compensation-with-networked-2d-games
+
+//https://www.youtube.com/watch?v=aVmqv3z4gnA
 
 sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor)
 {
@@ -25,9 +32,8 @@ sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor)
 
 bool isPositionCollidable(const Level& level, sf::Vector2f position)
 {
-	sf::Vector2i pos(position.x, position.y);
-	auto cIter = std::find_if(level.getCollisionLayer().cbegin(), level.getCollisionLayer().cend(), [pos](const auto collidablePosition)
-		{ return collidablePosition == pos; });
+	auto cIter = std::find_if(level.getCollisionLayer().cbegin(), level.getCollisionLayer().cend(), [position](const auto collidablePosition)
+		{ return collidablePosition == position; });
 	
 	if (cIter == level.getCollisionLayer().cend())
 	{
@@ -38,6 +44,9 @@ bool isPositionCollidable(const Level& level, sf::Vector2f position)
 		return true;
 	}
 }
+
+constexpr size_t MAX_RECENT_POSITIONS = 10;
+constexpr size_t MAX_BOMBS = 50;
 
 int main()
 {
@@ -58,14 +67,16 @@ int main()
 
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	Player player(tileSize);
+	std::vector<Bomb> bombs;
+	bombs.reserve(MAX_BOMBS);
 	
 	sf::Clock gameClock;
 	float deltaTime = 0;
 	float factor = 0;
-	const auto& collisionLayer = level->getCollisionLayer();
 	int clientID = 0;
 	bool gameStarted = false;
 	std::vector<sf::Vector2f> recentPositions;
+	recentPositions.reserve(MAX_RECENT_POSITIONS);
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -223,7 +234,7 @@ int main()
 				//Reached destination
 				if (player.m_position == player.m_newPosition)
 				{
-					if (recentPositions.size() > size_t(10))
+					if (recentPositions.size() > MAX_RECENT_POSITIONS)
 					{
 						for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
 						{
