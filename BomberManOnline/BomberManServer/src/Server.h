@@ -10,7 +10,7 @@
 
 struct Client
 {
-	Client(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID)
+	Client(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition)
 		: m_tcpSocket(std::move(tcpSocket)),
 		m_ID(ID)
 	{}
@@ -38,7 +38,7 @@ private:
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
 	std::vector<sf::Vector2i> m_collisionLayer;
-	std::vector<sf::Vector2i> m_spawnPositions;
+	std::vector<sf::Vector2f> m_spawnPositions;
 
 	void addNewClient();
 	void listen();

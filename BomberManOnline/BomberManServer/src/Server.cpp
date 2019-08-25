@@ -3,6 +3,7 @@
 #include <iostream>
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
+#include <assert.h>
 
 constexpr size_t MAX_CLIENTS = 4;
 
@@ -10,7 +11,11 @@ Server::Server()
 	: m_tcpListener(),
 	m_socketSelector(),
 	m_running(false),
-	m_clients()
+	m_clients(),
+	m_levelName(),
+	m_mapDimensions(),
+	m_collisionLayer(),
+	m_spawnPositions()
 {
 	m_clients.reserve(MAX_CLIENTS);
 }
@@ -71,11 +76,25 @@ void Server::addNewClient()
 			return;
 		}
 
-		packetToSend.clear();
-
-
+		//Initialize client starting location
+		assert(!m_spawnPositions.empty());
+		sf::Vector2f startingPosition = m_spawnPositions.back();
+		m_spawnPositions.pop_back();
 		m_clients.emplace_back(std::move(tcpSocket), clientID);
 		std::cout << "New client added to server\n";
+
+		//TODO: Send once 
+		packetToSend.clear();
+		packetToSend << eServerMessageType::eInitialGameData;
+		ServerMessageInitialGameData initialGameDataMessage;
+		initialGameDataMessage.levelName = m_levelName;
+		for (const auto& client : m_clients)
+		{
+			initialGameDataMessage.playerDetails.emplace_back(client.m_ID, client.m_position, client.m_controllerType);
+		}
+
+		packetToSend << initialGameDataMessage;
+		broadcastMessage(packetToSend);
 	}
 }
 
