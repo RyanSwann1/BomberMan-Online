@@ -55,3 +55,19 @@ struct ServerMessagePlayerMove
 	sf::Vector2f newPosition;
 	float speed;
 };
+
+struct ServerMessageBombPlacement
+{
+	ServerMessageBombPlacement()
+		: position(),
+		bombTimerExpired()
+	{}
+
+	ServerMessageBombPlacement(sf::Vector2f position, bool bombTimerExpired)
+		: position(position),
+		bombTimerExpired(bombTimerExpired)
+	{}
+
+	sf::Vector2f position;
+	bool bombTimerExpired;
+};

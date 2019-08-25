@@ -1,9 +1,9 @@
 #include "Timer.h"
 
-Timer::Timer(float expirationTime)
+Timer::Timer(float expirationTime, bool active)
 	: m_expirationTime(expirationTime),
 	m_elaspedTime(0),
-	m_active(false)
+	m_active(active)
 {
 }
 

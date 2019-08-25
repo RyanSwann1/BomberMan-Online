@@ -8,5 +8,6 @@ enum class eServerMessageType
 	eInitialGameData,
 	ePlayerMove,
 	ePlayerMoveToPosition,
-	eNewPlayerPosition
+	eNewPlayerPosition,
+	ePlayerBombPlacement
 };

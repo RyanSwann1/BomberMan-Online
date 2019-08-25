@@ -200,6 +200,10 @@ int main()
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
+			else if (player.m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			{
+
+			}
 
 			if (player.m_moving)
 			{
@@ -222,6 +226,7 @@ int main()
 					player.m_moving = false;
 				}
 			}
+
 		}
 		
 		window.clear(sf::Color::Black);

@@ -119,10 +119,15 @@ void Server::listen()
 				receivedPacket >> serverMessageType;
 				switch (serverMessageType)
 				{
-				case eServerMessageType::ePlayerMoveToPosition :
+				case eServerMessageType::ePlayerMoveToPosition:
 					ServerMessagePlayerMove playerMoveMessage;
 					receivedPacket >> playerMoveMessage;
 					movePlayer(client, playerMoveMessage);
+					break;
+
+				case eServerMessageType::ePlayerBombPlacement:
+					ServerMessageBombPlacement bombPlacementMessage;
+					receivedPacket >> bombPlacementMessage;
 					break;
 				}
 			}
