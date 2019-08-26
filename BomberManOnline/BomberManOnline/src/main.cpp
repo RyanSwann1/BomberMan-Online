@@ -134,6 +134,12 @@ int main()
 						}
 					}
 				}
+				case eServerMessageType::eValidBombPlacementRequest :
+				{
+					sf::Vector2f placementPosition;
+					networkMessage >> placementPosition.x >> placementPosition.y;
+					bombs.emplace_back()
+				}
 
 					break;
 				}
@@ -205,9 +211,8 @@ int main()
 				bombs.emplace_back(Textures::getInstance().getTileSheet(), clientID, player.m_position);
 				player.m_bombPlacementTimer.resetElaspedTime();
 
-				ServerMessageBombPlacement bombPlacementMessage(player.m_position, clientID);
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerBombPlacement << bombPlacementMessage;
+				packetToSend << eServerMessageType::ePlayerBombPlacementRequest << player.m_position.x << player.m_position.y;
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 

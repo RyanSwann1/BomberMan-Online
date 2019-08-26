@@ -127,7 +127,7 @@ void Server::listen()
 				}
 					break;
 
-				case eServerMessageType::ePlayerBombPlacement :
+				case eServerMessageType::ePlayerBombPlacementRequest :
 				{
 					sf::Vector2f position;
 					receivedPacket >> position.x >> position.y;
@@ -195,7 +195,7 @@ void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
 		packetToSend << eServerMessageType::eValidBombPlacementRequest << placementPosition.x << placementPosition.y;
 		
 		sf::Packet globalPacket;
-		globalPacket << eServerMessageType::ePlayerBombPlacement << placementPosition.x << placementPosition.y;
+		globalPacket << eServerMessageType::ePlayerBombPlacementRequest << placementPosition.x << placementPosition.y;
 		broadcastMessage(globalPacket);
 
 		m_bombs.emplace_back(placementPosition, client.m_ID);
@@ -224,18 +224,4 @@ void Server::update(float frameTime)
 
 		client.m_bombPlacementTimer.update(frameTime);
 	}
-
-	//for (auto iter = m_bombs.begin(); iter != m_bombs.end();)
-	//{
-	//	iter->m_lifeTime.update(frameTime);
-	//
-	//	if (iter->m_lifeTime.isExpired())
-	//	{
-	//		
-	//	}
-	//	else
-	//	{
-	//		++iter;
-	//	}
-	//}
 }
