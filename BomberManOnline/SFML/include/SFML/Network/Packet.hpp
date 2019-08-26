@@ -348,7 +348,8 @@ public:
 	friend Packet& operator>>(Packet& receivedPacket, ServerMessagePlayerMove& playerMoveMessage);
 	friend Packet& operator<<(Packet& packetToSend, ServerMessagePlayerMove playerMoveMessage);
 
-	friend Packet& operator>>(Packet& receivedPacket, )
+	friend Packet& operator>>(Packet& receivedPacket, ServerMessageBombPlacement& bombPlacementMessage);
+	friend Packet& operator<<(Packet& packetToSend, ServerMessageBombPlacement bombPlacementMessage);
 
 protected:
 
