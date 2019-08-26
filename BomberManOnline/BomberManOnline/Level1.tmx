@@ -134,7 +134,7 @@
   <object id="116" gid="254" x="48" y="288" width="16" height="16"/>
   <object id="120" gid="254" x="272" y="288" width="16" height="16"/>
  </objectgroup>
- <objectgroup name="Object Layer">
+ <objectgroup name="Box Layer">
   <object id="121" gid="205" x="80" y="96" width="16" height="16"/>
   <object id="122" gid="205" x="80" y="128" width="16" height="16"/>
   <object id="123" gid="205" x="80" y="160" width="16" height="16"/>
