@@ -29,8 +29,3 @@ struct Player
 	bool m_moving;
 	Timer m_bombPlacementTimer;
 };
-
-struct Bomb
-{
-
-};

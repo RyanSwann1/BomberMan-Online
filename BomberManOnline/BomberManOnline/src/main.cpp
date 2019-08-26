@@ -200,9 +200,15 @@ int main()
 				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
-			else if (player.m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			else if (!player.m_moving && player.m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
+				bombs.emplace_back(Textures::getInstance().getTileSheet(), clientID, player.m_position);
+				player.m_bombPlacementTimer.resetElaspedTime();
 
+				ServerMessageBombPlacement bombPlacementMessage(player.m_position, clientID);
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::ePlayerBombPlacement << bombPlacementMessage;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 
 			if (player.m_moving)
@@ -226,12 +232,17 @@ int main()
 					player.m_moving = false;
 				}
 			}
-
 		}
 		
+		player.m_bombPlacementTimer.update(deltaTime);
+
 		window.clear(sf::Color::Black);
 		level->render(window);
 		window.draw(player.m_shape);
+		for (const auto& bomb : bombs)
+		{
+			window.draw(bomb.m_sprite);
+		}
 		window.display();
 
 		deltaTime = gameClock.restart().asSeconds();
