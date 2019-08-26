@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "PlayerControllerType.h"
 #include "Direction.h"
+#include "Timer.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Network.hpp>
 #include <memory>
@@ -20,7 +21,8 @@ struct Client
 		m_controllerType(controllerType),
 		m_moving(false),
 		m_movementFactor(0),
-		m_movementSpeed(2.5f)
+		m_movementSpeed(2.5f),
+		m_bombPlacementTimer(2.0f, true)
 	{}
 
 	int m_ID;
@@ -33,6 +35,24 @@ struct Client
 	bool m_moving;
 	float m_movementFactor;
 	float m_movementSpeed;
+	Timer m_bombPlacementTimer;
+};
+
+struct BombServer
+{
+	BombServer(sf::Vector2f startingPosition, int owningPlayerID)
+		: m_position(startingPosition),
+		m_explosionSize(2, 2),
+		m_lifeTime(2.5f, true),
+		m_owningPlayerID(owningPlayerID),
+		m_damage(1)
+	{}
+
+	sf::Vector2f m_position;
+	sf::Vector2i m_explosionSize;
+	Timer m_lifeTime;
+	int m_owningPlayerID;
+	int m_damage;
 };
 
 struct ServerMessagePlayerMove;
@@ -53,6 +73,7 @@ private:
 	sf::Vector2i m_mapDimensions;
 	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<sf::Vector2f> m_spawnPositions;
+	std::vector<BombServer> m_bombs;
 	sf::Clock m_clock;
 
 	void addNewClient();
@@ -60,6 +81,7 @@ private:
 	void broadcastMessage(sf::Packet& packetToSend);
 
 	void movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessage);
+	void placeBomb(Client& client, sf::Vector2f placementPosition);
 
 	void update(float frameTime);
 };

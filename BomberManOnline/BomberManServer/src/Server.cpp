@@ -119,15 +119,20 @@ void Server::listen()
 				receivedPacket >> serverMessageType;
 				switch (serverMessageType)
 				{
-				case eServerMessageType::ePlayerMoveToPosition:
+				case eServerMessageType::ePlayerMoveToPosition :
+				{
 					ServerMessagePlayerMove playerMoveMessage;
 					receivedPacket >> playerMoveMessage;
 					movePlayer(client, playerMoveMessage);
+				}
 					break;
 
-				case eServerMessageType::ePlayerBombPlacement:
-					ServerMessageBombPlacement bombPlacementMessage;
-					receivedPacket >> bombPlacementMessage;
+				case eServerMessageType::ePlayerBombPlacement :
+				{
+					sf::Vector2f position;
+					receivedPacket >> position.x >> position.y;
+					placeBomb(client, position);
+				}
 					break;
 				}
 			}
@@ -176,6 +181,32 @@ void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessag
 	}
 }
 
+void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
+{
+	sf::Packet packetToSend;
+	//Invalid Bomb placement
+	if (!client.m_bombPlacementTimer.isExpired() || Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
+	{
+		packetToSend << eServerMessageType::eInvalidBombPlacementRequest << placementPosition.x << placementPosition.y;
+	}
+	//Valid Bomb placement
+	else
+	{
+		packetToSend << eServerMessageType::eValidBombPlacementRequest << placementPosition.x << placementPosition.y;
+		
+		sf::Packet globalPacket;
+		globalPacket << eServerMessageType::ePlayerBombPlacement << placementPosition.x << placementPosition.y;
+		broadcastMessage(globalPacket);
+
+		m_bombs.emplace_back(placementPosition, client.m_ID);
+	}
+
+	if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+	{
+		std::cout << "Cannot send packet to client\n";
+	}
+}
+
 void Server::update(float frameTime)
 {
 	for (auto& client : m_clients)
@@ -190,5 +221,21 @@ void Server::update(float frameTime)
 				client.m_moving = false;
 			}
 		}
+
+		client.m_bombPlacementTimer.update(frameTime);
 	}
+
+	//for (auto iter = m_bombs.begin(); iter != m_bombs.end();)
+	//{
+	//	iter->m_lifeTime.update(frameTime);
+	//
+	//	if (iter->m_lifeTime.isExpired())
+	//	{
+	//		
+	//	}
+	//	else
+	//	{
+	//		++iter;
+	//	}
+	//}
 }
