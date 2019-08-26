@@ -8,9 +8,8 @@
 std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);
 sf::Vector2i parseTileSize(const TiXmlElement& rootElement);
-std::vector<sf::Vector2f> parseCollisionLayer(const TiXmlElement& rootElement, int tileSize);
 std::vector<std::vector<int>> decodeTileLayer(const TiXmlElement & tileLayerElement, sf::Vector2i mapSize);
-std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize);
+std::vector<sf::Vector2f> parseObjectLayer(const TiXmlElement & rootElement, sf::Vector2i tileSize, const std::string& layerName);
 
 bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textureSize, int& columns, const std::string& levelFileName, const std::string& textureFileName)
 {
@@ -44,7 +43,7 @@ bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textur
 }
 
 bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<TileLayer>& tileLayers, 
-	std::vector<sf::Vector2f>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions)
+	std::vector<sf::Vector2f>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions, std::vector<sf::Vector2f>& boxes)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -55,14 +54,15 @@ bool XMLParser::loadMapAsClient(const std::string & mapName, sf::Vector2i & mapD
 	const auto& rootElement = xmlFile.RootElement();
 	mapDimensions = parseMapSize(*rootElement);
 	tileLayers = parseTileLayers(*rootElement, mapDimensions);
-	spawnPositions = parsePlayerSpawnPositions(*rootElement, parseTileSize(*rootElement));
-	collisionLayer = parseCollisionLayer(*rootElement, parseTileSize(*rootElement).x);
+	spawnPositions = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Spawn Position Layer");
+	collisionLayer = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Collision Layer");
+	boxes = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Box Layer");
 
 	return true;
 }
 
 bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<sf::Vector2f>& collisionLayer, 
-	std::vector<sf::Vector2f>& spawnPositions)
+	std::vector<sf::Vector2f>& spawnPositions, std::vector<sf::Vector2f>& boxes)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(mapName))
@@ -72,8 +72,9 @@ bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapD
 
 	const auto& rootElement = xmlFile.RootElement();
 	mapDimensions = parseMapSize(*rootElement);
-	spawnPositions = parsePlayerSpawnPositions(*rootElement, parseTileSize(*rootElement));
-	collisionLayer = parseCollisionLayer(*rootElement, parseTileSize(*rootElement).x);
+	spawnPositions = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Spawn Position Layer");
+	collisionLayer = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Collision Layer");
+	boxes = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Box Layer");
 
 	return true;
 }
@@ -153,12 +154,12 @@ sf::Vector2i parseTileSize(const TiXmlElement & rootElement)
 	return tileSize;
 }
 
-std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootElement, sf::Vector2i tileSize)
+std::vector<sf::Vector2f> parseObjectLayer(const TiXmlElement & rootElement, sf::Vector2i tileSize, const std::string & layerName)
 {
-	std::vector<sf::Vector2f> factionSpawnPositions;
+	std::vector<sf::Vector2f> objects;
 	for (const auto* entityElementRoot = rootElement.FirstChildElement(); entityElementRoot != nullptr; entityElementRoot = entityElementRoot->NextSiblingElement())
 	{
-		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string("Spawn Position Layer"))
+		if (entityElementRoot->Value() != std::string("objectgroup") || entityElementRoot->Attribute("name") != std::string(layerName))
 		{
 			continue;
 		}
@@ -169,42 +170,10 @@ std::vector<sf::Vector2f> parsePlayerSpawnPositions(const TiXmlElement & rootEle
 			entityElement->Attribute("x", &spawnPosition.x);
 			entityElement->Attribute("y", &spawnPosition.y);
 			spawnPosition.y -= tileSize.y; //Tiled Hack
-			factionSpawnPositions.emplace_back(sf::Vector2f(static_cast<float>(spawnPosition.x), static_cast<float>(spawnPosition.y)));
+			objects.emplace_back(sf::Vector2f(static_cast<float>(spawnPosition.x), static_cast<float>(spawnPosition.y)));
 		}
 	}
 
-	assert(!factionSpawnPositions.empty());
-	return factionSpawnPositions;
-}
-
-std::vector<sf::Vector2f> parseCollisionLayer(const TiXmlElement & rootElement, int tileSize)
-{
-	std::vector<sf::Vector2f> collidablePositions;
-	for (const auto* collisionLayerElement = rootElement.FirstChildElement(); collisionLayerElement != nullptr;
-		collisionLayerElement = collisionLayerElement->NextSiblingElement())
-	{
-		if (collisionLayerElement->Value() != std::string("objectgroup"))
-		{
-			continue;
-		}
-
-		if (collisionLayerElement->Attribute("name") != std::string("Collision Layer"))
-		{
-			continue;
-		}
-
-		for (const auto* collisionElement = collisionLayerElement->FirstChildElement();
-			collisionElement != nullptr; collisionElement = collisionElement->NextSiblingElement())
-		{
-			int xPosition = 0, yPosition = 0;
-			collisionElement->Attribute("x", &xPosition);
-			collisionElement->Attribute("y", &yPosition);
-			//Hack for Tiled.
-			yPosition -= tileSize;
-			collidablePositions.emplace_back(static_cast<float>(xPosition), static_cast<float>(yPosition));
-		}
-	}
-
-	assert(!collidablePositions.empty());
-	return collidablePositions;
+	assert(!objects.empty());
+	return objects;
 }
