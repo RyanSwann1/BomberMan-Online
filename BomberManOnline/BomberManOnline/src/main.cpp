@@ -19,6 +19,7 @@
 
 constexpr size_t MAX_RECENT_POSITIONS = 10;
 constexpr size_t MAX_BOMBS = 50;
+constexpr size_t MAX_PLAYERS = 4;
 
 int main()
 {
@@ -35,18 +36,18 @@ int main()
 		return -1;
 	}
 
-	std::unique_ptr<Level> level;
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	Player player(tileSize);
+	std::unique_ptr<Level> level;
+	std::vector<Player> players;
+	players.reserve(MAX_PLAYERS);
+	Player* localPlayer = nullptr;
 	std::vector<Bomb> bombs;
 	bombs.reserve(MAX_BOMBS);
 	std::vector<sf::Vector2f> recentPositions;
 	recentPositions.reserve(MAX_RECENT_POSITIONS);
-	
 	sf::Clock gameClock;
 	float deltaTime = 0;
 	float factor = 0;
-	int clientID = 0;
 	bool gameStarted = false;
 
 	while (window.isOpen())
@@ -69,7 +70,13 @@ int main()
 				switch (messageType)
 				{
 				case eServerMessageType::eInitializeClientID :
+				{
+					int clientID = 0;
 					networkMessage >> clientID;
+					players.emplace_back(tileSize, clientID);
+					localPlayer = &players.back();
+				}
+
 					break;
 
 				case eServerMessageType::eInitialGameData : 
@@ -80,9 +87,25 @@ int main()
 					assert(!level);
 					level = Level::create(initialGameData.levelName);
 
-					player.m_position = initialGameData.playerDetails[0].spawnPosition;
-					player.m_previousPosition = player.m_position;
-					player.m_shape.setPosition(player.m_position);
+					//Initialize local player
+					assert(localPlayer);
+					int localPlayerID = localPlayer->m_ID;
+					auto cIter = std::find_if(initialGameData.playerDetails.cbegin(), initialGameData.playerDetails.cend(),
+						[localPlayerID](const auto& playerDetails) { return playerDetails.ID == localPlayerID; });
+					assert(cIter != initialGameData.playerDetails.cend());
+
+					//Initialize Remote Players
+					for (auto& player : initialGameData.playerDetails)
+					{
+						if (player.ID != localPlayerID)
+						{
+							players.emplace_back(tileSize, player.ID);
+						}
+					}
+
+					localPlayer->m_position = cIter->spawnPosition;
+					localPlayer->m_previousPosition = localPlayer->m_position;
+					localPlayer->m_shape.setPosition(localPlayer->m_position);
 					gameStarted = true;
 				}
 					break;
@@ -110,9 +133,9 @@ int main()
 					}
 
 					recentPositions.clear();
-					player.m_position = invalidMoveMessage.lastValidPosition;
-					player.m_previousPosition = invalidMoveMessage.lastValidPosition;
-					player.m_moving = false;
+					localPlayer->m_position = invalidMoveMessage.lastValidPosition;
+					localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
+					localPlayer->m_moving = false;
 					factor = 0;
 				}
 
@@ -154,77 +177,77 @@ int main()
 		{
 			//Move player Left
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x - tileSize, player.m_position.y)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y)))
 			{
 				factor = 0;
-				player.m_newPosition = sf::Vector2f(player.m_position.x - tileSize, player.m_position.y);
-				player.m_previousPosition = player.m_position;
-				player.m_moving = true;
-				recentPositions.push_back(player.m_previousPosition);
+				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y);
+				localPlayer->m_previousPosition = localPlayer->m_position;
+				localPlayer->m_moving = true;
+				recentPositions.push_back(localPlayer->m_previousPosition);
 
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player right
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x + tileSize, player.m_position.y)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y)))
 			{
 				factor = 0;
-				player.m_newPosition = sf::Vector2f(player.m_position.x + tileSize, player.m_position.y);
-				player.m_previousPosition = player.m_position;
-				player.m_moving = true;
-				recentPositions.push_back(player.m_previousPosition);
+				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y);
+				localPlayer->m_previousPosition = localPlayer->m_position;
+				localPlayer->m_moving = true;
+				recentPositions.push_back(localPlayer->m_previousPosition);
 			
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player up
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x, player.m_position.y - tileSize)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize)))
 			{
 				factor = 0;
-				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y - tileSize);
-				player.m_previousPosition = player.m_position;
-				player.m_moving = true;
-				recentPositions.push_back(player.m_previousPosition);
+				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize);
+				localPlayer->m_previousPosition = localPlayer->m_position;
+				localPlayer->m_moving = true;
+				recentPositions.push_back(localPlayer->m_previousPosition);
 				
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			//Move player down
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-				!player.m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(player.m_position.x, player.m_position.y + tileSize)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize)))
 			{
 				factor = 0;
-				player.m_newPosition = sf::Vector2f(player.m_position.x, player.m_position.y + tileSize);
-				player.m_previousPosition = player.m_position;
-				player.m_moving = true;
-				recentPositions.push_back(player.m_previousPosition);
+				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize);
+				localPlayer->m_previousPosition = localPlayer->m_position;
+				localPlayer->m_moving = true;
+				recentPositions.push_back(localPlayer->m_previousPosition);
 
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(player.m_newPosition, player.m_movementSpeed);
+				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
-			else if (!player.m_moving && player.m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+			else if (!localPlayer->m_moving && localPlayer->m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				player.m_bombPlacementTimer.resetElaspedTime();
+				localPlayer->m_bombPlacementTimer.resetElaspedTime();
 
 				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerBombPlacementRequest << player.m_position.x << player.m_position.y;
+				packetToSend << eServerMessageType::ePlayerBombPlacementRequest << localPlayer->m_position.x << localPlayer->m_position.y;
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 
-			if (player.m_moving)
+			if (localPlayer->m_moving)
 			{
-				factor += deltaTime * player.m_movementSpeed;
-				player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, factor);
-				player.m_shape.setPosition(player.m_position);
+				factor += deltaTime * localPlayer->m_movementSpeed;
+				localPlayer->m_position = Utilities::Interpolate(localPlayer->m_previousPosition, localPlayer->m_newPosition, factor);
+				localPlayer->m_shape.setPosition(localPlayer->m_position);
 
 				//Reached destination
-				if (player.m_position == player.m_newPosition)
+				if (localPlayer->m_position == localPlayer->m_newPosition)
 				{
 					if (recentPositions.size() > MAX_RECENT_POSITIONS)
 					{
@@ -235,12 +258,12 @@ int main()
 						}
 					}
 
-					player.m_moving = false;
+					localPlayer->m_moving = false;
 				}
 			}
 		}
 		
-		player.m_bombPlacementTimer.update(deltaTime);
+		localPlayer->m_bombPlacementTimer.update(deltaTime);
 
 		for (auto iter = bombs.begin(); iter != bombs.end();)
 		{
@@ -257,12 +280,21 @@ int main()
 		}
 
 		window.clear(sf::Color::Black);
-		level->render(window);
-		window.draw(player.m_shape);
-		for (const auto& bomb : bombs)
+		
+		if (gameStarted)
 		{
-			window.draw(bomb.m_sprite);
+			assert(level);
+			level->render(window);
+			for(auto& player : players)
+			{ 
+				window.draw(player.m_shape);
+			}
+			for (const auto& bomb : bombs)
+			{
+				window.draw(bomb.m_sprite);
+			}
 		}
+
 		window.display();
 
 		deltaTime = gameClock.restart().asSeconds();

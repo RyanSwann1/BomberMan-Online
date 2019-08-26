@@ -91,18 +91,21 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		//TODO: Send once max players have joined
-		packetToSend.clear();
-		packetToSend << eServerMessageType::eInitialGameData;
-		ServerMessageInitialGameData initialGameDataMessage;
-		initialGameDataMessage.levelName = m_levelName;
-		for (const auto& client : m_clients)
+		if (m_clients.size() >= 2)
 		{
-			initialGameDataMessage.playerDetails.emplace_back(client.m_ID, client.m_position, client.m_controllerType);
-		}
+			//TODO: Send once max players have joined
+			packetToSend.clear();
+			packetToSend << eServerMessageType::eInitialGameData;
+			ServerMessageInitialGameData initialGameDataMessage;
+			initialGameDataMessage.levelName = m_levelName;
+			for (const auto& client : m_clients)
+			{
+				initialGameDataMessage.playerDetails.emplace_back(client.m_ID, client.m_position, client.m_controllerType);
+			}
 
-		packetToSend << initialGameDataMessage;
-		broadcastMessage(packetToSend);
+			packetToSend << initialGameDataMessage;
+			broadcastMessage(packetToSend);
+		}
 	}
 }
 
@@ -221,7 +224,12 @@ void Server::update(float frameTime)
 
 		if (iter->m_lifeTime.isExpired())
 		{
-			std::cout << "Explode Bomb\n";
+			for (int x = iter->m_position.x - 1; x <= iter->m_position.x; x += 2)
+			{
+
+			}
+
+
 			iter = m_bombs.erase(iter);
 		}
 		else
