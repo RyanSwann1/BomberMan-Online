@@ -10,6 +10,7 @@ enum class eServerMessageType
 	ePlayerMoveToPosition,
 	eNewPlayerPosition,
 	ePlayerBombPlacementRequest,
-	eInvalidBombPlacementRequest,
 	eValidBombPlacementRequest,
+	ePlaceBomb,
+	eExplodeBomb
 };

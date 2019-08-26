@@ -58,11 +58,16 @@ struct ServerMessagePlayerMove
 
 struct ServerMessageBombPlacement
 {
-	ServerMessageBombPlacement(sf::Vector2f position, int playerID)
+	ServerMessageBombPlacement()
+		: position(),
+		lifeTimeDuration(0)
+	{}
+
+	ServerMessageBombPlacement(sf::Vector2f position, float lifeTimeDuration)
 		: position(position),
-		playerID(playerID)
+		lifeTimeDuration(lifeTimeDuration)
 	{}
 
 	sf::Vector2f position;
-	int playerID;
+	float lifeTimeDuration;
 };
