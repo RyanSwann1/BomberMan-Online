@@ -32,7 +32,8 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
 		uniqueServer->m_running = true;
 		uniqueServer->m_levelName = "Level1.tmx";
-		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions, uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
+		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
+			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions, uniqueServer->m_boxes))
 		{
 			return std::unique_ptr<Server>();
 		}
@@ -91,7 +92,7 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 2)
+		if (m_clients.size() >= 1)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
@@ -220,9 +221,17 @@ void Server::update(float frameTime)
 		{
 			for (int x = iter->m_position.x - 1; x <= iter->m_position.x; x += 2)
 			{
+				sf::Vector2f explosionPosition(x, iter->m_position.y);
+				auto iter = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
+				if (iter != m_boxes.end())
+				{
+					m_boxes.erase(iter);
 
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+					broadcastMessage(packetToSend);
+				}
 			}
-
 
 			iter = m_bombs.erase(iter);
 		}

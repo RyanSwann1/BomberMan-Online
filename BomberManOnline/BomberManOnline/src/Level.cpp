@@ -2,13 +2,29 @@
 #include "XMLParser/XMLParser.h"
 #include "Resources.h"
 
+//Box
+Box::Box(sf::Vector2f startingPosition)
+	: position(startingPosition),
+	sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204))
+{
+	sprite.setPosition(startingPosition);
+}
+
+//Level
 std::unique_ptr<Level> Level::create(const std::string & levelName)
 {
 	Level* level = new Level;
 	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
 	uniqueLevel->m_levelName = levelName;
-	if (XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_levelDimensions, level->m_tileLayers, level->m_collisionLayer, level->m_spawnPositions))
+	std::vector<sf::Vector2f> boxSpawnPositions;
+	if (XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_levelDimensions, level->m_tileLayers, 
+		level->m_collisionLayer, level->m_spawnPositions, boxSpawnPositions))
 	{
+		level->m_boxes.reserve(boxSpawnPositions.size());
+		for (const auto& position : boxSpawnPositions)
+		{
+			level->m_boxes.emplace_back(position);
+		}
 		return uniqueLevel;
 	}
 	else
@@ -20,6 +36,11 @@ std::unique_ptr<Level> Level::create(const std::string & levelName)
 const std::vector<sf::Vector2f>& Level::getCollisionLayer() const
 {
 	return m_collisionLayer;
+}
+
+std::vector<Box>& Level::getBoxes()
+{
+	return m_boxes;
 }
 
 void Level::render(sf::RenderWindow & window) const
@@ -41,5 +62,10 @@ void Level::render(sf::RenderWindow & window) const
 				}
 			}
 		}
+	}
+
+	for (const auto& box : m_boxes)
+	{
+		window.draw(box.sprite);
 	}
 }

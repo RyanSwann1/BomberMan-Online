@@ -68,6 +68,7 @@ private:
 	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<BombServer> m_bombs;
+	std::vector<sf::Vector2f> m_boxes;
 	sf::Clock m_clock;
 
 	void addNewClient();

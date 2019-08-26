@@ -4,6 +4,7 @@
 #include <assert.h>
 #include "FrameDetails.h"
 #include "TileLayer.h"
+#include "Box.h"
 
 std::vector<TileLayer> parseTileLayers(const TiXmlElement& rootElement, const sf::Vector2i mapSize);
 sf::Vector2i parseMapSize(const TiXmlElement& rootElement);

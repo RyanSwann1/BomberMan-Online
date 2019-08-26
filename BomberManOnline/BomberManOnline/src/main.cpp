@@ -68,7 +68,7 @@ int main()
 				networkMessage >> messageType;
 				switch (messageType)
 				{
-				case eServerMessageType::eInitializeClientID :
+				case eServerMessageType::eInitializeClientID:
 				{
 					int clientID = 0;
 					networkMessage >> clientID;
@@ -76,9 +76,9 @@ int main()
 					localPlayer = &players.back();
 				}
 
-					break;
+				break;
 
-				case eServerMessageType::eInitialGameData : 
+				case eServerMessageType::eInitialGameData:
 				{
 					ServerMessageInitialGameData initialGameData;
 					networkMessage >> initialGameData;
@@ -107,8 +107,8 @@ int main()
 					localPlayer->m_shape.setPosition(localPlayer->m_position);
 					gameStarted = true;
 				}
-					break;
-				case eServerMessageType::eInvalidMoveRequest :
+				break;
+				case eServerMessageType::eInvalidMoveRequest:
 				{
 					ServerMessageInvalidMove invalidMoveMessage;
 					networkMessage >> invalidMoveMessage;
@@ -138,8 +138,8 @@ int main()
 					localPlayer->m_movementFactor = 0;
 				}
 
-					break;
-				case eServerMessageType::eNewPlayerPosition :
+				break;
+				case eServerMessageType::eNewPlayerPosition:
 				{
 					sf::Vector2f newPosition;
 					int clientID = 0;
@@ -171,16 +171,28 @@ int main()
 
 					break;
 				}
-				case eServerMessageType::ePlaceBomb :
+				case eServerMessageType::ePlaceBomb:
 				{
 					sf::Vector2f placementPosition;
 					float lifeTime = 0;
 					networkMessage >> placementPosition.x >> placementPosition.y >> lifeTime;
-					
+
 					bombs.emplace_back(Textures::getInstance().getTileSheet(), placementPosition, lifeTime);
 				}
 
 					break;
+
+				case eServerMessageType::eDestroyBox:
+				{
+					sf::Vector2f boxPosition;
+					networkMessage >> boxPosition.x >> boxPosition.y;
+					auto& boxes = level->getBoxes();
+					auto iter = std::find_if(level->getBoxes().begin(), level->getBoxes().end(), [boxPosition](const auto box) { return box.position == boxPosition; });
+					assert(iter != level->getBoxes().end());
+					
+					level->getBoxes().erase(iter);
+					break;
+				}
 				}
 			}
 
@@ -320,6 +332,8 @@ int main()
 				++iter;
 			}
 		}
+		
+
 
 		window.clear(sf::Color::Black);
 		
