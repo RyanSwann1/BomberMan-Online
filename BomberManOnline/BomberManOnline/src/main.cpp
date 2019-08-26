@@ -47,7 +47,6 @@ int main()
 	recentPositions.reserve(MAX_RECENT_POSITIONS);
 	sf::Clock gameClock;
 	float deltaTime = 0;
-	float factor = 0;
 	bool gameStarted = false;
 
 	while (window.isOpen())
@@ -99,7 +98,7 @@ int main()
 					{
 						if (player.ID != localPlayerID)
 						{
-							players.emplace_back(tileSize, player.ID);
+							players.emplace_back(tileSize, player.ID, player.spawnPosition);
 						}
 					}
 
@@ -136,26 +135,41 @@ int main()
 					localPlayer->m_position = invalidMoveMessage.lastValidPosition;
 					localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
 					localPlayer->m_moving = false;
-					factor = 0;
+					localPlayer->m_movementFactor = 0;
 				}
 
 					break;
-				case eServerMessageType::eValidMoveRequest :
+				case eServerMessageType::eNewPlayerPosition :
 				{
-					sf::Vector2f position;
-					networkMessage >> position.x >> position.y;
-					for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					sf::Vector2f newPosition;
+					int clientID = 0;
+					networkMessage >> newPosition.x >> newPosition.y >> clientID;
+					if (clientID == localPlayer->m_ID)
 					{
-						if ((*iter) == position)
+						for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
 						{
-							iter = recentPositions.erase(iter);
-							break;
-						}
-						else
-						{
-							++iter;
+							if ((*iter) == newPosition)
+							{
+								iter = recentPositions.erase(iter);
+								break;
+							}
+							else
+							{
+								++iter;
+							}
 						}
 					}
+					else
+					{
+						auto iter = std::find_if(players.begin(), players.end(), [clientID](const auto& player) { return player.m_ID == clientID; });
+						assert(iter != players.end());
+
+						iter->m_newPosition = newPosition;
+						iter->m_previousPosition = iter->m_position;
+						iter->m_moving = true;
+					}
+
+					break;
 				}
 				case eServerMessageType::ePlaceBomb :
 				{
@@ -179,7 +193,7 @@ int main()
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
 				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y)))
 			{
-				factor = 0;
+			
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y);
 				localPlayer->m_previousPosition = localPlayer->m_position;
 				localPlayer->m_moving = true;
@@ -193,7 +207,7 @@ int main()
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
 				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y)))
 			{
-				factor = 0;
+				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y);
 				localPlayer->m_previousPosition = localPlayer->m_position;
 				localPlayer->m_moving = true;
@@ -207,7 +221,7 @@ int main()
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
 				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize)))
 			{
-				factor = 0;
+				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize);
 				localPlayer->m_previousPosition = localPlayer->m_position;
 				localPlayer->m_moving = true;
@@ -221,7 +235,7 @@ int main()
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
 				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize)))
 			{
-				factor = 0;
+				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize);
 				localPlayer->m_previousPosition = localPlayer->m_position;
 				localPlayer->m_moving = true;
@@ -240,27 +254,55 @@ int main()
 				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 
-			if (localPlayer->m_moving)
+			for (auto& player : players)
 			{
-				factor += deltaTime * localPlayer->m_movementSpeed;
-				localPlayer->m_position = Utilities::Interpolate(localPlayer->m_previousPosition, localPlayer->m_newPosition, factor);
-				localPlayer->m_shape.setPosition(localPlayer->m_position);
+				if (!player.m_moving)
+				{
+					continue;
+				}
+
+				player.m_movementFactor += deltaTime * player.m_movementSpeed;
+				player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+				player.m_shape.setPosition(player.m_position);
 
 				//Reached destination
-				if (localPlayer->m_position == localPlayer->m_newPosition)
+				if (player.m_position == player.m_newPosition)
 				{
-					if (recentPositions.size() > MAX_RECENT_POSITIONS)
-					{
-						for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
-						{
-							recentPositions.erase(iter);
-							break;
-						}
-					}
+					//if (recentPositions.size() > MAX_RECENT_POSITIONS)
+					//{
+					//	for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+					//	{
+					//		recentPositions.erase(iter);
+					//		break;
+					//	}
+					//}
 
-					localPlayer->m_moving = false;
+					player.m_moving = false;
+					player.m_movementFactor = 0;
 				}
 			}
+
+			//if (localPlayer->m_moving)
+			//{
+			//	localPlayer->m_movementFactor += deltaTime * localPlayer->m_movementSpeed;
+			//	localPlayer->m_position = Utilities::Interpolate(localPlayer->m_previousPosition, localPlayer->m_newPosition, localPlayer->m_movementFactor);
+			//	localPlayer->m_shape.setPosition(localPlayer->m_position);
+
+			//	//Reached destination
+			//	if (localPlayer->m_position == localPlayer->m_newPosition)
+			//	{
+			//		if (recentPositions.size() > MAX_RECENT_POSITIONS)
+			//		{
+			//			for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+			//			{
+			//				recentPositions.erase(iter);
+			//				break;
+			//			}
+			//		}
+
+			//		localPlayer->m_moving = false;
+			//	}
+			//}
 		}
 		
 		localPlayer->m_bombPlacementTimer.update(deltaTime);

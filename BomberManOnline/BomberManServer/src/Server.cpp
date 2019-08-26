@@ -172,15 +172,9 @@ void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessag
 		client.m_previousPosition = client.m_position;
 		client.m_moving = true;
 
-		packetToSend << eServerMessageType::eValidMoveRequest << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y;
-		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
-		{
-			std::cout << "Failed to send message to client\n";
-		}
-
 		sf::Packet globalPacket;
-		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y;
-		broadcastMessage(packetToSend);
+		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y << client.m_ID;
+		broadcastMessage(globalPacket);
 	}
 }
 

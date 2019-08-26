@@ -11,6 +11,7 @@ struct Player
 		m_position(),
 		m_newPosition(),
 		m_movementSpeed(2.5f),
+		m_movementFactor(0.0f),
 		m_shape(sf::Vector2f(tileSize, tileSize)),
 		m_AABB(m_position, sf::Vector2f(tileSize, tileSize)),
 		m_moving(false),
@@ -25,6 +26,7 @@ struct Player
 		m_position(startingPosition),
 		m_newPosition(),
 		m_movementSpeed(2.5f),
+		m_movementFactor(0.0f),
 		m_shape(sf::Vector2f(tileSize, tileSize)),
 		m_AABB(m_position, sf::Vector2f(tileSize, tileSize)),
 		m_moving(false),
@@ -41,6 +43,7 @@ struct Player
 	sf::Vector2f m_newPosition;
 	eDirection m_movementDirection;
 	float m_movementSpeed;
+	float m_movementFactor;
 	sf::RectangleShape m_shape;
 	sf::FloatRect m_AABB;
 	bool m_moving;
