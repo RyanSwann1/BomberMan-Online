@@ -40,19 +40,13 @@ struct Client
 
 struct BombServer
 {
-	BombServer(sf::Vector2f startingPosition, int owningPlayerID)
+	BombServer(sf::Vector2f startingPosition, float expirationTime)
 		: m_position(startingPosition),
-		m_explosionSize(2, 2),
-		m_lifeTime(2.5f, true),
-		m_owningPlayerID(owningPlayerID),
-		m_damage(1)
+		m_lifeTime(expirationTime, true)
 	{}
 
 	sf::Vector2f m_position;
-	sf::Vector2i m_explosionSize;
 	Timer m_lifeTime;
-	int m_owningPlayerID;
-	int m_damage;
 };
 
 struct ServerMessagePlayerMove;

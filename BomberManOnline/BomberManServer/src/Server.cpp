@@ -183,27 +183,17 @@ void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessag
 
 void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
 {
-	sf::Packet packetToSend;
-	//Invalid Bomb placement
-	if (!client.m_bombPlacementTimer.isExpired() || Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
+	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
 	{
-		packetToSend << eServerMessageType::eInvalidBombPlacementRequest << placementPosition.x << placementPosition.y;
-	}
-	//Valid Bomb placement
-	else
-	{
-		packetToSend << eServerMessageType::eValidBombPlacementRequest << placementPosition.x << placementPosition.y;
-		
-		sf::Packet globalPacket;
-		globalPacket << eServerMessageType::ePlayerBombPlacementRequest << placementPosition.x << placementPosition.y;
-		broadcastMessage(globalPacket);
+		ServerMessageBombPlacement bombPlacementMessage;
+		bombPlacementMessage.position = placementPosition;
+		bombPlacementMessage.lifeTimeDuration = client.m_bombPlacementTimer.getExpirationTime();
 
-		m_bombs.emplace_back(placementPosition, client.m_ID);
-	}
-
-	if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
-	{
-		std::cout << "Cannot send packet to client\n";
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
+		broadcastMessage(packetToSend);
+		std::cout << "Place Bomb\n";
+		m_bombs.emplace_back(placementPosition, client.m_bombPlacementTimer.getExpirationTime());
 	}
 }
 
@@ -223,5 +213,20 @@ void Server::update(float frameTime)
 		}
 
 		client.m_bombPlacementTimer.update(frameTime);
+	}
+
+	for (auto iter = m_bombs.begin(); iter != m_bombs.end();)
+	{
+		iter->m_lifeTime.update(frameTime);
+
+		if (iter->m_lifeTime.isExpired())
+		{
+			std::cout << "Explode Bomb\n";
+			iter = m_bombs.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
 	}
 }
