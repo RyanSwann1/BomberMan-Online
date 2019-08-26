@@ -36,19 +36,19 @@ int main()
 	}
 
 	std::unique_ptr<Level> level;
-
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	Player player(tileSize);
 	std::vector<Bomb> bombs;
 	bombs.reserve(MAX_BOMBS);
+	std::vector<sf::Vector2f> recentPositions;
+	recentPositions.reserve(MAX_RECENT_POSITIONS);
 	
 	sf::Clock gameClock;
 	float deltaTime = 0;
 	float factor = 0;
 	int clientID = 0;
 	bool gameStarted = false;
-	std::vector<sf::Vector2f> recentPositions;
-	recentPositions.reserve(MAX_RECENT_POSITIONS);
+
 	while (window.isOpen())
 	{
 		sf::Event sfmlEvent;
@@ -134,11 +134,13 @@ int main()
 						}
 					}
 				}
-				case eServerMessageType::eValidBombPlacementRequest :
+				case eServerMessageType::ePlaceBomb :
 				{
 					sf::Vector2f placementPosition;
-					networkMessage >> placementPosition.x >> placementPosition.y;
-					bombs.emplace_back()
+					float lifeTime = 0;
+					networkMessage >> placementPosition.x >> placementPosition.y >> lifeTime;
+					
+					bombs.emplace_back(Textures::getInstance().getTileSheet(), placementPosition, lifeTime);
 				}
 
 					break;
@@ -208,7 +210,6 @@ int main()
 			}
 			else if (!player.m_moving && player.m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
 			{
-				bombs.emplace_back(Textures::getInstance().getTileSheet(), clientID, player.m_position);
 				player.m_bombPlacementTimer.resetElaspedTime();
 
 				sf::Packet packetToSend;
@@ -240,6 +241,20 @@ int main()
 		}
 		
 		player.m_bombPlacementTimer.update(deltaTime);
+
+		for (auto iter = bombs.begin(); iter != bombs.end();)
+		{
+			iter->m_lifeTimer.update(deltaTime);
+
+			if (iter->m_lifeTimer.isExpired())
+			{
+				iter = bombs.erase(iter);
+			}
+			else
+			{
+				++iter;
+			}
+		}
 
 		window.clear(sf::Color::Black);
 		level->render(window);

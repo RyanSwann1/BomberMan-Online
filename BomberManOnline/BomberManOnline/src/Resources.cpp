@@ -10,6 +10,7 @@ bool Textures::loadAllTextures()
 	if (m_tileSheet)
 	{
 		m_loadedAllTextures = true;
+		return true;
 	}
 	else
 	{
