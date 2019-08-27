@@ -1,4 +1,5 @@
 #include "Utilities.h"
+#include "CollidableTile.h"
 #include "Box.h"
 #include <algorithm>
 
@@ -14,6 +15,11 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 	}
 
 	return pointA + (pointB - pointA) * factor;
+}
+
+bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position)
+{
+	return (collisionLayer[position.x / 16][position.y / 16] == eCollidableTile::eCollidale);
 }
 
 bool Utilities::isPositionCollidable(const std::vector<sf::Vector2f>& collisionLayer, const std::vector<sf::Vector2f>& boxes, sf::Vector2f position)
