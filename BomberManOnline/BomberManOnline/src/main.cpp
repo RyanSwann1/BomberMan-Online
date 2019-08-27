@@ -2,9 +2,7 @@
 #include <iostream>
 #include "Level.h"
 #include "Resources.h"
-#include "Player.h"
 #include "ServerMessages.h"
-#include "Bomb.h"
 #include <algorithm>
 #include <assert.h>
 #include "Utilities.h"

@@ -2,9 +2,8 @@
 
 #include "NonCopyable.h"
 #include "TileLayer.h"
-#include "Player.h"
 #include "Box.h"
-#include "Bomb.h"
+#include "GameObjects.h"
 #include <vector>
 #include <string>
 #include <memory>

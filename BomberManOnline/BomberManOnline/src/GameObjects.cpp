@@ -61,7 +61,7 @@ void Player::plantBomb()
 //Bomb
 Bomb::Bomb(sf::Vector2f startingPosition, float expirationTime)
 	: m_position(startingPosition),
-	m_sprite(Textures::, texture.getFrameRect(236)),
+	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(236)),
 	m_lifeTimer(expirationTime, true)
 {
 	m_sprite.setPosition(startingPosition);

@@ -280,7 +280,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		float lifeTime = 0;
 		receivedMessage >> placementPosition.x >> placementPosition.y >> lifeTime;
 
-		m_bombs.emplace_back(Textures::getInstance().getTileSheet(), placementPosition, lifeTime);
+		m_bombs.emplace_back(placementPosition, lifeTime);
 	}
 	break;
 	case eServerMessageType::eDestroyBox :
