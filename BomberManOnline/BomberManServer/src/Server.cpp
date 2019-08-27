@@ -92,7 +92,7 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 1)
+		if (m_clients.size() >= 2)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
@@ -213,31 +213,47 @@ void Server::update(float frameTime)
 		client.m_bombPlacementTimer.update(frameTime);
 	}
 
-	for (auto iter = m_bombs.begin(); iter != m_bombs.end();)
+	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
 	{
-		iter->m_lifeTime.update(frameTime);
+		bomb->m_lifeTime.update(frameTime);
 
-		if (iter->m_lifeTime.isExpired())
+		if (bomb->m_lifeTime.isExpired())
 		{
-			for (int x = iter->m_position.x - 16; x <= iter->m_position.x + 16; x += 16)
+			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
 			{
-				sf::Vector2f explosionPosition(x, iter->m_position.y);
-				auto iter = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
-				if (iter != m_boxes.end())
+				sf::Vector2f explosionPosition(x, bomb->m_position.y);
+				auto box = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
+				if (box != m_boxes.end())
 				{
-					m_boxes.erase(iter);
+					m_boxes.erase(box);
 
 					sf::Packet packetToSend;
 					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 					broadcastMessage(packetToSend);
+					break;
+				}
+			}
+			
+			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
+			{
+				sf::Vector2f explosionPosition(bomb->m_position.x, y);
+				auto box = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
+				if (box != m_boxes.end())
+				{
+					m_boxes.erase(box);
+
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+					broadcastMessage(packetToSend);
+					break;
 				}
 			}
 
-			iter = m_bombs.erase(iter);
+			bomb = m_bombs.erase(bomb);
 		}
 		else
 		{
-			++iter;
+			++bomb;
 		}
 	}
 }
