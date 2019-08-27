@@ -36,6 +36,8 @@ struct Player
 		m_shape.setFillColor(sf::Color::Red);
 	}
 
+	void setNewPosition(sf::Vector2f newPosition);
+	void plantBomb();
 
 	int m_ID;
 	sf::Vector2f m_position;

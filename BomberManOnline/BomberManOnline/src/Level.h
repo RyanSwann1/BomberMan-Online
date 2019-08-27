@@ -7,8 +7,6 @@
 #include <string>
 #include <memory>
 
-
-
 class Level : private NonCopyable
 {
 public:

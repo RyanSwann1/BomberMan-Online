@@ -51,15 +51,7 @@ int main()
 
 	while (window.isOpen())
 	{
-		sf::Event sfmlEvent;
-		while (window.pollEvent(sfmlEvent))
-		{
-			if (sfmlEvent.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
-
+		//Handle Server Messages
 		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
 		{
 			for (auto& networkMessage : NetworkHandler::getInstance().getNetworkMessages())
@@ -199,73 +191,81 @@ int main()
 			NetworkHandler::getInstance().getNetworkMessages().clear();
 		}
 
+		//Input Handling
+		sf::Event sfmlEvent;
+		while (window.pollEvent(sfmlEvent))
+		{
+			if (sfmlEvent.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+			else if (sfmlEvent.type == sf::Event::KeyPressed)
+			{
+				if (localPlayer->m_moving)
+				{
+					continue;
+				}
+
+				switch (sfmlEvent.key.code)
+				{
+				case sf::Keyboard::A :
+				{
+					sf::Vector2f newPosition(localPlayer->m_position.x - tileSize, localPlayer->m_position.y);
+					if (!Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), newPosition))
+					{
+						localPlayer->setNewPosition(newPosition);
+
+						recentPositions.push_back(localPlayer->m_previousPosition);
+					}
+				}
+
+					break;
+				case sf::Keyboard::D :
+				{
+					sf::Vector2f newPosition(sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y));
+					if (!Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), newPosition))
+					{
+						localPlayer->setNewPosition(newPosition);
+
+						recentPositions.push_back(localPlayer->m_previousPosition);
+					}
+				}
+
+				break;
+				case sf::Keyboard::W :
+				{
+					sf::Vector2f newPosition(localPlayer->m_position.x, localPlayer->m_position.y - tileSize);
+					if (!Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), newPosition))
+					{
+						localPlayer->setNewPosition(newPosition);
+
+						recentPositions.push_back(localPlayer->m_previousPosition);
+					}
+				}
+
+					break;
+				case sf::Keyboard::S :
+				{
+					sf::Vector2f newPosition(localPlayer->m_position.x, localPlayer->m_position.y + tileSize);
+					if (!Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), newPosition))
+					{
+						localPlayer->setNewPosition(newPosition);
+
+						recentPositions.push_back(localPlayer->m_previousPosition);
+					}
+				}
+
+					break;
+				case sf::Keyboard::Space :
+					localPlayer->plantBomb();
+					
+					break;
+				}
+			}
+		}
+
 		if (gameStarted)
 		{
-			//Move player Left
-			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y)))
-			{
-			
-				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y);
-				localPlayer->m_previousPosition = localPlayer->m_position;
-				localPlayer->m_moving = true;
-				recentPositions.push_back(localPlayer->m_previousPosition);
-
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-			//Move player right
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y)))
-			{
-				
-				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y);
-				localPlayer->m_previousPosition = localPlayer->m_position;
-				localPlayer->m_moving = true;
-				recentPositions.push_back(localPlayer->m_previousPosition);
-			
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-			//Move player up
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize)))
-			{
-				
-				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize);
-				localPlayer->m_previousPosition = localPlayer->m_position;
-				localPlayer->m_moving = true;
-				recentPositions.push_back(localPlayer->m_previousPosition);
-				
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-			//Move player down
-			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize)))
-			{
-				
-				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize);
-				localPlayer->m_previousPosition = localPlayer->m_position;
-				localPlayer->m_moving = true;
-				recentPositions.push_back(localPlayer->m_previousPosition);
-
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(localPlayer->m_newPosition, localPlayer->m_movementSpeed);
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-			else if (!localPlayer->m_moving && localPlayer->m_bombPlacementTimer.isExpired() && sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
-			{
-				localPlayer->m_bombPlacementTimer.resetElaspedTime();
-
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::ePlayerBombPlacementRequest << localPlayer->m_position.x << localPlayer->m_position.y;
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-
 			for (auto& player : players)
 			{
 				if (!player.m_moving)
