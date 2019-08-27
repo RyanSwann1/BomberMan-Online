@@ -34,13 +34,11 @@ int main()
 		return -1;
 	}
 
-	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	std::unique_ptr<Level> level;
 	std::vector<sf::Vector2f> recentPositions;
 	recentPositions.reserve(MAX_RECENT_POSITIONS);
 	sf::Clock gameClock;
 	float deltaTime = 0;
-	bool gameStarted = false;
 	int clientID = 0;
 
 	while (window.isOpen())
@@ -92,20 +90,22 @@ int main()
 			}
 		}
 
+		//Update
 		if (level)
 		{
 			level->update(deltaTime);
 		}
 		
-
+		//Render
 		window.clear(sf::Color::Black);
 		if (level)
 		{
 			level->render(window);
 		}
-	
 		window.display();
 
 		deltaTime = gameClock.restart().asSeconds();
 	}
+
+	NetworkHandler::getInstance().disconnectFromServer();
 }

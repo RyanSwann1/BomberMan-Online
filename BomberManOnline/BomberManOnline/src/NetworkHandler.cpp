@@ -10,8 +10,9 @@ std::vector<sf::Packet>& NetworkHandler::getNetworkMessages()
 
 bool NetworkHandler::connectToServer()
 {
+	m_tcpSocket = std::make_unique<sf::TcpSocket>();
 	assert(!m_connectedToServer);
-	if (m_tcpSocket.connect(sf::IpAddress::LocalHost, 55001, sf::seconds(2.5f)) != sf::Socket::Done)
+	if (m_tcpSocket->connect(sf::IpAddress::LocalHost, 55001, sf::seconds(2.5f)) != sf::Socket::Done)
 	{
 		return false;
 	}
@@ -21,10 +22,17 @@ bool NetworkHandler::connectToServer()
 	return true;
 }
 
+void NetworkHandler::disconnectFromServer()
+{
+	m_tcpSocket->disconnect();
+	m_connectedToServer = false;
+	m_listenThread.join();
+}
+
 void NetworkHandler::sendMessageToServer(sf::Packet & packetToSend)
 {
 	assert(m_connectedToServer);
-	if (m_tcpSocket.send(packetToSend) != sf::Socket::Done)
+	if (m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 	{
 		std::cout << "Failed to send message\n";
 	}
@@ -35,7 +43,7 @@ void NetworkHandler::listen()
 	while (m_connectedToServer)
 	{
 		sf::Packet receivedPacket;
-		if (m_tcpSocket.receive(receivedPacket) == sf::Socket::Done)
+		if (m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 			m_receivedPackets.push_back(receivedPacket);

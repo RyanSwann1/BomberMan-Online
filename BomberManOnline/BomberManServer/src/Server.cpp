@@ -92,7 +92,7 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 2)
+		if (m_clients.size() >= 1)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
