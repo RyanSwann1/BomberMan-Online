@@ -92,7 +92,7 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 1)
+		if (m_clients.size() >= 2)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
@@ -140,7 +140,9 @@ void Server::listen()
 					break;
 					
 				case eServerMessageType::eDisconnectFromServer :
+				{
 					m_clientsToRemove.push_back(client.m_ID);
+				}
 					break;
 				}
 			}
@@ -209,6 +211,10 @@ void Server::update(float frameTime)
 		{
 			std::cout << "Client Removed\n";
 			m_clients.erase(client);
+
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
+			broadcastMessage(packetToSend);
 		}
 
 		iter = m_clientsToRemove.erase(iter);
