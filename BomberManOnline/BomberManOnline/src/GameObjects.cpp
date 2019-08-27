@@ -11,8 +11,8 @@ Player::Player(int tileSize, int ID)
 	m_newPosition(),
 	m_movementSpeed(2.5f),
 	m_movementFactor(0.0f),
-	m_shape(sf::Vector2f(tileSize, tileSize)),
-	m_AABB(m_position, sf::Vector2f(tileSize, tileSize)),
+	m_shape(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
+	m_AABB(m_position, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
 	m_moving(false),
 	m_bombPlacementTimer(2.0f, true)
 {
@@ -26,8 +26,8 @@ Player::Player(int tileSize, int ID, sf::Vector2f startingPosition)
 	m_newPosition(),
 	m_movementSpeed(2.5f),
 	m_movementFactor(0.0f),
-	m_shape(sf::Vector2f(tileSize, tileSize)),
-	m_AABB(m_position, sf::Vector2f(tileSize, tileSize)),
+	m_shape(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
+	m_AABB(m_position, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
 	m_moving(false),
 	m_bombPlacementTimer(2.0f, true)
 {
@@ -65,4 +65,18 @@ Bomb::Bomb(sf::Vector2f startingPosition, float expirationTime)
 	m_lifeTimer(expirationTime, true)
 {
 	m_sprite.setPosition(startingPosition);
+}
+
+//Explosion
+Explosion::Explosion(sf::Vector2f startingPosition, float expirationTime)
+	: m_position(startingPosition),
+	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(272)),
+	m_lifeTimer(expirationTime, true)
+{
+	m_sprite.setPosition(startingPosition);
+}
+
+void Explosion::update(float deltaTime)
+{
+	m_lifeTimer.update(deltaTime);
 }

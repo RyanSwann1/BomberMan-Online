@@ -37,4 +37,7 @@ private:
 	std::vector<Box> m_boxes;
 	std::vector<Player> m_players;
 	std::vector<Bomb> m_bombs;
+	std::vector<Explosion> m_explosions;
+
+	void spawnExplosions(sf::Vector2f bombExplodePosition);
 };

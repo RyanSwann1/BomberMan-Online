@@ -33,3 +33,14 @@ struct Bomb
 	sf::Sprite m_sprite;
 	Timer m_lifeTimer;
 };
+
+struct Explosion
+{
+	Explosion(sf::Vector2f startingPosition, float expirationTime);
+
+	void update(float deltaTime);
+
+	sf::Vector2f m_position;
+	sf::Sprite m_sprite;
+	Timer m_lifeTimer;
+};

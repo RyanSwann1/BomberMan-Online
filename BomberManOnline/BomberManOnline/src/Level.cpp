@@ -8,11 +8,28 @@
 
 constexpr size_t MAX_BOMBS = 50;
 constexpr size_t MAX_PLAYERS = 4;
+constexpr size_t MAX_EXPLOSIONS = 50;
+constexpr float EXPLOSION_DURATION = 0.5f;
 
 Level::Level()
 {
 	m_boxes.reserve(MAX_BOMBS);
 	m_players.reserve(MAX_PLAYERS);
+	m_explosions.reserve(MAX_EXPLOSIONS);
+}
+
+void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
+{
+	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	for (int x = bombExplodePosition.x - tileSize; x <= bombExplodePosition.x + tileSize; x += tileSize * 2)
+	{
+		m_explosions.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_DURATION);
+	}
+
+	for (int y = bombExplodePosition.y - tileSize; y <= bombExplodePosition.y + tileSize; y += tileSize * 2)
+	{
+		m_explosions.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_DURATION);
+	}
 }
 
 std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageInitialGameData & initialGameData)
@@ -154,6 +171,11 @@ void Level::render(sf::RenderWindow & window) const
 	{
 		window.draw(bomb.m_sprite);
 	}
+
+	for (const auto& explosion : m_explosions)
+	{
+		window.draw(explosion.m_sprite);
+	}
 }
 
 void Level::update(float deltaTime)
@@ -197,7 +219,22 @@ void Level::update(float deltaTime)
 
 		if (iter->m_lifeTimer.isExpired())
 		{
+			spawnExplosions(iter->m_position);
 			iter = m_bombs.erase(iter);
+		}
+		else
+		{
+			++iter;
+		}
+	}
+
+	for (auto iter = m_explosions.begin(); iter != m_explosions.end();)
+	{
+		iter->m_lifeTimer.update(deltaTime);
+
+		if (iter->m_lifeTimer.isExpired())
+		{
+			iter = m_explosions.erase(iter);
 		}
 		else
 		{
