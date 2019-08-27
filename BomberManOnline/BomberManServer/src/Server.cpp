@@ -209,12 +209,12 @@ void Server::update(float frameTime)
 		auto client = std::find_if(m_clients.begin(), m_clients.end(), [clientIDToRemove](const auto& client) { return client.m_ID == clientIDToRemove; });
 		if (client != m_clients.end())
 		{
-			std::cout << "Client Removed\n";
-			m_clients.erase(client);
-
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
 			broadcastMessage(packetToSend);
+
+			std::cout << "Client Removed\n";
+			m_clients.erase(client);
 		}
 
 		iter = m_clientsToRemove.erase(iter);
@@ -253,17 +253,12 @@ void Server::update(float frameTime)
 					sf::Packet packetToSend;
 					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 					broadcastMessage(packetToSend);
-					break;
 				}
 
 				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
 				if (player != m_clients.end())
 				{
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
-					broadcastMessage(packetToSend);
-
-					m_clients.erase(player);
+					m_clientsToRemove.push_back(player->m_ID);
 				}
 			}
 			
@@ -278,15 +273,16 @@ void Server::update(float frameTime)
 					sf::Packet packetToSend;
 					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 					broadcastMessage(packetToSend);
-					break;
 				}
 
 				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
 				if (player != m_clients.end())
 				{
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
-					broadcastMessage(packetToSend);
+					m_clientsToRemove.push_back(player->m_ID);
+
+					//sf::Packet packetToSend;
+					//packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
+					//broadcastMessage(packetToSend);
 				}
 			}
 
