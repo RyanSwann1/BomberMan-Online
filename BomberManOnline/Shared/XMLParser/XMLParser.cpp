@@ -224,7 +224,7 @@ void parseCollisionLayer(const TiXmlElement & rootElement, sf::Vector2i tileSize
 			spawnPosition.x /= tileSize.x;
 			spawnPosition.y /= tileSize.y;
 
-			collisionLayer[spawnPosition.x][spawnPosition.y] = eCollidableTile::eCollidale;
+			collisionLayer[spawnPosition.y][spawnPosition.x] = eCollidableTile::eCollidale;
 		}
 	}
 }
@@ -251,7 +251,7 @@ void parseBoxLayer(const TiXmlElement & rootElement, sf::Vector2i tileSize, std:
 			spawnPosition.x /= tileSize.x;
 			spawnPosition.y /= tileSize.y;
 
-			collisionLayer[spawnPosition.x][spawnPosition.y] = eCollidableTile::eCollidale;
+			collisionLayer[spawnPosition.y][spawnPosition.] = eCollidableTile::eCollidale;
 		}
 	}
 }
