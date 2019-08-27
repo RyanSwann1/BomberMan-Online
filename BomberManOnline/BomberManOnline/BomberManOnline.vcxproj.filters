@@ -125,5 +125,11 @@
     <ClInclude Include="src\GameObjects.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\PathFinding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\CollidableTile.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 
 #include "NonCopyable.h"
 #include "PlayerControllerType.h"
+#include "CollidableTile.h"
 #include "Direction.h"
 #include "Timer.h"
 #include <SFML/Graphics.hpp>
@@ -66,10 +67,10 @@ private:
 	std::vector<int> m_clientsToRemove;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
-	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<BombServer> m_bombs;
 	std::vector<sf::Vector2f> m_boxes;
+	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	sf::Clock m_clock;
 
 	void addNewClient();
@@ -80,4 +81,5 @@ private:
 	void placeBomb(Client& client, sf::Vector2f placementPosition);
 
 	void update(float frameTime);
+
 };

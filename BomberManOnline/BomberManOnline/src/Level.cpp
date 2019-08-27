@@ -72,7 +72,7 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 	case sf::Keyboard::A:
 	{
 		sf::Vector2f newPosition(m_localPlayer->m_position.x - tileSize, m_localPlayer->m_position.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, m_boxes, newPosition))
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 
@@ -85,7 +85,7 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 	case sf::Keyboard::D:
 	{
 		sf::Vector2f newPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize, m_localPlayer->m_position.y));
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, m_boxes, newPosition))
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 
@@ -98,7 +98,7 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 	case sf::Keyboard::W:
 	{
 		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, m_boxes, newPosition))
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 
@@ -111,7 +111,7 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 	case sf::Keyboard::S:
 	{
 		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, m_boxes, newPosition))
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 
@@ -125,16 +125,6 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 
 		break;
 	}
-}
-
-const std::vector<sf::Vector2f>& Level::getCollisionLayer() const
-{
-	return m_collisionLayer;
-}
-
-std::vector<Box>& Level::getBoxes()
-{
-	return m_boxes;
 }
 
 void Level::render(sf::RenderWindow & window) const
@@ -329,6 +319,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		assert(iter != m_boxes.end());
 
 		m_boxes.erase(iter);
+		m_collisionLayer[boxPosition.y / tileSize][boxPosition.x / tileSize] = eCollidableTile::NonCollidable;
 	}
 		
 		break;
