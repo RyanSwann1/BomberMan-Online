@@ -317,7 +317,10 @@ int main()
 			//}
 		}
 		
-		localPlayer->m_bombPlacementTimer.update(deltaTime);
+		if (localPlayer)
+		{
+			localPlayer->m_bombPlacementTimer.update(deltaTime);
+		}
 
 		for (auto iter = bombs.begin(); iter != bombs.end();)
 		{

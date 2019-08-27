@@ -219,7 +219,7 @@ void Server::update(float frameTime)
 
 		if (iter->m_lifeTime.isExpired())
 		{
-			for (int x = iter->m_position.x - 1; x <= iter->m_position.x; x += 2)
+			for (int x = iter->m_position.x - 16; x <= iter->m_position.x + 16; x += 16)
 			{
 				sf::Vector2f explosionPosition(x, iter->m_position.y);
 				auto iter = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
