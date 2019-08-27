@@ -2,14 +2,6 @@
 #include "XMLParser/XMLParser.h"
 #include "Resources.h"
 
-//Box
-Box::Box(sf::Vector2f startingPosition)
-	: position(startingPosition),
-	sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204))
-{
-	sprite.setPosition(startingPosition);
-}
-
 //Level
 std::unique_ptr<Level> Level::create(const std::string & levelName)
 {

@@ -2,18 +2,12 @@
 
 #include "NonCopyable.h"
 #include "TileLayer.h"
-#include <SFML/Graphics.hpp>
+#include "Box.h"
 #include <vector>
 #include <string>
 #include <memory>
 
-struct Box
-{
-	Box(sf::Vector2f startingPosition);
 
-	sf::Vector2f position;
-	sf::Sprite sprite;
-};
 
 class Level : private NonCopyable
 {

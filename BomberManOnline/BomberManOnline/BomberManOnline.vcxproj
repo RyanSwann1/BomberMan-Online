@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
+    <ClCompile Include="..\Shared\Box.cpp" />
+    <ClCompile Include="..\Shared\Resources.cpp" />
+    <ClCompile Include="..\Shared\Texture.cpp" />
     <ClCompile Include="..\Shared\Timer.cpp" />
     <ClCompile Include="..\Shared\Utilities.cpp" />
     <ClCompile Include="..\Shared\XMLParser\Base64.cpp" />
@@ -31,17 +34,18 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\Player.cpp" />
-    <ClCompile Include="src\Resources.cpp" />
-    <ClCompile Include="src\Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
+    <ClInclude Include="..\Shared\Box.h" />
     <ClInclude Include="..\Shared\Direction.h" />
     <ClInclude Include="..\Shared\FrameDetails.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\PlayerControllerType.h" />
+    <ClInclude Include="..\Shared\Resources.h" />
     <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
+    <ClInclude Include="..\Shared\Texture.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
     <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\Utilities.h" />
@@ -52,8 +56,6 @@
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
     <ClInclude Include="src\Player.h" />
-    <ClInclude Include="src\Resources.h" />
-    <ClInclude Include="src\Texture.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

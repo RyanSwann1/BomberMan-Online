@@ -158,7 +158,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	sf::Packet packetToSend;
-	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
+	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, m_boxes, playerMoveMessage.newPosition))
 	{
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_position);
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
@@ -181,7 +181,7 @@ void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessag
 
 void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
 {
-	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
+	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, m_boxes, placementPosition))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;

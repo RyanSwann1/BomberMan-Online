@@ -203,7 +203,7 @@ int main()
 		{
 			//Move player Left
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y)))
 			{
 			
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x - tileSize, localPlayer->m_position.y);
@@ -217,7 +217,7 @@ int main()
 			}
 			//Move player right
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y)))
 			{
 				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x + tileSize, localPlayer->m_position.y);
@@ -231,7 +231,7 @@ int main()
 			}
 			//Move player up
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::W) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize)))
 			{
 				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y - tileSize);
@@ -245,7 +245,7 @@ int main()
 			}
 			//Move player down
 			else if (sf::Keyboard::isKeyPressed(sf::Keyboard::S) &&
-				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize)))
+				!localPlayer->m_moving && !Utilities::isPositionCollidable(level->getCollisionLayer(), level->getBoxes(), sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize)))
 			{
 				
 				localPlayer->m_newPosition = sf::Vector2f(localPlayer->m_position.x, localPlayer->m_position.y + tileSize);

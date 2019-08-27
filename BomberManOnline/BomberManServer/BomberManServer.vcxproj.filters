@@ -51,6 +51,15 @@
     <ClCompile Include="..\Shared\Utilities.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Box.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Resources.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Texture.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Server.h">
@@ -90,6 +99,15 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Utilities.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Box.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Resources.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Texture.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

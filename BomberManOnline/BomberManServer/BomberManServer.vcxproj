@@ -124,6 +124,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
+    <ClCompile Include="..\Shared\Box.cpp" />
+    <ClCompile Include="..\Shared\Resources.cpp" />
+    <ClCompile Include="..\Shared\Texture.cpp" />
     <ClCompile Include="..\Shared\Timer.cpp" />
     <ClCompile Include="..\Shared\Utilities.cpp" />
     <ClCompile Include="..\Shared\XMLParser\Base64.cpp" />
@@ -136,11 +139,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
+    <ClInclude Include="..\Shared\Box.h" />
     <ClInclude Include="..\Shared\Direction.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\PlayerControllerType.h" />
+    <ClInclude Include="..\Shared\Resources.h" />
     <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
+    <ClInclude Include="..\Shared\Texture.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
     <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\Utilities.h" />
