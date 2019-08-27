@@ -19,40 +19,5 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position)
 {
-	return (collisionLayer[position.x / 16][position.y / 16] == eCollidableTile::eCollidale);
+	return (collisionLayer[position.y / 16][position.x / 16] == eCollidableTile::eCollidale);
 }
-
-bool Utilities::isPositionCollidable(const std::vector<sf::Vector2f>& collisionLayer, const std::vector<sf::Vector2f>& boxes, sf::Vector2f position)
-{
-	auto cIter = std::find_if(collisionLayer.cbegin(), collisionLayer.cend(), [position](const auto collidablePosition)
-		{ return collidablePosition == position; });
-
-	if (cIter == collisionLayer.end())
-	{
-		auto boxColision = std::find_if(boxes.cbegin(), boxes.cend(), [position](const auto box) { return box == position; });
-		if (boxColision == boxes.cend())
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool Utilities::isPositionCollidable(const std::vector<sf::Vector2f>& collisionLayer, const std::vector<Box>& boxes, sf::Vector2f position)
-{
-	auto cIter = std::find_if(collisionLayer.cbegin(), collisionLayer.cend(), [position](const auto collidablePosition)
-	{ return collidablePosition == position; });
-
-	if (cIter == collisionLayer.end())
-	{
-		auto boxColision = std::find_if(boxes.cbegin(), boxes.cend(), [position](const auto& box) { return box.position == position; });
-		if (boxColision == boxes.cend())
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
