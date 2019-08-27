@@ -64,8 +64,9 @@ int main()
 				case eServerMessageType::eNewPlayerPosition:
 				case eServerMessageType::ePlaceBomb:
 				case eServerMessageType::eDestroyBox:
+				case eServerMessageType::ePlayerDisconnected :
 				{
-					level->onReceivedServerMessage(messageType, receivedMessage, recentPositions);
+					level->onReceivedServerMessage(messageType, receivedMessage, recentPositions, window);
 				}
 				break;
 				}

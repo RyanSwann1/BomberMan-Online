@@ -63,6 +63,7 @@ private:
 	sf::SocketSelector m_socketSelector;
 	bool m_running;
 	std::vector<Client> m_clients;
+	std::vector<int> m_clientsToRemove;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
 	std::vector<sf::Vector2f> m_collisionLayer;

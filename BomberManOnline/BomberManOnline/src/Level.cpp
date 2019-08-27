@@ -117,6 +117,7 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 
 			recentPositions.push_back(m_localPlayer->m_previousPosition);
 		}
+		break;
 	}
 
 	case sf::Keyboard::Space:
@@ -243,7 +244,7 @@ void Level::update(float deltaTime)
 	}
 }
 
-void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet & receivedMessage, std::vector<sf::Vector2f>& recentPositions)
+void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet & receivedMessage, std::vector<sf::Vector2f>& recentPositions, sf::RenderWindow& window)
 {
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	switch (receivedMessageType)
@@ -330,6 +331,23 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		m_boxes.erase(iter);
 	}
 		
+		break;
+	case eServerMessageType::ePlayerDisconnected :
+	{
+		int clientID = 0;
+		receivedMessage >> clientID;
+		if (m_localPlayer->m_ID == clientID)
+		{
+			window.close();
+		}
+		else
+		{
+			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player.m_ID == clientID; });
+			assert(iter != m_players.end());
+			
+			m_players.erase(iter);
+		}
+	}
 		break;
 	}
 }

@@ -138,6 +138,10 @@ void Server::listen()
 					placeBomb(client, position);
 				}
 					break;
+					
+				case eServerMessageType::eDisconnectFromServer :
+					m_clientsToRemove.push_back(client.m_ID);
+					break;
 				}
 			}
 		}
@@ -197,6 +201,19 @@ void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
 
 void Server::update(float frameTime)
 {
+	for (auto iter = m_clientsToRemove.begin(); iter != m_clientsToRemove.end();)
+	{
+		int clientIDToRemove = (*iter);
+		auto client = std::find_if(m_clients.begin(), m_clients.end(), [clientIDToRemove](const auto& client) { return client.m_ID == clientIDToRemove; });
+		if (client != m_clients.end())
+		{
+			std::cout << "Client Removed\n";
+			m_clients.erase(client);
+		}
+
+		iter = m_clientsToRemove.erase(iter);
+	}
+
 	for (auto& client : m_clients)
 	{
 		if (client.m_moving)
@@ -232,6 +249,16 @@ void Server::update(float frameTime)
 					broadcastMessage(packetToSend);
 					break;
 				}
+
+				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
+				if (player != m_clients.end())
+				{
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
+					broadcastMessage(packetToSend);
+
+					m_clients.erase(player);
+				}
 			}
 			
 			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
@@ -246,6 +273,14 @@ void Server::update(float frameTime)
 					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 					broadcastMessage(packetToSend);
 					break;
+				}
+
+				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
+				if (player != m_clients.end())
+				{
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
+					broadcastMessage(packetToSend);
 				}
 			}
 

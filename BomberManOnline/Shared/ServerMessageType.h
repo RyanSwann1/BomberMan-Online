@@ -12,5 +12,7 @@ enum class eServerMessageType
 	eValidBombPlacementRequest,
 	ePlaceBomb,
 	eExplodeBomb,
-	eDestroyBox
+	eDestroyBox,
+	ePlayerDisconnected,
+	eDisconnectFromServer
 };

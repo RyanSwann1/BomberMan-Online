@@ -20,7 +20,7 @@ public:
 	std::vector<Box>& getBoxes();
 
 	void handleInput(const sf::Event& sfmlEvent, std::vector<sf::Vector2f>& recentPositions);
-	void onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet& receivedMessage, std::vector<sf::Vector2f>& recentPositions);
+	void onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet& receivedMessage, std::vector<sf::Vector2f>& recentPositions, sf::RenderWindow& window);
 
 	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);
