@@ -279,10 +279,6 @@ void Server::update(float frameTime)
 				if (player != m_clients.end())
 				{
 					m_clientsToRemove.push_back(player->m_ID);
-
-					//sf::Packet packetToSend;
-					//packetToSend << eServerMessageType::ePlayerDisconnected << player->m_ID;
-					//broadcastMessage(packetToSend);
 				}
 			}
 
