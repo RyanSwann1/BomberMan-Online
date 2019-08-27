@@ -32,11 +32,14 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
 		uniqueServer->m_running = true;
 		uniqueServer->m_levelName = "Level1.tmx";
+		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
-			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions, uniqueServer->m_boxes))
+			uniqueServer->m_collidableGrid, uniqueServer->m_spawnPositions, uniqueServer->m_boxes))
 		{
 			return std::unique_ptr<Server>();
 		}
+
+
 
 		return uniqueServer;
 	}
@@ -92,7 +95,7 @@ void Server::addNewClient()
 		m_socketSelector.add(*m_clients.back().m_tcpSocket);
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 2)
+		if (m_clients.size() >= 1)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();

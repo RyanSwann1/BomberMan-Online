@@ -38,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
     <ClInclude Include="..\Shared\Box.h" />
+    <ClInclude Include="..\Shared\CollidableTile.h" />
     <ClInclude Include="..\Shared\Direction.h" />
     <ClInclude Include="..\Shared\FrameDetails.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
@@ -55,6 +56,7 @@
     <ClInclude Include="src\GameObjects.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
+    <ClInclude Include="src\PathFinding.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -4,6 +4,7 @@
 #include "TileLayer.h"
 #include "Box.h"
 #include "GameObjects.h"
+#include "CollidableTile.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -32,6 +33,7 @@ private:
 	std::vector<sf::Vector2f> m_collisionLayer;
 	std::vector<TileLayer> m_tileLayers;
 	std::vector<sf::Vector2f> m_spawnPositions;
+	std::vector<std::vector<eCollidableTile>> m_collidableGrid;
 
 	Player* m_localPlayer;
 	std::vector<Box> m_boxes;

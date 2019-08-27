@@ -2,6 +2,7 @@
 
 #include "NonCopyable.h"
 #include "PlayerControllerType.h"
+#include "CollidableTile.h"
 #include "Direction.h"
 #include "Timer.h"
 #include <SFML/Graphics.hpp>
@@ -70,6 +71,7 @@ private:
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<BombServer> m_bombs;
 	std::vector<sf::Vector2f> m_boxes;
+	std::vector<std::vector<eCollidableTile>> m_collidableGrid;
 	sf::Clock m_clock;
 
 	void addNewClient();
@@ -80,4 +82,5 @@ private:
 	void placeBomb(Client& client, sf::Vector2f placementPosition);
 
 	void update(float frameTime);
+
 };

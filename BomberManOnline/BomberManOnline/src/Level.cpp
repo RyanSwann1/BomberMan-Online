@@ -39,7 +39,7 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	uniqueLevel->m_levelName = initialGameData.levelName;
 	std::vector<sf::Vector2f> boxSpawnPositions;
 	if (!XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_levelDimensions, level->m_tileLayers,
-		level->m_collisionLayer, level->m_spawnPositions, boxSpawnPositions))
+		level->m_collidableGrid, level->m_spawnPositions, boxSpawnPositions))
 	{
 		return std::unique_ptr<Level>();
 	}
