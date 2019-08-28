@@ -134,7 +134,6 @@
     <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp" />
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\PathFinding.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +152,6 @@
     <ClInclude Include="..\Shared\XMLParser\Base64.h" />
     <ClInclude Include="..\Shared\XMLParser\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser\XMLParser.h" />
-    <ClInclude Include="src\PathFinding.h" />
     <ClInclude Include="src\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
