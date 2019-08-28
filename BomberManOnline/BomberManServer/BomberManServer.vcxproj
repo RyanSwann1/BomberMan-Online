@@ -124,7 +124,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\SFML\include\SFML\Network\Packet.cpp" />
-    <ClCompile Include="..\Shared\Box.cpp" />
     <ClCompile Include="..\Shared\Resources.cpp" />
     <ClCompile Include="..\Shared\Texture.cpp" />
     <ClCompile Include="..\Shared\Timer.cpp" />
@@ -140,7 +139,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
-    <ClInclude Include="..\Shared\Box.h" />
     <ClInclude Include="..\Shared\CollidableTile.h" />
     <ClInclude Include="..\Shared\Direction.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />

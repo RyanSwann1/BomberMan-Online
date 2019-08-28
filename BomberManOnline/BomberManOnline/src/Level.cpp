@@ -13,7 +13,6 @@ constexpr float EXPLOSION_DURATION = 0.5f;
 
 Level::Level()
 {
-	m_boxes.reserve(MAX_BOMBS);
 	m_players.reserve(MAX_PLAYERS);
 	m_explosions.reserve(MAX_EXPLOSIONS);
 }
@@ -37,17 +36,10 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	Level* level = new Level;
 	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
 	uniqueLevel->m_levelName = initialGameData.levelName;
-	std::vector<sf::Vector2f> boxSpawnPositions;
 	if (!XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_levelDimensions, level->m_tileLayers,
-		level->m_collisionLayer, level->m_spawnPositions, boxSpawnPositions))
+		level->m_collisionLayer, level->m_spawnPositions))
 	{
 		return std::unique_ptr<Level>();
-	}
-
-	level->m_boxes.reserve(boxSpawnPositions.size());
-	for (const auto& position : boxSpawnPositions)
-	{
-		level->m_boxes.emplace_back(position);
 	}
 
 	//Initialize Remote Players
@@ -153,9 +145,17 @@ void Level::render(sf::RenderWindow & window) const
 		window.draw(player.m_shape);
 	}
 
-	for (const auto& box : m_boxes)
+	sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
+	for (int y = 0; y < m_levelDimensions.y; y++)
 	{
-		window.draw(box.sprite);
+		for (int x = 0; x < m_levelDimensions.x; x++)
+		{
+			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
+			{
+				boxSprite.setPosition(sf::Vector2f(x * 16, y * 16));
+				window.draw(boxSprite);
+			}
+		}
 	}
 
 	for (const auto& bomb : m_bombs)
@@ -315,11 +315,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	{
 		sf::Vector2f boxPosition;
 		receivedMessage >> boxPosition.x >> boxPosition.y;
-		auto iter = std::find_if(m_boxes.begin(), m_boxes.end(), [boxPosition](const auto box) { return box.position == boxPosition; });
-		assert(iter != m_boxes.end());
-
-		m_boxes.erase(iter);
-		m_collisionLayer[boxPosition.y / tileSize][boxPosition.x / tileSize] = eCollidableTile::NonCollidable;
+		m_collisionLayer[boxPosition.y / tileSize][boxPosition.x / tileSize] = eCollidableTile::eNonCollidable;
 	}
 		
 		break;

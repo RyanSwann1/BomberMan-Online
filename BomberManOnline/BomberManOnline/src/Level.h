@@ -32,7 +32,6 @@ private:
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 
 	Player* m_localPlayer;
-	std::vector<Box> m_boxes;
 	std::vector<Player> m_players;
 	std::vector<Bomb> m_bombs;
 	std::vector<Explosion> m_explosions;

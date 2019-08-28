@@ -2,6 +2,7 @@
 
 enum class eCollidableTile
 {
-	NonCollidable = 0,
-	eCollidale
+	eBox = 0, 
+	eWall,
+	eNonCollidable
 };

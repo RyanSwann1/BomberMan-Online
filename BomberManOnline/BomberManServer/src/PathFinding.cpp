@@ -1,5 +1,11 @@
 #include "PathFinding.h"
 #include "CollidableTile.h"
+#include <math.h>
+
+float distanceFromSource(sf::Vector2f source, sf::Vector2f target)
+{
+	return std::abs(source.x - target.x) + std::abs(source.y - target.y);
+}
 
 void getNeighbours(sf::Vector2f position, std::vector<sf::Vector2f>& neighbours, 
 	const std::vector<std::vector<eCollidableTile>>& collisionLayers)

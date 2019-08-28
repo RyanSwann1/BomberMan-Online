@@ -13,9 +13,8 @@ namespace XMLParser
 	
 	bool loadMapAsClient(const std::string& mapName, sf::Vector2i& mapDimensions,
 		std::vector<TileLayer>& tileLayers, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
-		std::vector<sf::Vector2f>& spawnPositions, std::vector<sf::Vector2f>& boxes);
+		std::vector<sf::Vector2f>& spawnPositions);
 
 	bool loadMapAsServer(const std::string& mapName, sf::Vector2i& mapDimensions,
-		std::vector<std::vector<eCollidableTile>>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions,
-		std::vector<sf::Vector2f>& boxes);
+		std::vector<std::vector<eCollidableTile>>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions);
 }

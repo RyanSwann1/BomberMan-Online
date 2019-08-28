@@ -19,5 +19,5 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position)
 {
-	return (collisionLayer[position.y / 16][position.x / 16] == eCollidableTile::eCollidale);
+	return collisionLayer[position.y / 16][position.x / 16] != eCollidableTile::eNonCollidable;
 }
