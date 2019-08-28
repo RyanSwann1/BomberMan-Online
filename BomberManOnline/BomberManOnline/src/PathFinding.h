@@ -33,6 +33,7 @@ public:
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
 	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+	std::vector<sf::Vector2f> pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
 private:
 
