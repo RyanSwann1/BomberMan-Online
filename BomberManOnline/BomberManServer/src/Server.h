@@ -69,7 +69,6 @@ private:
 	sf::Vector2i m_mapDimensions;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<BombServer> m_bombs;
-	std::vector<sf::Vector2f> m_boxes;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	sf::Clock m_clock;
 

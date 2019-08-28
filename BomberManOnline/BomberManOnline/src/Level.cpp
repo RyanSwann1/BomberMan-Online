@@ -310,14 +310,13 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		m_bombs.emplace_back(placementPosition, lifeTime);
 	}
-	break;
+		break;
 	case eServerMessageType::eDestroyBox :
 	{
 		sf::Vector2f boxPosition;
 		receivedMessage >> boxPosition.x >> boxPosition.y;
 		m_collisionLayer[boxPosition.y / tileSize][boxPosition.x / tileSize] = eCollidableTile::eNonCollidable;
 	}
-		
 		break;
 	case eServerMessageType::ePlayerDisconnected :
 	{

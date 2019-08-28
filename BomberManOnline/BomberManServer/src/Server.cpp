@@ -34,12 +34,10 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		uniqueServer->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
-			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions, uniqueServer->m_boxes))
+			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
 		{
 			return std::unique_ptr<Server>();
 		}
-
-
 
 		return uniqueServer;
 	}
@@ -248,16 +246,12 @@ void Server::update(float frameTime)
 			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
 			{
 				sf::Vector2f explosionPosition(x, bomb->m_position.y);
-				auto box = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
-				if (box != m_boxes.end())
-				{
-					m_boxes.erase(box);
-					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::NonCollidable;
+				m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
 
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-					broadcastMessage(packetToSend);
-				}
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+				broadcastMessage(packetToSend);
+
 
 				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
 				if (player != m_clients.end())
@@ -269,16 +263,11 @@ void Server::update(float frameTime)
 			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
 			{
 				sf::Vector2f explosionPosition(bomb->m_position.x, y);
-				auto box = std::find_if(m_boxes.begin(), m_boxes.end(), [explosionPosition](const auto& box) { return box == explosionPosition; });
-				if (box != m_boxes.end())
-				{
-					m_boxes.erase(box);
-					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::NonCollidable;
+				m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
 
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-					broadcastMessage(packetToSend);
-				}
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+				broadcastMessage(packetToSend);
 
 				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
 				if (player != m_clients.end())

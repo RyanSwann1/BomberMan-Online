@@ -8,10 +8,8 @@ struct FrontierNode
 	FrontierNode(sf::Vector2f position, bool visited)
 		: position(position),
 		visited(visited)
-	{
-
-	}
-
+	{}
+	
 	sf::Vector2f position;
 	bool visited;
 };
@@ -19,7 +17,6 @@ struct FrontierNode
 enum class eCollidableTile;
 class PathFinding
 {
-
 public:
 	static PathFinding& getInstance()
 	{

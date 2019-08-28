@@ -60,6 +60,9 @@
     <ClCompile Include="..\Shared\Texture.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="src\GameObjects.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -121,6 +124,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\GameObjects.h">
       <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObjects.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
