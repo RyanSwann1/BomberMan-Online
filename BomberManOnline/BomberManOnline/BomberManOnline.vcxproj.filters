@@ -63,9 +63,6 @@
     <ClCompile Include="..\Shared\Texture.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObjects.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\NetworkHandler.h">
@@ -122,13 +119,13 @@
     <ClInclude Include="..\Shared\Texture.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PathFinding.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\CollidableTile.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlayerClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\GameObjects.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

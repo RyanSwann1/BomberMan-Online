@@ -60,6 +60,9 @@
     <ClCompile Include="..\Shared\Texture.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="src\PathFinding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Server.h">
@@ -108,6 +111,12 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Texture.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PathFinding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\CollidableTile.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>
