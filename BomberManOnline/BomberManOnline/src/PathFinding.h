@@ -5,12 +5,17 @@
 
 struct FrontierNode
 {
-	FrontierNode(sf::Vector2f position, bool visited)
-		: position(position),
+	FrontierNode(bool visited)
+		: cameFrom(cameFrom),
+		visited(visited)
+	{}
+
+	FrontierNode(bool visited, FrontierNode& cameFrom)
+		: cameFrom(&cameFrom),
 		visited(visited)
 	{}
 	
-	sf::Vector2f position;
+	FrontierNode* cameFrom;
 	bool visited;
 };
 
@@ -26,6 +31,8 @@ public:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f source, sf::Vector2f destination, 
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+
+	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
 private:
 
