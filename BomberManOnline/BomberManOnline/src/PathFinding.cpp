@@ -1,12 +1,13 @@
 #include "PathFinding.h"
 #include "CollidableTile.h"
 #include <math.h>
+#include <queue>
 
 constexpr size_t MAX_NEIGHBOURS = 4;
 
-bool isNodeVisited(const std::vector<std::vector<FrontierNode>>& frontier, sf::Vector2f position)
+bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2f position)
 {
-	return frontier[position.y][position.x].visited;
+	return graph[position.y][position.x].visited;
 }
 
 bool isNodeVisited(const std::vector<std::vector<bool>>& frontier, sf::Vector2f position)
@@ -77,18 +78,17 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f source, sf::Ve
 
 std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer)
 {
-	std::vector<std::vector<FrontierNode>> frontier;
-	frontier.resize(21);
-	for (auto& row : frontier)
+	std::queue<sf::Vector2f> frontier;
+	frontier.emplace(source);
+
+	std::vector<std::vector<GraphNode>> graph;
+	graph.resize(21);
+	for (auto& row : graph)
 	{
-		std::vector<FrontierNode> col;
+		std::vector<GraphNode> col;
 		col.resize(21);
 		row = col;
 	}
-
-	std::vector<sf::Vector2f> graph;
-	graph.emplace_back(source);
-	sf::Vector2f lastPosition = source;
 
 	std::vector<sf::Vector2f> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
@@ -96,19 +96,21 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 	bool boxFound = false;
 	while (!boxFound)
 	{
-		getNeighbours(graph.back(), neighbours);
+		sf::Vector2f lastPosition = frontier.front();
+		frontier.pop();
+		getNeighbours(lastPosition, neighbours);
 		for (auto& neighbourPosition : neighbours)
 		{
 			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
 			{
 				boxFound = true;
+				break;
 			}
 			else
 			{
-				if (!isNodeVisited(frontier, neighbourPosition))
+				if (!isNodeVisited(graph, neighbourPosition))
 				{
-					frontier[neighbourPosition.y][neighbourPosition.x] = FrontierNode(true, lastPosition);
-					break;
+					graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 				}
 			}
 		}
@@ -118,3 +120,6 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 
 	return std::vector<sf::Vector2f>();
 }
+
+
+

@@ -3,19 +3,19 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-struct FrontierNode
+struct GraphNode
 {
-	FrontierNode(bool visited)
-		: cameFrom(cameFrom),
-		visited(visited)
+	GraphNode()
+		: cameFrom(),
+		visited(false)
 	{}
 
-	FrontierNode(bool visited, FrontierNode& cameFrom)
-		: cameFrom(&cameFrom),
-		visited(visited)
+	GraphNode(sf::Vector2f cameFrom)
+		: cameFrom(cameFrom),
+		visited(true)
 	{}
-	
-	FrontierNode* cameFrom;
+
+	sf::Vector2f cameFrom;
 	bool visited;
 };
 
