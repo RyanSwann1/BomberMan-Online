@@ -1,0 +1,33 @@
+#pragma once
+
+#include "Player.h"
+#include <SFML/Network.hpp>
+#include <memory>
+#include <utility>
+
+enum class eAIState
+{
+	eNone = 0,
+	eMoveToBox,
+	eMoveToSafePosition
+};
+
+struct PlayerServerHuman : public Player
+{
+	PlayerServerHuman(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
+		: Player(ID, startingPosition, controllerType),
+		m_tcpSocket(std::move(tcpSocket))
+	{}
+
+	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
+};
+
+struct PlayerServerAI : public Player
+{
+	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
+		: Player(ID, startingPosition, controllerType),
+		m_currentState(eAIState::eMoveToBox)
+	{}
+
+	eAIState m_currentState;
+};

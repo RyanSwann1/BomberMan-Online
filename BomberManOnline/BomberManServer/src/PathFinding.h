@@ -3,14 +3,19 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-struct FrontierNode
+struct GraphNode
 {
-	FrontierNode(sf::Vector2f position, bool visited)
-		: position(position),
-		visited(visited)
+	GraphNode()
+		: cameFrom(),
+		visited(false)
 	{}
-	
-	sf::Vector2f position;
+
+	GraphNode(sf::Vector2f cameFrom)
+		: cameFrom(cameFrom),
+		visited(true)
+	{}
+
+	sf::Vector2f cameFrom;
 	bool visited;
 };
 
@@ -26,6 +31,9 @@ public:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f source, sf::Vector2f destination, 
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+
+	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+	std::vector<sf::Vector2f> pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
 private:
 

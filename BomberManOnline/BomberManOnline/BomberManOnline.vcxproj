@@ -33,7 +33,6 @@
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
-    <ClCompile Include="src\PathFinding.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
@@ -56,7 +55,6 @@
     <ClInclude Include="src\GameObjects.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\NetworkHandler.h" />
-    <ClInclude Include="src\PathFinding.h" />
     <ClInclude Include="src\PlayerClient.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

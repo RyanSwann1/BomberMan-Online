@@ -5,22 +5,24 @@
 #include "ServerMessages.h"
 #include <assert.h>
 #include "Utilities.h"
+#include "PlayerServer.h"
 
 constexpr size_t MAX_CLIENTS = 4;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
+constexpr int MAX_AI_PLAYERS = 2;
 
 Server::Server()
 	: m_tcpListener(),
 	m_socketSelector(),
 	m_running(false),
-	m_clients(),
+	m_players(),
 	m_levelName(),
 	m_mapDimensions(),
 	m_collisionLayer(),
 	m_spawnPositions(),
 	m_clock()
 {
-	m_clients.reserve(MAX_CLIENTS);
+	m_players.reserve(MAX_CLIENTS);
 }
 
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
@@ -37,6 +39,17 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
 		{
 			return std::unique_ptr<Server>();
+		}
+
+		//Initialize AI Players
+		for (int i = 0; i < MAX_AI_PLAYERS; i++)
+		{
+			int clientID = static_cast<int>(server->m_players.size());
+			std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();
+			sf::Vector2f startingPosition = server->m_spawnPositions.back();
+			server->m_spawnPositions.pop_back();
+			
+			server->m_players.emplace_back(std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eAI));
 		}
 
 		return uniqueServer;
@@ -75,7 +88,7 @@ void Server::addNewClient()
 	std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();
 	if (m_tcpListener.accept(*tcpSocket) == sf::Socket::Done)
 	{
-		int clientID = static_cast<int>(m_clients.size());
+		int clientID = static_cast<int>(m_players.size());
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eInitializeClientID << clientID;
 		if (tcpSocket->send(packetToSend) != sf::Socket::Done)
@@ -89,20 +102,22 @@ void Server::addNewClient()
 		assert(!m_spawnPositions.empty());
 		sf::Vector2f startingPosition = m_spawnPositions.back();
 		m_spawnPositions.pop_back();
-		m_clients.emplace_back(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eRemotePlayer);
-		m_socketSelector.add(*m_clients.back().m_tcpSocket);
+
+		std::unique_ptr<Player> newPlayer = std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eHuman);
+		m_socketSelector.add(*static_cast<PlayerServerHuman*>(newPlayer.get())->m_tcpSocket.get());
+		m_players.emplace_back(std::move(newPlayer));
 		std::cout << "New client added to server\n";
 
-		if (m_clients.size() >= 1)
+		if (m_players.size() >= 3)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
 			packetToSend << eServerMessageType::eInitialGameData;
 			ServerMessageInitialGameData initialGameDataMessage;
 			initialGameDataMessage.levelName = m_levelName;
-			for (const auto& client : m_clients)
+			for (const auto& player : m_players)
 			{
-				initialGameDataMessage.playerDetails.emplace_back(client.m_ID, client.m_position, client.m_controllerType);
+				initialGameDataMessage.playerDetails.emplace_back(player->m_ID, player->m_position);
 			}
 
 			packetToSend << initialGameDataMessage;
@@ -113,56 +128,66 @@ void Server::addNewClient()
 
 void Server::listen()
 {
-	for (auto& client : m_clients)
+	for (auto& player : m_players)
 	{
-		if (m_socketSelector.isReady(*client.m_tcpSocket))
+		if (player->m_controllerType == ePlayerControllerType::eHuman)
 		{
-			sf::Packet receivedPacket;
-			if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
+			auto& client = *static_cast<PlayerServerHuman*>(player.get());
+
+			if (m_socketSelector.isReady(*client.m_tcpSocket))
 			{
-				eServerMessageType serverMessageType;
-				receivedPacket >> serverMessageType;
-				switch (serverMessageType)
+				sf::Packet receivedPacket;
+				if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 				{
-				case eServerMessageType::ePlayerMoveToPosition :
-				{
-					ServerMessagePlayerMove playerMoveMessage;
-					receivedPacket >> playerMoveMessage;
-					movePlayer(client, playerMoveMessage);
-				}
+					eServerMessageType serverMessageType;
+					receivedPacket >> serverMessageType;
+					switch (serverMessageType)
+					{
+					case eServerMessageType::ePlayerMoveToPosition:
+					{
+						ServerMessagePlayerMove playerMoveMessage;
+						receivedPacket >> playerMoveMessage;
+						movePlayer(client, playerMoveMessage);
+					}
 					break;
 
-				case eServerMessageType::ePlayerBombPlacementRequest :
-				{
-					sf::Vector2f position;
-					receivedPacket >> position.x >> position.y;
-					placeBomb(client, position);
-				}
+					case eServerMessageType::ePlayerBombPlacementRequest:
+					{
+						sf::Vector2f position;
+						receivedPacket >> position.x >> position.y;
+						placeBomb(client, position);
+					}
 					break;
-					
-				case eServerMessageType::eDisconnectFromServer :
-				{
-					m_clientsToRemove.push_back(client.m_ID);
-				}
+
+					case eServerMessageType::eDisconnectFromServer:
+					{
+						m_clientsToRemove.push_back(client.m_ID);
+					}
 					break;
+					}
 				}
 			}
 		}
+		
 	}
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
 {
-	for (auto& client : m_clients)
+	for (auto& player : m_players)
 	{
-		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+		if(player->m_controllerType == ePlayerControllerType::eHuman)
 		{
-			std::cout << "Cannot send message to client\n";
+			auto& client = *static_cast<PlayerServerHuman*>(player.get());
+			if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+			{
+				std::cout << "Cannot send message to client\n";
+			}
 		}
 	}
 }
 
-void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessage)
+void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	sf::Packet packetToSend;
 	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
@@ -186,7 +211,7 @@ void Server::movePlayer(Client& client, ServerMessagePlayerMove playerMoveMessag
 	}
 }
 
-void Server::placeBomb(Client & client, sf::Vector2f placementPosition)
+void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
 	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
 	{
@@ -207,34 +232,40 @@ void Server::update(float frameTime)
 	for (auto iter = m_clientsToRemove.begin(); iter != m_clientsToRemove.end();)
 	{
 		int clientIDToRemove = (*iter);
-		auto client = std::find_if(m_clients.begin(), m_clients.end(), [clientIDToRemove](const auto& client) { return client.m_ID == clientIDToRemove; });
-		if (client != m_clients.end())
+		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->m_ID == clientIDToRemove; });
+		if (client != m_players.end())
 		{
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
 			broadcastMessage(packetToSend);
 
 			std::cout << "Client Removed\n";
-			m_clients.erase(client);
+			m_players.erase(client);
 		}
 
 		iter = m_clientsToRemove.erase(iter);
 	}
 
-	for (auto& client : m_clients)
+	for (auto& player : m_players)
 	{
-		if (client.m_moving)
+		if (player->m_controllerType == ePlayerControllerType::eAI)
 		{
-			client.m_movementFactor += frameTime * client.m_movementSpeed;
-			client.m_position = Utilities::Interpolate(client.m_previousPosition, client.m_newPosition, client.m_movementFactor);
+			auto& client = *static_cast<PlayerServerHuman*>(player.get());
+		}
 
-			if (client.m_position == client.m_newPosition)
+
+		if (player->m_moving)
+		{
+			player->m_movementFactor += frameTime * player->m_movementSpeed;
+			player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
+
+			if (player->m_position == player->m_newPosition)
 			{
-				client.m_moving = false;
+				player->m_moving = false;
 			}
 		}
 
-		client.m_bombPlacementTimer.update(frameTime);
+		player->m_bombPlacementTimer.update(frameTime);
 	}
 
 	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
@@ -253,10 +284,10 @@ void Server::update(float frameTime)
 				broadcastMessage(packetToSend);
 
 
-				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
-				if (player != m_clients.end())
+				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
+				if (player != m_players.end())
 				{
-					m_clientsToRemove.push_back(player->m_ID);
+					m_clientsToRemove.push_back(player->get()->m_ID);
 				}
 			}
 			
@@ -269,10 +300,10 @@ void Server::update(float frameTime)
 				packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 				broadcastMessage(packetToSend);
 
-				auto player = std::find_if(m_clients.begin(), m_clients.end(), [explosionPosition](const auto& client) { return explosionPosition == client.m_position; });
-				if (player != m_clients.end())
+				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
+				if (player != m_players.end())
 				{
-					m_clientsToRemove.push_back(player->m_ID);
+					m_clientsToRemove.push_back(player->get()->m_ID);
 				}
 			}
 

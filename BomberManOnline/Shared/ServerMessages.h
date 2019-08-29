@@ -7,15 +7,13 @@
 
 struct PlayerDetails
 {
-	PlayerDetails(int ID, sf::Vector2f spawnPosition, ePlayerControllerType controllerType)
+	PlayerDetails(int ID, sf::Vector2f spawnPosition)
 		: ID(ID),
-		spawnPosition(spawnPosition),
-		controllerType(controllerType)
+		spawnPosition(spawnPosition)
 	{}
 
 	int ID;
 	sf::Vector2f spawnPosition;
-	ePlayerControllerType controllerType;
 };
 
 struct ServerMessageInitialGameData

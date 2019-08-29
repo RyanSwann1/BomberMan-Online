@@ -5,7 +5,6 @@
 #include "ServerMessages.h"
 #include <assert.h>
 #include "Utilities.h"
-#include "PathFinding.h"
 
 constexpr size_t MAX_BOMBS = 50;
 constexpr size_t MAX_PLAYERS = 4;
@@ -53,8 +52,6 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 			uniqueLevel->m_localPlayer = &uniqueLevel->m_players.back();
 		}
 	}
-
-	PathFinding::getInstance().getPathToTile(sf::Vector2f(80 / 16, 80 / 16), sf::Vector2f(160 / 16, 160 / 16), level->m_collisionLayer);
 
 	return uniqueLevel;
 }

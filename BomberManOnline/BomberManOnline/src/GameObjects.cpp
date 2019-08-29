@@ -5,37 +5,16 @@
 #include "Resources.h"
 
 //Player
-Player::Player(int tileSize, int ID)
-	: m_ID(ID),
-	m_position(),
-	m_newPosition(),
-	m_movementSpeed(2.5f),
-	m_movementFactor(0.0f),
+PlayerClient::PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition)
+	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
 	m_shape(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
-	m_AABB(m_position, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
-	m_moving(false),
-	m_bombPlacementTimer(2.0f, true)
+	m_AABB(startingPosition, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)))
 {
-	m_shape.setPosition(m_position);
+	m_shape.setPosition(startingPosition);
 	m_shape.setFillColor(sf::Color::Red);
 }
 
-Player::Player(int tileSize, int ID, sf::Vector2f startingPosition)
-	: m_ID(ID),
-	m_position(startingPosition),
-	m_newPosition(),
-	m_movementSpeed(2.5f),
-	m_movementFactor(0.0f),
-	m_shape(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
-	m_AABB(m_position, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
-	m_moving(false),
-	m_bombPlacementTimer(2.0f, true)
-{
-	m_shape.setPosition(m_position);
-	m_shape.setFillColor(sf::Color::Red);
-}
-
-void Player::setNewPosition(sf::Vector2f newPosition)
+void PlayerClient::setNewPosition(sf::Vector2f newPosition)
 {
 	m_newPosition = newPosition;
 	m_previousPosition = m_position;
@@ -46,7 +25,7 @@ void Player::setNewPosition(sf::Vector2f newPosition)
 	NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 }
 
-void Player::plantBomb()
+void PlayerClient::plantBomb()
 {
 	if (!m_moving && m_bombPlacementTimer.isExpired())
 	{

@@ -44,10 +44,9 @@ sf::Packet & sf::operator>>(Packet & receivedPacket, ServerMessageInitialGameDat
 		receivedPacket >> ID;
 		sf::Vector2f spawnPosition;
 		receivedPacket >> spawnPosition.x >> spawnPosition.y;
-		int controllerType = 0;
-		receivedPacket >> controllerType;
 
-		initialGameData.playerDetails.emplace_back(ID, spawnPosition, static_cast<ePlayerControllerType>(controllerType));
+
+		initialGameData.playerDetails.emplace_back(ID, spawnPosition);
 	}
 	
 	return receivedPacket;
@@ -62,7 +61,6 @@ sf::Packet & sf::operator<<(Packet & packetToSend, const ServerMessageInitialGam
 	{
 		packetToSend << playerDetails.ID;
 		packetToSend << playerDetails.spawnPosition.x << playerDetails.spawnPosition.y;
-		packetToSend << static_cast<int>(playerDetails.controllerType);
 	}
 
 	return packetToSend;

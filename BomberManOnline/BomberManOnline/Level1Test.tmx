@@ -129,8 +129,10 @@
   <object id="113" gid="255" x="64" y="272" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Spawn Position Layer">
+  <object id="114" gid="254" x="272" y="64" width="16" height="16"/>
   <object id="115" gid="254" x="48" y="64" width="16" height="16"/>
   <object id="116" gid="254" x="48" y="288" width="16" height="16"/>
+  <object id="120" gid="254" x="272" y="288" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Box Layer">
   <object id="123" gid="205" x="80" y="160" width="16" height="16"/>

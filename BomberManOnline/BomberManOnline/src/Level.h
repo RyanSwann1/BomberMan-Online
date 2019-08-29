@@ -31,8 +31,8 @@ private:
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 
-	Player* m_localPlayer;
-	std::vector<Player> m_players;
+	PlayerClient* m_localPlayer;
+	std::vector<PlayerClient> m_players;
 	std::vector<Bomb> m_bombs;
 	std::vector<Explosion> m_explosions;
 

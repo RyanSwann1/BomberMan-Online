@@ -3,7 +3,6 @@
 enum class ePlayerControllerType
 {
 	eNone = 0,
-	eLocalPlayer,
-	eRemotePlayer,
+	eHuman,
 	eAI
 };
