@@ -10,12 +10,12 @@ struct GraphNode
 		visited(false)
 	{}
 
-	GraphNode(sf::Vector2f cameFrom)
+	GraphNode(sf::Vector2i cameFrom)
 		: cameFrom(cameFrom),
 		visited(true)
 	{}
 
-	sf::Vector2f cameFrom;
+	sf::Vector2i cameFrom;
 	bool visited;
 };
 
@@ -29,12 +29,9 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f source, sf::Vector2f destination, 
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i source, sf::Vector2i destination, 
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
-	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
-	std::vector<sf::Vector2f> pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
-
-private:
-
+	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+	std::vector<sf::Vector2f> pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 };
