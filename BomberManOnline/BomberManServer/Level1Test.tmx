@@ -135,11 +135,6 @@
   <object id="120" gid="254" x="272" y="288" width="16" height="16"/>
  </objectgroup>
  <objectgroup name="Box Layer">
-  <object id="123" gid="205" x="80" y="160" width="16" height="16"/>
-  <object id="124" gid="205" x="80" y="192" width="16" height="16"/>
-  <object id="127" gid="205" x="112" y="256" width="16" height="16"/>
-  <object id="128" gid="205" x="112" y="224" width="16" height="16"/>
-  <object id="129" gid="205" x="112" y="192" width="16" height="16"/>
   <object id="130" gid="205" x="112" y="160" width="16" height="16"/>
   <object id="131" gid="205" x="112" y="128" width="16" height="16"/>
   <object id="132" gid="205" x="112" y="96" width="16" height="16"/>
@@ -147,25 +142,12 @@
   <object id="134" gid="205" x="144" y="128" width="16" height="16"/>
   <object id="135" gid="205" x="144" y="160" width="16" height="16"/>
   <object id="136" gid="205" x="144" y="192" width="16" height="16"/>
-  <object id="137" gid="205" x="144" y="224" width="16" height="16"/>
-  <object id="138" gid="205" x="144" y="256" width="16" height="16"/>
-  <object id="139" gid="205" x="176" y="256" width="16" height="16"/>
-  <object id="140" gid="205" x="176" y="224" width="16" height="16"/>
   <object id="141" gid="205" x="176" y="192" width="16" height="16"/>
   <object id="142" gid="205" x="176" y="160" width="16" height="16"/>
   <object id="143" gid="205" x="176" y="128" width="16" height="16"/>
   <object id="144" gid="205" x="176" y="96" width="16" height="16"/>
   <object id="146" gid="205" x="208" y="128" width="16" height="16"/>
-  <object id="147" gid="205" x="208" y="160" width="16" height="16"/>
-  <object id="148" gid="205" x="208" y="192" width="16" height="16"/>
-  <object id="149" gid="205" x="208" y="224" width="16" height="16"/>
-  <object id="153" gid="205" x="240" y="192" width="16" height="16"/>
-  <object id="154" gid="205" x="240" y="160" width="16" height="16"/>
-  <object id="160" gid="205" x="48" y="192" width="16" height="16"/>
   <object id="167" gid="205" x="144" y="64" width="16" height="16"/>
   <object id="168" gid="205" x="176" y="64" width="16" height="16"/>
-  <object id="173" gid="205" x="272" y="160" width="16" height="16"/>
-  <object id="179" gid="205" x="176" y="288" width="16" height="16"/>
-  <object id="180" gid="205" x="144" y="288" width="16" height="16"/>
  </objectgroup>
 </map>

@@ -357,6 +357,9 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			if (player.m_position == player.m_newPosition)
 			{
 				player.m_movementFactor = 0;
+				sf::Packet globalPacket;
+				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
+				broadcastMessage(globalPacket);
 
 				if (player.m_pathToTile.empty())
 				{
@@ -368,10 +371,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 					player.m_newPosition = player.m_pathToTile.back();
 					player.m_pathToTile.pop_back();
 					player.m_previousPosition = player.m_position;
-
-					sf::Packet globalPacket;
-					globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
-					broadcastMessage(globalPacket);
 				}
 			}
 		}
