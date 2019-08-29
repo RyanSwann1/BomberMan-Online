@@ -30,9 +30,11 @@ struct PlayerServerAI : public Player
 {
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
-		m_currentState(eAIState::eNone)
+		m_currentState(eAIState::eNone),
+		m_waitTimer(2.5f)
 	{}
 
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
+	Timer m_waitTimer;
 };

@@ -35,7 +35,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
 		uniqueServer->m_running = true;
-		uniqueServer->m_levelName = "Level1Test.tmx";
+		uniqueServer->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
 			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
@@ -348,6 +348,10 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
 			broadcastMessage(globalPacket);
 		}
+		else
+		{
+			int i = 0;
+		}
 		break;
 	case eAIState::eMoveToBox :
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
@@ -412,7 +416,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 
 		break;
 	case eAIState::ePlantBomb :
-		
 		if (player.m_bombPlacementTimer.isExpired())
 		{
 			ServerMessageBombPlacement bombPlacementMessage;
@@ -428,6 +431,15 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			player.m_currentState = eAIState::eSetSafePosition;
 		}
 
+		break;
+	case eAIState::eWait :
+		player.m_waitTimer.setActive(true);
+		player.m_waitTimer.update(frameTime);
+		if (player.m_waitTimer.isExpired())
+		{
+			player.m_currentState = eAIState::eNone;
+			player.m_waitTimer.resetElaspedTime();
+		}
 		break;
 	}
 }

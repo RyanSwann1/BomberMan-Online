@@ -130,6 +130,13 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2i source, con
 		{
 			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
 			{
+				if (lastPosition == source)
+				{
+					pathToTile.emplace_back(lastPosition.x * 16, lastPosition.y * 16);
+					boxFound = true;
+					break;
+				}
+
 				boxFound = true;
 				sf::Vector2i comeFrom = lastPosition;
 				pathToTile.emplace_back(comeFrom.x * 16, comeFrom.y * 16);
