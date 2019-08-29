@@ -290,13 +290,15 @@ void Server::update(float frameTime)
 			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
 			{
 				sf::Vector2f explosionPosition(x, bomb->m_position.y);
-				m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
+				if (m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] == eCollidableTile::eBox)
+				{
+					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
 
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-				broadcastMessage(packetToSend);
-
-
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+					broadcastMessage(packetToSend);
+				}
+			
 				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
 				if (player != m_players.end())
 				{
@@ -307,11 +309,14 @@ void Server::update(float frameTime)
 			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
 			{
 				sf::Vector2f explosionPosition(bomb->m_position.x, y);
-				m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
+				if (m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] == eCollidableTile::eBox)
+				{
+					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
 
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-				broadcastMessage(packetToSend);
+					sf::Packet packetToSend;
+					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+					broadcastMessage(packetToSend);
+				}
 
 				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
 				if (player != m_players.end())
@@ -347,10 +352,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			sf::Packet globalPacket;
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
 			broadcastMessage(globalPacket);
-		}
-		else
-		{
-			int i = 0;
 		}
 		break;
 	case eAIState::eMoveToBox :
