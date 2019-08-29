@@ -227,6 +227,7 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 		broadcastMessage(packetToSend);
 		std::cout << "Place Bomb\n";
 		m_bombs.emplace_back(placementPosition, client.m_bombPlacementTimer.getExpirationTime());
+		client.m_bombPlacementTimer.resetElaspedTime();
 	}
 }
 
@@ -349,33 +350,84 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		}
 		break;
 	case eAIState::eMoveToBox :
-		if (player.m_moving)
+		player.m_movementFactor += frameTime * player.m_movementSpeed;
+		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+
+		if (player.m_position == player.m_newPosition)
 		{
-			player.m_movementFactor += frameTime * player.m_movementSpeed;
-			player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+			player.m_movementFactor = 0;
+			sf::Packet globalPacket;
+			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
+			broadcastMessage(globalPacket);
 
-			if (player.m_position == player.m_newPosition)
+			if (player.m_pathToTile.empty())
 			{
-				player.m_movementFactor = 0;
-				sf::Packet globalPacket;
-				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
-				broadcastMessage(globalPacket);
-
-				if (player.m_pathToTile.empty())
-				{
-					player.m_moving = false;
-				}
-				else
-				{
-					player.m_moving = true;
-					player.m_newPosition = player.m_pathToTile.back();
-					player.m_pathToTile.pop_back();
-					player.m_previousPosition = player.m_position;
-				}
+				player.m_moving = false;
+				player.m_currentState = eAIState::ePlantBomb;
+			}
+			else
+			{
+				player.m_moving = true;
+				player.m_newPosition = player.m_pathToTile.back();
+				player.m_pathToTile.pop_back();
+				player.m_previousPosition = player.m_position;
 			}
 		}
+		
+		break;
+	case eAIState::eSetSafePosition :
+		player.m_pathToTile = PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), m_collisionLayer);
+		player.m_currentState = eAIState::eMoveToSafePosition;
+		player.m_moving = true;
+
+		player.m_newPosition = player.m_pathToTile.back();
+		player.m_pathToTile.pop_back();
+		player.m_previousPosition = player.m_position;
+
 		break;
 	case eAIState::eMoveToSafePosition :
+		player.m_movementFactor += frameTime * player.m_movementSpeed;
+		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+
+		if (player.m_position == player.m_newPosition)
+		{
+			player.m_movementFactor = 0;
+			sf::Packet globalPacket;
+			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
+			broadcastMessage(globalPacket);
+
+			if (player.m_pathToTile.empty())
+			{
+				player.m_moving = false;
+				player.m_currentState = eAIState::eWait;
+			}
+			else
+			{
+				player.m_moving = true;
+				player.m_newPosition = player.m_pathToTile.back();
+				player.m_pathToTile.pop_back();
+				player.m_previousPosition = player.m_position;
+			}
+		}
+
+		break;
+	case eAIState::ePlantBomb :
+		
+		if (player.m_bombPlacementTimer.isExpired())
+		{
+			ServerMessageBombPlacement bombPlacementMessage;
+			bombPlacementMessage.position = player.m_position;
+			bombPlacementMessage.lifeTimeDuration = player.m_bombPlacementTimer.getExpirationTime();
+
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
+			broadcastMessage(packetToSend);
+			std::cout << "Place Bomb\n";
+			m_bombs.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
+			
+			player.m_currentState = eAIState::eSetSafePosition;
+		}
+
 		break;
 	}
 }

@@ -10,7 +10,10 @@ enum class eAIState
 {
 	eNone = 0,
 	eMoveToBox,
-	eMoveToSafePosition
+	eMoveToSafePosition,
+	ePlantBomb,
+	eSetSafePosition,
+	eWait
 };
 
 struct PlayerServerHuman : public Player
