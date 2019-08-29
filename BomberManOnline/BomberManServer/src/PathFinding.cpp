@@ -40,16 +40,22 @@ void getNonCollidableNeighbours(sf::Vector2f position, std::vector<sf::Vector2f>
 	}
 }
 
-void getNeighbours(sf::Vector2f position, std::vector<sf::Vector2f>& neighbours)
+void getNeighbours(sf::Vector2f position, std::vector<sf::Vector2f>& neighbours, const std::vector<std::vector<eCollidableTile>>& collisionLayer)
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		neighbours.emplace_back(x, position.y);
+		if (x >= 0 && x < 21)
+		{
+			neighbours.emplace_back(x, position.y);
+		}	
 	}
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		neighbours.emplace_back(position.x, y);
+		if (y >= 0 && y < 21)
+		{
+			neighbours.emplace_back(position.x, y);
+		}
 	}
 }
 
@@ -74,7 +80,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f source, sf::Ve
 	bool reachedDestination = false;
 	while (!reachedDestination)
 	{
-		getNeighbours(graph.back(), neighbours);
+		getNeighbours(graph.back(), neighbours, collisionLayer);
 		for (auto& neighbourPosition : neighbours)
 		{
 			if (distanceFromDestination(neighbourPosition, destination) < distanceFromDestination(graph.back(), destination))
@@ -119,7 +125,7 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 	{
 		sf::Vector2f lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbours(lastPosition, neighbours);
+		getNeighbours(lastPosition, neighbours, collisionLayer);
 		for (sf::Vector2f neighbourPosition : neighbours)
 		{
 			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
@@ -127,10 +133,18 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 				boxFound = true;
 				sf::Vector2f comeFrom = lastPosition;
 				pathToTile.push_back(comeFrom);
-				while (comeFrom != source)
+				bool pathCompleted = false;
+				while (!pathCompleted)
 				{
 					comeFrom = graph[comeFrom.y][comeFrom.x].cameFrom;
-					pathToTile.push_back(comeFrom);
+					if (comeFrom != source)
+					{
+						pathToTile.push_back(comeFrom);
+					}
+					else
+					{
+						pathCompleted = true;
+					}
 				}
 				break;
 			}
@@ -139,6 +153,7 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 				if (!isNodeVisited(graph, neighbourPosition))
 				{
 					graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
+					frontier.push(neighbourPosition);
 				}
 			}
 		}
@@ -149,11 +164,6 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2f source, con
 		{
 			break;
 		}
-	}
-
-	if (!pathToTile.empty())
-	{
-		std::reverse(pathToTile.begin(), pathToTile.end());
 	}
 
 	return pathToTile;

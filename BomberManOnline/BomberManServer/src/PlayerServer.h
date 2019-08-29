@@ -4,6 +4,7 @@
 #include <SFML/Network.hpp>
 #include <memory>
 #include <utility>
+#include <vector>
 
 enum class eAIState
 {
@@ -26,8 +27,9 @@ struct PlayerServerAI : public Player
 {
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
-		m_currentState(eAIState::eMoveToBox)
+		m_currentState(eAIState::eNone)
 	{}
 
 	eAIState m_currentState;
+	std::vector<sf::Vector2f> m_pathToTile;
 };
