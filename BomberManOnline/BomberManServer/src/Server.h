@@ -20,6 +20,7 @@ struct BombServer
 
 struct ServerMessagePlayerMove;
 struct PlayerServerHuman;
+struct PlayerServerAI;
 class Server : private NonCopyable
 {
 public:
@@ -40,6 +41,7 @@ private:
 	std::vector<BombServer> m_bombs;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	sf::Clock m_clock;
+	bool m_gameRunning;
 
 	void addNewClient();
 	void listen();
@@ -50,5 +52,5 @@ private:
 
 	void update(float frameTime);
 
-	void updateAI();
+	void updateAI(PlayerServerAI& player, float frameTime);
 };

@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "Utilities.h"
 #include "PlayerServer.h"
+#include "PathFinding.h"
 
 constexpr size_t MAX_CLIENTS = 4;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
@@ -20,7 +21,8 @@ Server::Server()
 	m_mapDimensions(),
 	m_collisionLayer(),
 	m_spawnPositions(),
-	m_clock()
+	m_clock(),
+	m_gameRunning(false)
 {
 	m_players.reserve(MAX_CLIENTS);
 }
@@ -33,7 +35,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
 		uniqueServer->m_running = true;
-		uniqueServer->m_levelName = "Level1.tmx";
+		uniqueServer->m_levelName = "Level1Test.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
 			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
@@ -49,7 +51,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			sf::Vector2f startingPosition = server->m_spawnPositions.back();
 			server->m_spawnPositions.pop_back();
 			
-			server->m_players.emplace_back(std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eAI));
+			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, ePlayerControllerType::eAI));
 		}
 
 		return uniqueServer;
@@ -122,6 +124,8 @@ void Server::addNewClient()
 
 			packetToSend << initialGameDataMessage;
 			broadcastMessage(packetToSend);
+
+			m_gameRunning = true;
 		}
 	}
 }
@@ -168,7 +172,6 @@ void Server::listen()
 				}
 			}
 		}
-		
 	}
 }
 
@@ -229,6 +232,13 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
+	std::cout << frameTime << "\n";
+
+	if (!m_gameRunning)
+	{
+		return;
+	}
+
 	for (auto iter = m_clientsToRemove.begin(); iter != m_clientsToRemove.end();)
 	{
 		int clientIDToRemove = (*iter);
@@ -250,17 +260,20 @@ void Server::update(float frameTime)
 	{
 		if (player->m_controllerType == ePlayerControllerType::eAI)
 		{
-			auto& client = *static_cast<PlayerServerHuman*>(player.get());
+			updateAI(*static_cast<PlayerServerAI*>(player.get()), frameTime);
 		}
-
-		if (player->m_moving)
+		else
 		{
-			player->m_movementFactor += frameTime * player->m_movementSpeed;
-			player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
-
-			if (player->m_position == player->m_newPosition)
+			if (player->m_moving)
 			{
-				player->m_moving = false;
+				player->m_movementFactor += frameTime * player->m_movementSpeed;
+				player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
+
+				if (player->m_position == player->m_newPosition)
+				{
+					player->m_moving = false;
+					player->m_movementFactor = 0;
+				}
 			}
 		}
 
@@ -315,7 +328,55 @@ void Server::update(float frameTime)
 	}
 }
 
-void Server::updateAI()
+void Server::updateAI(PlayerServerAI& player, float frameTime)
 {
+	switch (player.m_currentState)
+	{
+	case eAIState::eNone :
+		player.m_pathToTile = PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), m_collisionLayer);
+		if (!player.m_pathToTile.empty())
+		{
+			player.m_currentState = eAIState::eMoveToBox;
+			player.m_moving = true;
 
+			player.m_newPosition = player.m_pathToTile.back();
+			player.m_pathToTile.pop_back();
+			player.m_previousPosition = player.m_position;
+
+			sf::Packet globalPacket;
+			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
+			broadcastMessage(globalPacket);
+		}
+		break;
+	case eAIState::eMoveToBox :
+		if (player.m_moving)
+		{
+			player.m_movementFactor += frameTime * player.m_movementSpeed;
+			player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+
+			if (player.m_position == player.m_newPosition)
+			{
+				player.m_movementFactor = 0;
+
+				if (player.m_pathToTile.empty())
+				{
+					player.m_moving = false;
+				}
+				else
+				{
+					player.m_moving = true;
+					player.m_newPosition = player.m_pathToTile.back();
+					player.m_pathToTile.pop_back();
+					player.m_previousPosition = player.m_position;
+
+					sf::Packet globalPacket;
+					globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
+					broadcastMessage(globalPacket);
+				}
+			}
+		}
+		break;
+	case eAIState::eMoveToSafePosition :
+		break;
+	}
 }

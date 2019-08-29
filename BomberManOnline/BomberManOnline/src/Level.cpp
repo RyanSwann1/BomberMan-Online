@@ -295,6 +295,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player.m_ID == clientID; });
 			assert(iter != m_players.end());
 
+			//iter->m_position = newPosition;
 			iter->m_newPosition = newPosition;
 			iter->m_previousPosition = iter->m_position;
 			iter->m_moving = true;

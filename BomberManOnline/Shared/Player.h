@@ -17,6 +17,7 @@ struct Player
 		m_movementSpeed(2.5f),
 		m_bombPlacementTimer(2.0f, true)
 	{}
+	virtual ~Player() {}
 
 	void update(float deltaTime);
 

@@ -15,6 +15,8 @@
 
 //https://www.youtube.com/watch?v=aVmqv3z4gnA
 
+//https://www.bogotobogo.com/DesignPatterns/introduction.php
+
 constexpr size_t MAX_RECENT_POSITIONS = 10;
 
 int main()
