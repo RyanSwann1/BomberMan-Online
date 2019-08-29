@@ -253,7 +253,6 @@ void Server::update(float frameTime)
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
 		}
 
-
 		if (player->m_moving)
 		{
 			player->m_movementFactor += frameTime * player->m_movementSpeed;
@@ -314,4 +313,9 @@ void Server::update(float frameTime)
 			++bomb;
 		}
 	}
+}
+
+void Server::updateAI()
+{
+
 }
