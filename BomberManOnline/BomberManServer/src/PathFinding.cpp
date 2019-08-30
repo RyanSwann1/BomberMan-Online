@@ -25,7 +25,7 @@ void getNonCollidableNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		if (x >= 0 && x < 21 && collisionLayer[x][position.y] == eCollidableTile::eNonCollidable)
+		if (x >= 0 && x < 21 && collisionLayer[position.y][x] != eCollidableTile::eWall)
 		{
 			neighbours.emplace_back(x, position.y);
 		}
@@ -33,14 +33,15 @@ void getNonCollidableNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		if (y >= 0 && y < 21 && collisionLayer[position.x][y] == eCollidableTile::eNonCollidable)
+		if (y >= 0 && y < 21 && collisionLayer[y][position.x] != eCollidableTile::eWall)
 		{
 			neighbours.emplace_back(position.x, y);
 		}
 	}
 }
 
-void getNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, const std::vector<std::vector<eCollidableTile>>& collisionLayer)
+void getNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, 
+	const std::vector<std::vector<eCollidableTile>>& collisionLayer)
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
@@ -125,7 +126,7 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestBox(sf::Vector2i source, con
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbours(lastPosition, neighbours, collisionLayer);
+		getNonCollidableNeighbours(lastPosition, neighbours, collisionLayer);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
 			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
@@ -199,7 +200,7 @@ std::vector<sf::Vector2f> PathFinding::pathToClosestSafePosition(sf::Vector2i so
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbours(lastPosition, neighbours, collisionLayer);
+		getNonCollidableNeighbours(lastPosition, neighbours, collisionLayer);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
 			if (neighbourPosition.x != source.x && neighbourPosition.y != source.y)

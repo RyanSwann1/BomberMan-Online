@@ -10,7 +10,7 @@
 
 constexpr size_t MAX_CLIENTS = 4;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
-constexpr int MAX_AI_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS =  1;
 
 Server::Server()
 	: m_tcpListener(),
@@ -110,7 +110,7 @@ void Server::addNewClient()
 		m_players.emplace_back(std::move(newPlayer));
 		std::cout << "New client added to server\n";
 
-		if (m_players.size() >= 3)
+		if (m_players.size() >= 2)
 		{
 			//TODO: Send once max players have joined
 			packetToSend.clear();
