@@ -5,15 +5,8 @@
 
 struct GraphNode
 {
-	GraphNode()
-		: cameFrom(),
-		visited(false)
-	{}
-
-	GraphNode(sf::Vector2i cameFrom)
-		: cameFrom(cameFrom),
-		visited(true)
-	{}
+	GraphNode();
+	GraphNode(sf::Vector2i cameFrom);
 
 	sf::Vector2i cameFrom;
 	bool visited;
@@ -32,10 +25,11 @@ public:
 	void initGraph(sf::Vector2i levelSize);
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i source, sf::Vector2i destination, 
-		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+		const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize);
 
 	void pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile);
+
 	void pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
 		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile);
 
