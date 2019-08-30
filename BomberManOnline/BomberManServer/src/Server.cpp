@@ -373,6 +373,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
 			broadcastMessage(globalPacket);
 		}
+
 		break;
 	case eAIState::eMoveToBox :
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
@@ -399,6 +400,9 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			}
 		}
 		
+		break;
+	case eAIState::eMoveToPlayer :
+
 		break;
 	case eAIState::eSetSafePosition :
 		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), 
