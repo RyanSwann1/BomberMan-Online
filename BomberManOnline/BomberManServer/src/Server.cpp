@@ -336,6 +336,7 @@ void Server::update(float frameTime)
 	}
 }
 
+
 void Server::updateAI(PlayerServerAI& player, float frameTime)
 {
 	switch (player.m_currentState)

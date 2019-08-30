@@ -7,6 +7,26 @@
 constexpr size_t MAX_NEIGHBOURS = 4;
 constexpr size_t MAX_BOX_SELECTION = 5;
 
+void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph);
+bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position);
+bool isNodeVisited(const std::vector<std::vector<bool>>& frontier, sf::Vector2i position);
+
+void getNonCollidableNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours,
+	const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+void getNeighbours(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours,
+	const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+
+void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph)
+{
+	for (int y = 0; y < levelSize.y; y++)
+	{
+		for (int x = 0; x < levelSize.x; ++x)
+		{
+			graph[y][x] = GraphNode();
+		}
+	}
+}
+
 bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position)
 {
 	return graph[position.y][position.x].visited;
@@ -119,7 +139,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i source, sf::Ve
 void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile)
 {
-	resetGraph(levelSize);
+	resetGraph(levelSize, m_graph);
 
 	std::queue<sf::Vector2i> frontier;
 	frontier.push(source);
@@ -206,7 +226,7 @@ void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::v
 void PathFinding::pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile)
 {
-	resetGraph(levelSize);
+	resetGraph(levelSize, m_graph);
 
 	std::queue<sf::Vector2i> frontier;
 	frontier.push(source);
@@ -265,15 +285,4 @@ void PathFinding::pathToClosestSafePosition(sf::Vector2i source, const std::vect
 			break;
 		}
 	}
-}
-
-void PathFinding::resetGraph(sf::Vector2i levelSize)
-{
-	for (int y = 0; y < levelSize.y; y++)
-	{
-		for (int x = 0; x < levelSize.x; ++x)
-		{
-			m_graph[y][x] = GraphNode();
-		}
-	} 
 }

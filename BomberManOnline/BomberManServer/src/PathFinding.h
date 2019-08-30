@@ -41,6 +41,4 @@ public:
 
 private:
 	std::vector<std::vector<GraphNode>> m_graph;
-
-	void resetGraph(sf::Vector2i levelSize);
 };
