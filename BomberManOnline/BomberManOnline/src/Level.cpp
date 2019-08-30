@@ -45,11 +45,11 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	//Initialize Remote Players
 	for (auto& player : initialGameData.playerDetails)
 	{
-		uniqueLevel->m_players.emplace_back(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition);
+		uniqueLevel->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
 		
 		if (player.ID == localClientID)
 		{	
-			uniqueLevel->m_localPlayer = &uniqueLevel->m_players.back();
+			uniqueLevel->m_localPlayer = &*uniqueLevel->m_players.back();
 		}
 	}
 
@@ -142,7 +142,7 @@ void Level::render(sf::RenderWindow & window) const
 
 	for (auto& player : m_players)
 	{
-		window.draw(player.m_shape);
+		window.draw(player->m_shape);
 	}
 
 	sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
@@ -178,17 +178,17 @@ void Level::update(float deltaTime)
 
 	for (auto& player : m_players)
 	{
-		if (!player.m_moving)
+		if (!player->m_moving)
 		{
 			continue;
 		}
 
-		player.m_movementFactor += deltaTime * player.m_movementSpeed;
-		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
-		player.m_shape.setPosition(player.m_position);
+		player->m_movementFactor += deltaTime * player->m_movementSpeed;
+		player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
+		player->m_shape.setPosition(player->m_position);
 
 		//Reached destination
-		if (player.m_position == player.m_newPosition)
+		if (player->m_position == player->m_newPosition)
 		{
 			//if (recentPositions.size() > MAX_RECENT_POSITIONS)
 			//{
@@ -199,8 +199,8 @@ void Level::update(float deltaTime)
 			//	}
 			//}
 
-			player.m_moving = false;
-			player.m_movementFactor = 0;
+			player->m_moving = false;
+			player->m_movementFactor = 0;
 		}
 	}
 
@@ -292,13 +292,13 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player.m_ID == clientID; });
+			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
 			assert(iter != m_players.end());
 
 			//iter->m_position = newPosition;
-			iter->m_newPosition = newPosition;
-			iter->m_previousPosition = iter->m_position;
-			iter->m_moving = true;
+			(*iter)->m_newPosition = newPosition;
+			(*iter)->m_previousPosition = (*iter)->m_position;
+			(*iter)->m_moving = true;
 		}
 	}
 		break;
@@ -329,7 +329,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player.m_ID == clientID; });
+			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
 			assert(iter != m_players.end());
 			
 			m_players.erase(iter);
