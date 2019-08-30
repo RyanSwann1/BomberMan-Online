@@ -339,6 +339,22 @@ void Server::update(float frameTime)
 
 void Server::updateAI(PlayerServerAI& player, float frameTime)
 {
+	if (player.m_behavour == eAIBehaviour::ePassive)
+	{
+		sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
+		for (const auto& targetPlayer : m_players)
+		{
+			if (targetPlayer->m_ID != player.m_ID)
+			{
+				sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
+				if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+				{
+					player.m_behavour = eAIBehaviour::eAggressive;
+				}
+			}
+		}
+	}
+
 	switch (player.m_currentState)
 	{
 	case eAIState::eNone :
