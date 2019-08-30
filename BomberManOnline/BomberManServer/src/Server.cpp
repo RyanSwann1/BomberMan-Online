@@ -54,6 +54,8 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, ePlayerControllerType::eAI));
 		}
 
+		PathFinding::getInstance().initGraph(server->m_mapDimensions);
+
 		return uniqueServer;
 	}
 	else
@@ -339,7 +341,8 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	switch (player.m_currentState)
 	{
 	case eAIState::eNone :
-		player.m_pathToTile = PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), m_collisionLayer);
+		PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), 
+			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
 		if (!player.m_pathToTile.empty())
 		{
 			player.m_currentState = eAIState::eMoveToBox;
@@ -381,7 +384,8 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		
 		break;
 	case eAIState::eSetSafePosition :
-		player.m_pathToTile = PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), m_collisionLayer);
+		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), 
+			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
 

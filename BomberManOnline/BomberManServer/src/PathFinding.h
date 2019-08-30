@@ -29,9 +29,18 @@ public:
 		return instance;
 	}
 
+	void initGraph(sf::Vector2i levelSize);
+
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i source, sf::Vector2i destination, 
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer);
 
-	std::vector<sf::Vector2f> pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
-	std::vector<sf::Vector2f> pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer);
+	void pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile);
+	void pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
+		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile);
+
+private:
+	std::vector<std::vector<GraphNode>> m_graph;
+
+	void resetGraph(sf::Vector2i levelSize);
 };
