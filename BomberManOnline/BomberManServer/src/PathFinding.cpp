@@ -117,6 +117,8 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i source, sf::Ve
 void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile)
 {
+	resetGraph(levelSize);
+
 	std::queue<sf::Vector2i> frontier;
 	frontier.push(source);
 
