@@ -1,9 +1,11 @@
 #include "PathFinding.h"
 #include "CollidableTile.h"
+#include "Utilities.h"
 #include <math.h>
 #include <queue>
 
 constexpr size_t MAX_NEIGHBOURS = 4;
+constexpr size_t MAX_BOX_SELECTION = 5;
 
 bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position)
 {
@@ -124,11 +126,14 @@ void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::v
 
 	std::vector<sf::Vector2i> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
-	
+
+	std::vector<sf::Vector2i> boxSelection;
+	boxSelection.reserve(MAX_BOX_SELECTION);
+	sf::Vector2i lastPosition;
 	bool boxFound = false;
 	while (!frontier.empty())
 	{
-		sf::Vector2i lastPosition = frontier.front();
+		lastPosition = frontier.front();
 		frontier.pop();
 		getNonCollidableNeighbours(lastPosition, neighbours, collisionLayer);
 		for (sf::Vector2i neighbourPosition : neighbours)
@@ -137,28 +142,26 @@ void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::v
 			{
 				if (lastPosition == source)
 				{
+					continue;
+				}
+
+				if (boxSelection.size() < MAX_BOX_SELECTION)
+				{
+					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
+					boxSelection.push_back(neighbourPosition);
+				}
+				else
+				{
+					break;
+					boxFound = true;
+				}
+
+				if (lastPosition == source)
+				{
 					pathToTile.emplace_back(lastPosition.x * 16, lastPosition.y * 16);
 					boxFound = true;
 					break;
 				}
-
-				boxFound = true;
-				sf::Vector2i comeFrom = lastPosition;
-				pathToTile.emplace_back(comeFrom.x * 16, comeFrom.y * 16);
-				bool pathCompleted = false;
-				while (!pathCompleted)
-				{
-					comeFrom = m_graph[comeFrom.y][comeFrom.x].cameFrom;
-					if (comeFrom != source)
-					{
-						pathToTile.emplace_back(comeFrom.x * 16, comeFrom.y * 16);
-					}
-					else
-					{
-						pathCompleted = true;
-					}
-				}
-				break;
 			}
 			else
 			{
@@ -175,6 +178,27 @@ void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::v
 		if (boxFound)
 		{
 			break;
+		}
+	}
+
+	if (!boxSelection.empty())
+	{
+		int i = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
+		lastPosition = m_graph[boxSelection[i].y][boxSelection[i].x].cameFrom;
+		sf::Vector2i comeFrom = lastPosition;
+		pathToTile.emplace_back(comeFrom.x * 16, comeFrom.y * 16);
+		bool pathCompleted = false;
+		while (!pathCompleted)
+		{
+			comeFrom = m_graph[comeFrom.y][comeFrom.x].cameFrom;
+			if (comeFrom != source)
+			{
+				pathToTile.emplace_back(comeFrom.x * 16, comeFrom.y * 16);
+			}
+			else
+			{
+				pathCompleted = true;
+			}
 		}
 	}
 }

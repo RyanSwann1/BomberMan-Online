@@ -235,7 +235,7 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
-	std::cout << frameTime << "\n";
+	std::cout << Utilities::getRandomNumber(0, 5) << "\n";
 
 	if (!m_gameRunning)
 	{
