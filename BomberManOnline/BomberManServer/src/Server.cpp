@@ -195,6 +195,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	sf::Packet packetToSend;
+	//Invalid Move
 	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
 	{
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_position);
@@ -204,6 +205,7 @@ void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playe
 			std::cout << "Failed to send message to client\n";
 		}
 	}
+	//Valid Move
 	else
 	{
 		client.m_newPosition = playerMoveMessage.newPosition;

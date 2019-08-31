@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "Direction.h"
 
 struct PlayerClient : public Player
 {
@@ -11,6 +12,7 @@ struct PlayerClient : public Player
 
 	sf::RectangleShape m_shape;
 	sf::FloatRect m_AABB;
+	eDirection m_moveDirection;
 };
 
 struct Bomb

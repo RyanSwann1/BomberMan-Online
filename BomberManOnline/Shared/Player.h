@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "PlayerControllerType.h"
 #include "Timer.h"
+#include "Direction.h"
 
 struct Player
 {
@@ -18,8 +19,6 @@ struct Player
 		m_bombPlacementTimer(2.0f, true)
 	{}
 	virtual ~Player() {}
-
-	void update(float deltaTime);
 
 	int m_ID;
 	sf::Vector2f m_previousPosition;
