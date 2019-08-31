@@ -38,7 +38,7 @@ struct PlayerServerAI : public Player
 {
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
-		m_behavour(eAIBehaviour::eAggressive),
+		m_behavour(eAIBehaviour::ePassive),
 		m_currentState(eAIState::eIdle),
 		m_pathToTile(),
 		m_waitTimer(2.5f)

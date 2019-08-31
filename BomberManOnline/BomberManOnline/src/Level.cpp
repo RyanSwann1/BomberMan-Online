@@ -11,8 +11,6 @@ constexpr size_t MAX_PLAYERS = 4;
 constexpr size_t MAX_EXPLOSIONS = 50;
 constexpr float EXPLOSION_DURATION = 0.5f;
 
-constexpr size_t MAX_PREVIOUS_POINTS = 10;
-
 Level::Level()
 	: m_levelName(),
 	m_levelSize(),
@@ -20,14 +18,12 @@ Level::Level()
 	m_spawnPositions(),
 	m_collisionLayer(),
 	m_localPlayer(nullptr),
-	m_localPlayerPreviousMovementPoints(),
 	m_players(),
 	m_bombs(),
 	m_explosions()
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_explosions.reserve(MAX_EXPLOSIONS);
-	m_localPlayerPreviousMovementPoints.reserve(MAX_PREVIOUS_POINTS);
 }
 
 void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
@@ -61,21 +57,23 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	}
 
 	//Initialize Remote Players
-	for (auto& player : initialGameData.playerDetails)
+	for (const auto& player : initialGameData.playerDetails)
 	{
-		level->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
-		
 		if (player.ID == localClientID)
-		{	
-			level->m_localPlayer = &*level->m_players.back();
+		{
+			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+			level->m_localPlayer = static_cast<PlayerClientLocalPlayer*>(level->m_players.back().get()); //&*level->m_players.back();
+		}
+		else
+		{
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
 		}
 	}
 
-	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
-	return uniqueLevel;
+	return std::unique_ptr<Level>(level);
 }
 
-void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& recentPositions)
+void Level::handleInput(const sf::Event & sfmlEvent)
 {
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	switch (sfmlEvent.key.code)
@@ -86,8 +84,6 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
-
-			recentPositions.push_back(m_localPlayer->m_previousPosition);
 		}
 
 		break;
@@ -99,8 +95,6 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
-
-			recentPositions.push_back(m_localPlayer->m_previousPosition);
 		}
 
 		break;
@@ -112,8 +106,6 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
-
-			recentPositions.push_back(m_localPlayer->m_previousPosition);
 		}
 
 		break;
@@ -125,8 +117,6 @@ void Level::handleInput(const sf::Event & sfmlEvent, std::vector<sf::Vector2f>& 
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
 		{
 			m_localPlayer->setNewPosition(newPosition);
-
-			recentPositions.push_back(m_localPlayer->m_previousPosition);
 		}
 		break;
 	}
@@ -209,14 +199,14 @@ void Level::update(float deltaTime)
 		//Reached destination
 		if (player->m_position == player->m_newPosition)
 		{
-			//if (recentPositions.size() > MAX_RECENT_POSITIONS)
-			//{
-			//	for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
-			//	{
-			//		recentPositions.erase(iter);
-			//		break;
-			//	}
-			//}
+			if (m_localPlayer->m_previousPositions.size() > MAX_PREVIOUS_POINTS)
+			{
+				for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
+				{
+					m_localPlayer->m_previousPositions.erase(iter);
+					break;
+				}
+			}
 
 			player->m_moving = false;
 			player->m_movementFactor = 0;
@@ -253,7 +243,7 @@ void Level::update(float deltaTime)
 	}
 }
 
-void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet & receivedMessage, std::vector<sf::Vector2f>& recentPositions, sf::RenderWindow& window)
+void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet & receivedMessage, sf::RenderWindow& window)
 {
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	switch (receivedMessageType)
@@ -264,15 +254,15 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> invalidMoveMessage;
 
 		bool clearRemaining = false;
-		for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+		for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
 		{
 			if (clearRemaining)
 			{
-				iter = recentPositions.erase(iter);
+				iter = m_localPlayer->m_previousPositions.erase(iter);
 			}
-			else if ((*iter) == invalidMoveMessage.invalidPosition)
+			else if ((*iter).position == invalidMoveMessage.invalidPosition)
 			{
-				iter = recentPositions.erase(iter);
+				iter = m_localPlayer->m_previousPositions.erase(iter);
 				clearRemaining = true;
 			}
 			else
@@ -281,7 +271,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			}
 		}
 
-		recentPositions.clear();
 		m_localPlayer->m_position = invalidMoveMessage.lastValidPosition;
 		m_localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
 		m_localPlayer->m_moving = false;
@@ -296,11 +285,11 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> newPosition.x >> newPosition.y >> clientID;
 		if (clientID == m_localPlayer->m_ID)
 		{
-			for (auto iter = recentPositions.begin(); iter != recentPositions.end();)
+			for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
 			{
-				if ((*iter) == newPosition)
+				if ((*iter).position == newPosition)
 				{
-					iter = recentPositions.erase(iter);
+					iter = m_localPlayer->m_previousPositions.erase(iter);
 					break;
 				}
 				else

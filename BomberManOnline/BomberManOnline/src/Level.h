@@ -15,22 +15,11 @@
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable
 {
-	struct MovementPoint
-	{
-		MovementPoint(sf::Vector2f position, eDirection moveDirection)
-			: position(position),
-			moveDirection(moveDirection)
-		{}
-
-		sf::Vector2f position;
-		eDirection moveDirection;
-	};
-
 public:
 	static std::unique_ptr<Level> create(int localClientID, const ServerMessageInitialGameData& initialGameData);
 
-	void handleInput(const sf::Event& sfmlEvent, std::vector<sf::Vector2f>& recentPositions);
-	void onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet& receivedMessage, std::vector<sf::Vector2f>& recentPositions, sf::RenderWindow& window);
+	void handleInput(const sf::Event& sfmlEvent);
+	void onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet& receivedMessage, sf::RenderWindow& window);
 
 	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);
@@ -43,8 +32,7 @@ private:
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 
-	PlayerClient* m_localPlayer;
-	std::vector<MovementPoint> m_localPlayerPreviousMovementPoints;
+	PlayerClientLocalPlayer* m_localPlayer;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<Bomb> m_bombs;
 	std::vector<Explosion> m_explosions;

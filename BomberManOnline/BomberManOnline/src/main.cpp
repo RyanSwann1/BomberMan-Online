@@ -34,11 +34,9 @@ int main()
 	}
 
 	std::unique_ptr<Level> level;
-	std::vector<sf::Vector2f> recentPositions;
-	recentPositions.reserve(MAX_RECENT_POSITIONS);
 	sf::Clock gameClock;
 	float deltaTime = 0;
-	int clientID = 0;
+	int localClientID = 0;
 
 	while (window.isOpen())
 	{
@@ -52,13 +50,13 @@ int main()
 				switch (messageType)
 				{
 				case eServerMessageType::eInitializeClientID:
-					receivedMessage >> clientID;
+					receivedMessage >> localClientID;
 					break;
 				case eServerMessageType::eInitialGameData:
 				{
 					ServerMessageInitialGameData initialGameData;
 					receivedMessage >> initialGameData;
-					level = Level::create(clientID, initialGameData);
+					level = Level::create(localClientID, initialGameData);
 				}
 				break;
 				case eServerMessageType::eInvalidMoveRequest:
@@ -67,7 +65,7 @@ int main()
 				case eServerMessageType::eDestroyBox:
 				case eServerMessageType::ePlayerDisconnected :
 				{
-					level->onReceivedServerMessage(messageType, receivedMessage, recentPositions, window);
+					level->onReceivedServerMessage(messageType, receivedMessage, window);
 				}
 				break;
 				}
@@ -86,7 +84,7 @@ int main()
 			}
 			else if (sfmlEvent.type == sf::Event::KeyPressed)
 			{
-				level->handleInput(sfmlEvent, recentPositions);
+				level->handleInput(sfmlEvent);
 			}
 		}
 

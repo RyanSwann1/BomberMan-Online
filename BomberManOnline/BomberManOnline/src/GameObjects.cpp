@@ -59,3 +59,10 @@ void Explosion::update(float deltaTime)
 {
 	m_lifeTimer.update(deltaTime);
 }
+
+void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
+{
+	PlayerClient::setNewPosition(newPosition);
+
+	m_previousPositions.push_back(newPosition);
+}
