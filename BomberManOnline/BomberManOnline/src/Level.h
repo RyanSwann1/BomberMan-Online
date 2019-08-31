@@ -5,6 +5,7 @@
 #include "Box.h"
 #include "GameObjects.h"
 #include "CollidableTile.h"
+#include "Direction.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -14,6 +15,17 @@
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable
 {
+	struct MovementPoint
+	{
+		MovementPoint(sf::Vector2f position, eDirection moveDirection)
+			: position(position),
+			moveDirection(moveDirection)
+		{}
+
+		sf::Vector2f position;
+		eDirection moveDirection;
+	};
+
 public:
 	static std::unique_ptr<Level> create(int localClientID, const ServerMessageInitialGameData& initialGameData);
 
@@ -32,6 +44,7 @@ private:
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 
 	PlayerClient* m_localPlayer;
+	std::vector<MovementPoint> m_localPlayerPreviousMovementPoints;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<Bomb> m_bombs;
 	std::vector<Explosion> m_explosions;

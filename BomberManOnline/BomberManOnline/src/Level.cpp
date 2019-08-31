@@ -11,10 +11,13 @@ constexpr size_t MAX_PLAYERS = 4;
 constexpr size_t MAX_EXPLOSIONS = 50;
 constexpr float EXPLOSION_DURATION = 0.5f;
 
+constexpr size_t MAX_PREVIOUS_POINTS = 10;
+
 Level::Level()
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_explosions.reserve(MAX_EXPLOSIONS);
+	m_localPlayerPreviousMovementPoints.reserve(MAX_PREVIOUS_POINTS);
 }
 
 void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
