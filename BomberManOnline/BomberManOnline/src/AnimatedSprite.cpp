@@ -1,4 +1,4 @@
-#include "Sprite.h"
+#include "AnimatedSprite.h"
 #include "Resources.h"
 #include "Texture.h"
 #include <assert.h>
@@ -14,10 +14,11 @@ Sprite::Sprite(sf::Vector2f startingPosition, eAnimationName animationName, floa
 
 void Sprite::setNewAnimation(eAnimationName newAnimationName)
 {
-	assert(m_animationName == newAnimationName);
+	assert(m_animationName != newAnimationName);
 
 	m_animationName = newAnimationName;
 	m_currentFrameID = Animations::getInstance().animations[static_cast<int>(m_animationName)].startFrameID;
+	m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
 }
 
 void Sprite::render(sf::RenderWindow & window) const
