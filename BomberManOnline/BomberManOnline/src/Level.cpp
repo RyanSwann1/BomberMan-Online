@@ -151,7 +151,7 @@ void Level::render(sf::RenderWindow & window) const
 
 	for (const auto& player : m_players)
 	{
-		window.draw(player->m_shape);
+		player->m_sprite.render(window);
 	}
 
 	sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
@@ -194,7 +194,7 @@ void Level::update(float deltaTime)
 
 		player->m_movementFactor += deltaTime * player->m_movementSpeed;
 		player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
-		player->m_shape.setPosition(player->m_position);
+		player->m_sprite.setPosition(player->m_position);
 
 		//Reached destination
 		if (player->m_position == player->m_newPosition)
@@ -206,6 +206,22 @@ void Level::update(float deltaTime)
 					m_localPlayer->m_previousPositions.erase(iter);
 					break;
 				}
+			}
+	
+			switch (player->m_moveDirection)
+			{
+			case eDirection::eLeft :
+				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleLeft);
+				break;
+			case eDirection::eRight :
+				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleRight);
+				break;
+			case eDirection::eUp :
+				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleUp);
+				break;
+			case eDirection::eDown :
+				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleDown);
+				break;
 			}
 
 			player->m_moving = false;

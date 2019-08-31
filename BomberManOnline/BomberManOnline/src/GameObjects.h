@@ -2,6 +2,7 @@
 
 #include "Player.h"
 #include "Direction.h"
+#include "AnimatedSprite.h"
 #include <vector>
 
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
@@ -24,7 +25,7 @@ struct PlayerClient : public Player
 	virtual void setNewPosition(sf::Vector2f newPosition);
 	void plantBomb();
 
-	sf::RectangleShape m_shape;
+	AnimatedSprite m_sprite;
 	sf::FloatRect m_AABB;
 	eDirection m_moveDirection;
 };

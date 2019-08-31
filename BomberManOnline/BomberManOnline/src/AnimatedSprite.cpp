@@ -12,13 +12,19 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName ani
 	m_sprite.setPosition(startingPosition);
 }
 
+void AnimatedSprite::setPosition(sf::Vector2f position)
+{
+	m_sprite.setPosition(position);
+}
+
 void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
 {
-	assert(m_animationName != newAnimationName);
-
-	m_animationName = newAnimationName;
-	m_currentFrameID = Animations::getInstance().animations[static_cast<int>(m_animationName)].startFrameID;
-	m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
+	if (m_animationName != newAnimationName)
+	{
+		m_animationName = newAnimationName;
+		m_currentFrameID = Animations::getInstance().animations[static_cast<int>(m_animationName)].startFrameID;
+		m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
+	}
 }
 
 void AnimatedSprite::render(sf::RenderWindow & window) const

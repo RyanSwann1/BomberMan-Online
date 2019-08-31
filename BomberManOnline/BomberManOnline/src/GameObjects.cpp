@@ -7,11 +7,9 @@
 //Player
 PlayerClient::PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
-	m_shape(sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize))),
+	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown, 2.0f),
 	m_AABB(startingPosition, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)))
 {
-	m_shape.setPosition(startingPosition);
-	m_shape.setFillColor(sf::Color::Red);
 }
 
 void PlayerClient::setNewPosition(sf::Vector2f newPosition)
@@ -24,18 +22,22 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition)
 	if (newPosition.x > m_position.x)
 	{
 		m_moveDirection = eDirection::eRight;
+		m_sprite.setNewAnimation(eAnimationName::ePlayerMoveRight);
 	}
 	else if (newPosition.x < m_position.x)
 	{
 		m_moveDirection = eDirection::eLeft;
+		m_sprite.setNewAnimation(eAnimationName::ePlayerMoveLeft);
 	}
 	else if (newPosition.y < m_position.y)
 	{
 		m_moveDirection = eDirection::eUp;
+		m_sprite.setNewAnimation(eAnimationName::ePlayerMoveUp);
 	}
 	else if (newPosition.y > m_position.y)
 	{
 		m_moveDirection = eDirection::eDown;
+		m_sprite.setNewAnimation(eAnimationName::ePlayerMoveDown);
 	}
 }
 
