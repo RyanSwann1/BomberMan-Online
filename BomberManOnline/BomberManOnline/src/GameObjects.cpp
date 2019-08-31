@@ -7,10 +7,9 @@
 //Player
 PlayerClient::PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
-	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown, 2.0f),
+	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown, 0.25f),
 	m_AABB(startingPosition, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)))
-{
-}
+{}
 
 void PlayerClient::setNewPosition(sf::Vector2f newPosition)
 {

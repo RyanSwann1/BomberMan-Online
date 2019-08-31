@@ -38,13 +38,20 @@ enum class eAnimationName
 	eTotal
 };
 
+enum class eAnimationFlipped
+{
+	eFalse = 0,
+	eTrue
+};
+
 struct AnimationDetails
 {
-	AnimationDetails(eAnimationType type, eFrameID startFrameID, eFrameID endFrameID);
+	AnimationDetails(eAnimationType type, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped = eAnimationFlipped::eFalse);
 
 	const eAnimationType type;
 	const int startFrameID;
 	const int endFrameID;
+	const bool flipped;
 };
 
 class Textures : private NonCopyable
@@ -84,7 +91,7 @@ public:
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpEnd),
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd),
+		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationFlipped::eTrue),
 		//Bomb
 		AnimationDetails(eAnimationType::eVertical,  eFrameID::eBombStart, eFrameID::eBombEnd)
 	};

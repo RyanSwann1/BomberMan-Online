@@ -207,22 +207,6 @@ void Level::update(float deltaTime)
 					break;
 				}
 			}
-	
-			switch (player->m_moveDirection)
-			{
-			case eDirection::eLeft :
-				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleLeft);
-				break;
-			case eDirection::eRight :
-				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleRight);
-				break;
-			case eDirection::eUp :
-				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleUp);
-				break;
-			case eDirection::eDown :
-				player->m_sprite.setNewAnimation(eAnimationName::ePlayerIdleDown);
-				break;
-			}
 
 			player->m_moving = false;
 			player->m_movementFactor = 0;

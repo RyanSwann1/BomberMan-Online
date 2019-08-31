@@ -22,8 +22,17 @@ void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
 	if (m_animationName != newAnimationName)
 	{
 		m_animationName = newAnimationName;
-		m_currentFrameID = Animations::getInstance().animations[static_cast<int>(m_animationName)].startFrameID;
+		AnimationDetails animationDetails = Animations::getInstance().animations[static_cast<int>(m_animationName)];
+		m_currentFrameID = animationDetails.startFrameID;
 		m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
+		if (animationDetails.flipped)
+		{
+			//m_sprite.setScale(-1.f, 1.f);
+		}
+		else
+		{
+			//m_sprite.setScale(1.f, 1.f);
+		}
 	}
 }
 
