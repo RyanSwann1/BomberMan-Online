@@ -30,15 +30,15 @@ Server::Server()
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
 {
 	Server* server = new Server;
-	std::unique_ptr<Server> uniqueServer = std::unique_ptr<Server>(server);
+	std::unique_ptr<Server> smartPointerServer = std::unique_ptr<Server>(server);
 	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
-		uniqueServer->m_socketSelector.add(uniqueServer->m_tcpListener);
-		uniqueServer->m_running = true;
-		uniqueServer->m_levelName = "Level1.tmx";
+		server->m_socketSelector.add(server->m_tcpListener);
+		server->m_running = true;
+		server->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
-		if (!XMLParser::loadMapAsServer(uniqueServer->m_levelName, uniqueServer->m_mapDimensions,
-			uniqueServer->m_collisionLayer, uniqueServer->m_spawnPositions))
+		if (!XMLParser::loadMapAsServer(server->m_levelName, server->m_mapDimensions,
+			server->m_collisionLayer, server->m_spawnPositions))
 		{
 			return std::unique_ptr<Server>();
 		}
@@ -56,7 +56,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 		PathFinding::getInstance().initGraph(server->m_mapDimensions);
 
-		return uniqueServer;
+		return smartPointerServer;
 	}
 	else
 	{
@@ -333,7 +333,6 @@ void Server::update(float frameTime)
 		}
 	}
 }
-
 
 void Server::updateAI(PlayerServerAI& player, float frameTime)
 {
