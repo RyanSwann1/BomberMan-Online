@@ -4,10 +4,10 @@
 #include "Resources.h"
 #include "Timer.h"
 
-class Sprite
+class AnimatedSprite
 {
 public:
-	Sprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime);
+	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime);
 
 	void setNewAnimation(eAnimationName newAnimationName);
 	void render(sf::RenderWindow& window) const;

@@ -3,7 +3,7 @@
 #include "Texture.h"
 #include <assert.h>
 
-Sprite::Sprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime)
+AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime)
 	: m_currentFrameID(Animations::getInstance().animations[static_cast<int>(animationName)].startFrameID),
 	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID)),
 	m_animationName(animationName),
@@ -12,7 +12,7 @@ Sprite::Sprite(sf::Vector2f startingPosition, eAnimationName animationName, floa
 	m_sprite.setPosition(startingPosition);
 }
 
-void Sprite::setNewAnimation(eAnimationName newAnimationName)
+void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
 {
 	assert(m_animationName != newAnimationName);
 
@@ -21,12 +21,12 @@ void Sprite::setNewAnimation(eAnimationName newAnimationName)
 	m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
 }
 
-void Sprite::render(sf::RenderWindow & window) const
+void AnimatedSprite::render(sf::RenderWindow & window) const
 {
 	window.draw(m_sprite);
 }
 
-void Sprite::update(float deltaTime)
+void AnimatedSprite::update(float deltaTime)
 {
 	m_animationTimer.update(deltaTime);
 
@@ -46,7 +46,7 @@ void Sprite::update(float deltaTime)
 	}
 }
 
-void Sprite::updateHorizontalAnimation(AnimationDetails animationDetails)
+void AnimatedSprite::updateHorizontalAnimation(AnimationDetails animationDetails)
 {
 	if (m_currentFrameID + 1 < animationDetails.endFrameID)
 	{
@@ -58,7 +58,7 @@ void Sprite::updateHorizontalAnimation(AnimationDetails animationDetails)
 	}
 }
 
-void Sprite::updateVerticalAnimation(AnimationDetails animationDetails)
+void AnimatedSprite::updateVerticalAnimation(AnimationDetails animationDetails)
 {
 	if (m_currentFrameID + 16 < animationDetails.endFrameID)
 	{
