@@ -26,7 +26,8 @@ const Texture & Textures::getTileSheet() const
 }
 
 //Animation Details
-AnimationDetails::AnimationDetails(eAnimationType type, std::vector<eTileID>&& tileIDs)
+AnimationDetails::AnimationDetails(eAnimationType type, eFrameID startFrameID, eFrameID endFrameID)
 	: type(type),
-	tileIDs(std::move(tileIDs))
+	startFrameID(static_cast<int>(startFrameID)),
+	endFrameID(static_cast<int>(endFrameID))
 {}

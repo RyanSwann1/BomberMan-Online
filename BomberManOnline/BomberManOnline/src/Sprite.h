@@ -1,38 +1,24 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "Resources.h"
 #include "Timer.h"
-
-enum class eTileID
-{
-	ePlayerMoveUpStart = 263,
-	ePlayerMoveUpEnd = 264,
-	ePlayerMoveDownStart = 256,
-	ePlayerMoveDownEnd = 258,
-	ePlayerMoveRightStart = 259,
-	ePlayerMoveRightEnd = 262,
-	ePlayerMoveLeftStart = 259,
-	ePlayerMoveLeftEnd = 262,
-	eBombEnd = 236,
-	eBombStart = 266
-};
-
-enum class eAnimationType
-{
-	eHorizontal = 0,
-	eVertical
-};
 
 class Sprite
 {
 public:
-	Sprite(sf::Vector2f startingPosition, eTileID startTileID, eTileID endTileID, float frameExpirationTime);
+	Sprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime);
 
+	void setNewAnimation(eAnimationName newAnimationName);
+	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);
 
 private:
+	int m_currentFrameID;
 	sf::Sprite m_sprite;
+	eAnimationName m_animationName;
 	Timer m_animationTimer;
-	int m_startTileID;
-	int m_endTileID;
+	
+	void updateHorizontalAnimation(AnimationDetails animationDetails);
+	void updateVerticalAnimation(AnimationDetails animationDetails);
 };
