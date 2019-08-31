@@ -24,3 +24,9 @@ const Texture & Textures::getTileSheet() const
 	assert(m_tileSheet);
 	return *m_tileSheet;
 }
+
+//Animation Details
+AnimationDetails::AnimationDetails(eAnimationType type, std::vector<eTileID>&& tileIDs)
+	: type(type),
+	tileIDs(std::move(tileIDs))
+{}

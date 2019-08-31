@@ -63,6 +63,9 @@
     <ClCompile Include="src\GameObjects.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Level.h">
@@ -120,6 +123,12 @@
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="src\GameObjects.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sprite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Animation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
