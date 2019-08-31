@@ -112,42 +112,59 @@ bool PathFinding::isPositionReachable(sf::Vector2i source, sf::Vector2i target, 
 	return false;
 }
 
-std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i source, sf::Vector2i destination,
-	const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getPathToTile(sf::Vector2i source, sf::Vector2i destination, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile)
 {
-	//resetGraph(levelSize, m_graph);
+	resetGraph(levelSize, m_graph);
 
-	//std::queue<sf::Vector2i> frontier;
-	//frontier.push(source);
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(source);
 
-	//std::vector<sf::Vector2i> neighbours;
-	//neighbours.reserve(MAX_NEIGHBOURS);
+	std::vector<sf::Vector2i> neighbours;
+	neighbours.reserve(MAX_NEIGHBOURS);
 
-	//std::vector<
+	bool reachedDestination = false;
+	while (!reachedDestination)
+	{
+		sf::Vector2i lastPosition = frontier.front();
+		frontier.pop();
+		getNeighbouringPoints(lastPosition, neighbours, collisionLayer, levelSize);
+		for (auto& neighbourPosition : neighbours)
+		{
+			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
+			{
+				continue;
+			}
 
-	//bool reachedDestination = false;
-	//while (!reachedDestination)
-	//{
-	//	getNeighbouringPoints(graph.back(), neighbours, collisionLayer, levelSize);
-	//	for (auto& neighbourPosition : neighbours)
-	//	{
-	//		if (distanceFromDestination(neighbourPosition, destination) < distanceFromDestination(graph.back(), destination))
-	//		{
-	//			frontier[neighbourPosition.y][neighbourPosition.x] = true;
-	//			graph.push_back(neighbourPosition);
-	//			if (graph.back() == destination)
-	//			{
-	//				reachedDestination = true;
-	//			}
-	//		}
-	//	}
+			if (pathToTile.empty())
+			{
+				if (distanceFromDestination(neighbourPosition, destination) < distanceFromDestination(source, destination))
+				{
+					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
+					pathToTile.emplace_back(neighbourPosition.x * 16, neighbourPosition.y * 16);
+					frontier.push(neighbourPosition);
+					break;
+				}
+			}
+			else
+			{
+				if (distanceFromDestination(neighbourPosition, destination) < distanceFromDestination(lastPosition, destination))
+				{
+					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
+					pathToTile.emplace_back(neighbourPosition.x * 16, neighbourPosition.y * 16);
+					frontier.push(neighbourPosition);
+					break;
+				}
+			}
+		}
 
-	//	neighbours.clear();
-	//}
+		if (pathToTile.back() == sf::Vector2f(destination.x * 16, destination.y * 16))
+		{
+			reachedDestination = true;
+		}
 
-	//int i = 0;
-
-	return std::vector<sf::Vector2f>();
+		neighbours.clear();
+	}
 }
 
 void PathFinding::pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 

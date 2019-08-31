@@ -235,8 +235,6 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
-	std::cout << Utilities::getRandomNumber(0, 5) << "\n";
-
 	if (!m_gameRunning)
 	{
 		return;
@@ -339,43 +337,130 @@ void Server::update(float frameTime)
 
 void Server::updateAI(PlayerServerAI& player, float frameTime)
 {
-	if (player.m_behavour == eAIBehaviour::ePassive)
+	switch (player.m_currentState)
 	{
-		sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
-		for (const auto& targetPlayer : m_players)
+	case eAIState::eIdle :
+	{
+		bool targetFound = false;
+		if (player.m_behavour == eAIBehaviour::eAggressive)
 		{
-			if (targetPlayer->m_ID != player.m_ID)
+
+			sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
+			for (const auto& targetPlayer : m_players)
 			{
-				sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
-				if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+				if (targetPlayer->m_ID != player.m_ID)
 				{
-					player.m_behavour = eAIBehaviour::eAggressive;
+					sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
+					if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+					{
+						targetFound = true;
+						player.m_currentState = eAIState::eMoveToPlayer;
+						player.m_pathToTile.clear();
+						break;
+					}
+				}
+			}
+		}
+		if (!targetFound || player.m_behavour == eAIBehaviour::ePassive)
+		{
+			PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16),
+				m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+			if (!player.m_pathToTile.empty())
+			{
+				player.m_currentState = eAIState::eMoveToBox;
+				player.m_moving = true;
+
+				player.m_newPosition = player.m_pathToTile.back();
+				player.m_pathToTile.pop_back();
+				player.m_previousPosition = player.m_position;
+
+				sf::Packet globalPacket;
+				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
+				broadcastMessage(globalPacket);
+			}
+		}
+	}
+		
+		break;
+	case eAIState::eMoveToBox :
+	{
+		player.m_movementFactor += frameTime * player.m_movementSpeed;
+		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
+
+		if (player.m_position == player.m_newPosition)
+		{
+			player.m_movementFactor = 0;
+			sf::Packet globalPacket;
+			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
+			broadcastMessage(globalPacket);
+
+			bool targetFound = false;
+			if (player.m_behavour == eAIBehaviour::eAggressive)
+			{
+				sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
+				for (const auto& targetPlayer : m_players)
+				{
+					if (targetPlayer->m_ID != player.m_ID)
+					{
+						sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
+						if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+						{
+							targetFound = true;
+							player.m_currentState = eAIState::eMoveToPlayer;
+							player.m_pathToTile.clear();
+							break;
+						}
+					}
+				}
+			}
+
+			if (!targetFound)
+			{
+				if (player.m_pathToTile.empty())
+				{
+					player.m_moving = false;
+					player.m_currentState = eAIState::ePlantBomb;
+				}
+				else
+				{
+					player.m_moving = true;
+					player.m_newPosition = player.m_pathToTile.back();
+					player.m_pathToTile.pop_back();
+					player.m_previousPosition = player.m_position;
 				}
 			}
 		}
 	}
-
-	switch (player.m_currentState)
-	{
-	case eAIState::eNone :
-		PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), 
-			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
-		if (!player.m_pathToTile.empty())
-		{
-			player.m_currentState = eAIState::eMoveToBox;
-			player.m_moving = true;
-
-			player.m_newPosition = player.m_pathToTile.back();
-			player.m_pathToTile.pop_back();
-			player.m_previousPosition = player.m_position;
-
-			sf::Packet globalPacket;
-			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
-			broadcastMessage(globalPacket);
-		}
-
+		
 		break;
-	case eAIState::eMoveToBox :
+	case eAIState::eSetTargetPosition :
+	{
+		for (const auto& target : m_players)
+		{
+			if (target->m_ID != player.m_ID)
+			{
+				PathFinding::getInstance().getPathToTile(sf::Vector2i(player.m_position.x, player.m_position.y), sf::Vector2i(target->m_position.x, target->m_position.y),
+					m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+				if (!player.m_pathToTile.empty())
+				{
+					player.m_currentState = eAIState::eMoveToPlayer;
+					player.m_moving = true;
+
+					player.m_newPosition = player.m_pathToTile.back();
+					player.m_pathToTile.pop_back();
+					player.m_previousPosition = player.m_position;
+
+					sf::Packet globalPacket;
+					globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
+					broadcastMessage(globalPacket);
+				}
+			}
+		}
+	}
+		
+		break;
+	case eAIState::eMoveToPlayer :
+	{
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
 		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
 
@@ -399,13 +484,12 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				player.m_previousPosition = player.m_position;
 			}
 		}
-		
-		break;
-	case eAIState::eMoveToPlayer :
-
+	}
+	
 		break;
 	case eAIState::eSetSafePosition :
-		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16), 
+	{
+		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16),
 			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
@@ -413,9 +497,11 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		player.m_newPosition = player.m_pathToTile.back();
 		player.m_pathToTile.pop_back();
 		player.m_previousPosition = player.m_position;
-
+	}
+		
 		break;
 	case eAIState::eMoveToSafePosition :
+	{
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
 		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
 
@@ -439,9 +525,11 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				player.m_previousPosition = player.m_position;
 			}
 		}
-
+	}
+		
 		break;
 	case eAIState::ePlantBomb :
+	{
 		if (player.m_bombPlacementTimer.isExpired())
 		{
 			ServerMessageBombPlacement bombPlacementMessage;
@@ -453,19 +541,23 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			broadcastMessage(packetToSend);
 			std::cout << "Place Bomb\n";
 			m_bombs.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
-			
+
 			player.m_currentState = eAIState::eSetSafePosition;
 		}
-
+	}
+		
 		break;
 	case eAIState::eWait :
+	{
 		player.m_waitTimer.setActive(true);
 		player.m_waitTimer.update(frameTime);
 		if (player.m_waitTimer.isExpired())
 		{
-			player.m_currentState = eAIState::eNone;
+			player.m_currentState = eAIState::eIdle;
 			player.m_waitTimer.resetElaspedTime();
 		}
+	}
+		
 		break;
 	}
 }
