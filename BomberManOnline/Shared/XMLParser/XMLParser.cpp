@@ -47,28 +47,28 @@ bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textur
 	return textureDetailsFound;
 }
 
-bool XMLParser::loadMapAsClient(const std::string& mapName, sf::Vector2i& mapDimensions,
+bool XMLParser::loadLevelAsClient(const std::string& levelName, sf::Vector2i& levelSize,
 	std::vector<TileLayer>& tileLayers, std::vector<std::vector<eCollidableTile>>& collisionLayer,
 	std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
-	if (!xmlFile.LoadFile(mapName))
+	if (!xmlFile.LoadFile(levelName))
 	{
 		return false;
 	}
 	
 	const auto& rootElement = xmlFile.RootElement();
-	mapDimensions = parseMapSize(*rootElement);
+	levelSize = parseMapSize(*rootElement);
 	
-	collisionLayer.resize(mapDimensions.y);
+	collisionLayer.resize(levelSize.y);
 	for (auto& row : collisionLayer)
 	{
 		std::vector<eCollidableTile> col;
-		col.resize(mapDimensions.x);
+		col.resize(levelSize.x);
 		row = col;
 	}
 	
-	tileLayers = parseTileLayers(*rootElement, mapDimensions);
+	tileLayers = parseTileLayers(*rootElement, levelSize);
 	spawnPositions = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Spawn Position Layer");
 	parseCollisionLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
 	parseBoxLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
@@ -77,23 +77,23 @@ bool XMLParser::loadMapAsClient(const std::string& mapName, sf::Vector2i& mapDim
 }
 
 
-bool XMLParser::loadMapAsServer(const std::string & mapName, sf::Vector2i & mapDimensions, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+bool XMLParser::loadLevelAsServer(const std::string & levelName, sf::Vector2i & levelSize, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
-	if (!xmlFile.LoadFile(mapName))
+	if (!xmlFile.LoadFile(levelName))
 	{
 		return false;
 	}
 
 	const auto& rootElement = xmlFile.RootElement();
-	mapDimensions = parseMapSize(*rootElement);
+	levelSize = parseMapSize(*rootElement);
 
-	collisionLayer.resize(mapDimensions.y);
+	collisionLayer.resize(levelSize.y);
 	for (auto& row : collisionLayer)
 	{
 		std::vector<eCollidableTile> col;
-		col.resize(mapDimensions.x);
+		col.resize(levelSize.x);
 		row = col;
 	}
 

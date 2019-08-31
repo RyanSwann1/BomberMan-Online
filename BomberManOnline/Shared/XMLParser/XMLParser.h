@@ -11,10 +11,10 @@ namespace XMLParser
 {
 	bool parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textureSize, int& columns, const std::string& levelFileName, const std::string& textureFileName);
 	
-	bool loadMapAsClient(const std::string& mapName, sf::Vector2i& mapDimensions,
+	bool loadLevelAsClient(const std::string& levelName, sf::Vector2i& levelSize,
 		std::vector<TileLayer>& tileLayers, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 		std::vector<sf::Vector2f>& spawnPositions);
 
-	bool loadMapAsServer(const std::string& mapName, sf::Vector2i& mapDimensions,
+	bool loadLevelAsServer(const std::string& levelName, sf::Vector2i& levelSize,
 		std::vector<std::vector<eCollidableTile>>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions);
 }
