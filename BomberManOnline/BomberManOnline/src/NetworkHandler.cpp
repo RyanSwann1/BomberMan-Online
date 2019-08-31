@@ -24,15 +24,18 @@ bool NetworkHandler::connectToServer()
 
 void NetworkHandler::disconnectFromServer()
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	m_connectedToServer = false;
-	
+	if (m_connectedToServer)
+	{
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_connectedToServer = false;
 
-	sf::Packet disconnectPacket;
-	disconnectPacket << eServerMessageType::eDisconnectFromServer;
-	m_tcpSocket->send(disconnectPacket);
-	m_tcpSocket->disconnect();
-	m_listenThread.join();
+
+		sf::Packet disconnectPacket;
+		disconnectPacket << eServerMessageType::eDisconnectFromServer;
+		m_tcpSocket->send(disconnectPacket);
+		m_tcpSocket->disconnect();
+		m_listenThread.join();
+	}
 }
 
 void NetworkHandler::sendMessageToServer(sf::Packet & packetToSend)
