@@ -26,7 +26,11 @@ enum class eAnimationType
 
 enum class eAnimationName
 {
-	ePlayerMoveUp = 0,
+	ePlayerIdleUp = 0,
+	ePlayerIdleDown,
+	ePlayerIdleLeft,
+	ePlayerIdleRight,
+	ePlayerMoveUp,
 	ePlayerMoveDown,
 	ePlayerMoveRight,
 	ePlayerMoveLeft,
@@ -71,10 +75,17 @@ public:
 
 	const std::array<AnimationDetails, static_cast<size_t>(eAnimationName::eTotal)> animations
 	{
+		//Player Idle
+		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpStart),
+		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownStart),
+		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightStart),
+		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftStart),
+		//Player Move
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpEnd),
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
 		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd),
+		//Bomb
 		AnimationDetails(eAnimationType::eVertical,  eFrameID::eBombStart, eFrameID::eBombEnd)
 	};
 
