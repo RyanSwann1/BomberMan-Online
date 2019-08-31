@@ -14,6 +14,16 @@ constexpr float EXPLOSION_DURATION = 0.5f;
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
 Level::Level()
+	: m_levelName(),
+	m_levelSize(),
+	m_tileLayers(),
+	m_spawnPositions(),
+	m_collisionLayer(),
+	m_localPlayer(nullptr),
+	m_localPlayerPreviousMovementPoints(),
+	m_players(),
+	m_bombs(),
+	m_explosions()
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_explosions.reserve(MAX_EXPLOSIONS);
@@ -43,9 +53,8 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageInitialGameData & initialGameData)
 {
 	Level* level = new Level;
-	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
-	uniqueLevel->m_levelName = initialGameData.levelName;
-	if (!XMLParser::loadMapAsClient(uniqueLevel->m_levelName, level->m_levelDimensions, level->m_tileLayers,
+	level->m_levelName = initialGameData.levelName;
+	if (!XMLParser::loadLevelAsClient(level->m_levelName, level->m_levelSize, level->m_tileLayers,
 		level->m_collisionLayer, level->m_spawnPositions))
 	{
 		return std::unique_ptr<Level>();
@@ -54,14 +63,15 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	//Initialize Remote Players
 	for (auto& player : initialGameData.playerDetails)
 	{
-		uniqueLevel->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+		level->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
 		
 		if (player.ID == localClientID)
 		{	
-			uniqueLevel->m_localPlayer = &*uniqueLevel->m_players.back();
+			level->m_localPlayer = &*level->m_players.back();
 		}
 	}
 
+	std::unique_ptr<Level> uniqueLevel = std::unique_ptr<Level>(level);
 	return uniqueLevel;
 }
 
@@ -133,9 +143,9 @@ void Level::render(sf::RenderWindow & window) const
 	const auto& tileSheet = Textures::getInstance().getTileSheet();
 	for (const auto& tileLayer : m_tileLayers)
 	{
-		for (int y = 0; y < m_levelDimensions.y; ++y)
+		for (int y = 0; y < m_levelSize.y; ++y)
 		{
-			for (int x = 0; x < m_levelDimensions.x; ++x)
+			for (int x = 0; x < m_levelSize.x; ++x)
 			{
 				int tileID = tileLayer.m_tileLayer[y][x];
 				if (tileID > 0)
@@ -149,15 +159,15 @@ void Level::render(sf::RenderWindow & window) const
 		}
 	}
 
-	for (auto& player : m_players)
+	for (const auto& player : m_players)
 	{
 		window.draw(player->m_shape);
 	}
 
 	sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
-	for (int y = 0; y < m_levelDimensions.y; y++)
+	for (int y = 0; y < m_levelSize.y; y++)
 	{
-		for (int x = 0; x < m_levelDimensions.x; x++)
+		for (int x = 0; x < m_levelSize.x; x++)
 		{
 			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
 			{

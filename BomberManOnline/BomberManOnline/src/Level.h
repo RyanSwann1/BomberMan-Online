@@ -38,7 +38,7 @@ public:
 private:
 	Level();
 	std::string m_levelName;
-	sf::Vector2i m_levelDimensions;
+	sf::Vector2i m_levelSize;
 	std::vector<TileLayer> m_tileLayers;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
