@@ -30,14 +30,13 @@ Server::Server()
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
 {
 	Server* server = new Server;
-	std::unique_ptr<Server> smartPointerServer = std::unique_ptr<Server>(server);
 	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
-		if (!XMLParser::loadMapAsServer(server->m_levelName, server->m_mapDimensions,
+		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_mapDimensions,
 			server->m_collisionLayer, server->m_spawnPositions))
 		{
 			return std::unique_ptr<Server>();
@@ -56,6 +55,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 		PathFinding::getInstance().initGraph(server->m_mapDimensions);
 
+		std::unique_ptr<Server> smartPointerServer = std::unique_ptr<Server>(server);
 		return smartPointerServer;
 	}
 	else
@@ -345,7 +345,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		bool targetFound = false;
 		if (player.m_behavour == eAIBehaviour::eAggressive)
 		{
-
 			sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
 			for (const auto& targetPlayer : m_players)
 			{
@@ -424,20 +423,10 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				}
 				else
 				{
-					if (m_collisionLayer[player.m_pathToTile.back().y / 16][player.m_pathToTile.back().x / 16] != eCollidableTile::eBox)
-					{
-						player.m_pathToTile.clear();
-						player.m_currentState = eAIState::eIdle;
-						break;
-					}
-					else
-					{
-						player.m_moving = true;
-						player.m_newPosition = player.m_pathToTile.back();
-						player.m_pathToTile.pop_back();
-						player.m_previousPosition = player.m_position;
-
-					}
+					player.m_moving = true;
+					player.m_newPosition = player.m_pathToTile.back();
+					player.m_pathToTile.pop_back();
+					player.m_previousPosition = player.m_position;
 				}
 			}
 		}
