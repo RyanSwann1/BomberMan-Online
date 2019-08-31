@@ -422,10 +422,20 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				}
 				else
 				{
-					player.m_moving = true;
-					player.m_newPosition = player.m_pathToTile.back();
-					player.m_pathToTile.pop_back();
-					player.m_previousPosition = player.m_position;
+					if (m_collisionLayer[player.m_pathToTile.back().y / 16][player.m_pathToTile.back().x / 16] != eCollidableTile::eBox)
+					{
+						player.m_pathToTile.clear();
+						player.m_currentState = eAIState::eIdle;
+						break;
+					}
+					else
+					{
+						player.m_moving = true;
+						player.m_newPosition = player.m_pathToTile.back();
+						player.m_pathToTile.pop_back();
+						player.m_previousPosition = player.m_position;
+
+					}
 				}
 			}
 		}
