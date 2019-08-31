@@ -2,6 +2,7 @@
 
 #include "PlayerControllerType.h"
 #include <SFML/Graphics.hpp>
+#include "Direction.h"
 #include <vector>
 #include <string>
 

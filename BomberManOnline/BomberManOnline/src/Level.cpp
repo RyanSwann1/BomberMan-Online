@@ -253,6 +253,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		ServerMessageInvalidMove invalidMoveMessage;
 		receivedMessage >> invalidMoveMessage;
 
+		bool previousPositionFound = false;
 		bool clearRemaining = false;
 		for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
 		{
@@ -262,8 +263,14 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			}
 			else if ((*iter).position == invalidMoveMessage.invalidPosition)
 			{
+				m_localPlayer->m_position = invalidMoveMessage.lastValidPosition;
+				m_localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
+				m_localPlayer->m_moving = false;
+				m_localPlayer->m_movementFactor = 0;
+
 				iter = m_localPlayer->m_previousPositions.erase(iter);
 				clearRemaining = true;
+				previousPositionFound = true;
 			}
 			else
 			{
@@ -271,10 +278,13 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			}
 		}
 
-		m_localPlayer->m_position = invalidMoveMessage.lastValidPosition;
-		m_localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
-		m_localPlayer->m_moving = false;
-		m_localPlayer->m_movementFactor = 0;
+
+		if (!previousPositionFound)
+		{
+			NetworkHandler::getInstance().disconnectFromServer();
+			window.close();
+			return;
+		}
 	}
 	break;
 		

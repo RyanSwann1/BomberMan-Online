@@ -20,9 +20,23 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition)
 	m_previousPosition = m_position;
 	m_moving = true;
 
-	sf::Packet packetToSend;
-	packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(m_newPosition, m_movementSpeed);
-	NetworkHandler::getInstance().sendMessageToServer(packetToSend);
+	//Assign new movement direction
+	if (newPosition.x > m_position.x)
+	{
+		m_moveDirection = eDirection::eRight;
+	}
+	else if (newPosition.x < m_position.x)
+	{
+		m_moveDirection = eDirection::eLeft;
+	}
+	else if (newPosition.y < m_position.y)
+	{
+		m_moveDirection = eDirection::eUp;
+	}
+	else if (newPosition.y > m_position.y)
+	{
+		m_moveDirection = eDirection::eDown;
+	}
 }
 
 void PlayerClient::plantBomb()
@@ -64,5 +78,9 @@ void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
 {
 	PlayerClient::setNewPosition(newPosition);
 
-	m_previousPositions.push_back(newPosition);
+	m_previousPositions.emplace_back(newPosition, m_moveDirection);
+
+	sf::Packet packetToSend;
+	packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(m_newPosition, m_movementSpeed);
+	NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 }

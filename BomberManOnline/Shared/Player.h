@@ -25,6 +25,7 @@ struct Player
 	sf::Vector2f m_position;
 	sf::Vector2f m_newPosition;
 	ePlayerControllerType m_controllerType;
+	eDirection m_moveDirection;
 	bool m_moving;
 	float m_movementFactor;
 	float m_movementSpeed;

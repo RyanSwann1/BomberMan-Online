@@ -8,7 +8,7 @@ constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
 struct MovementPoint
 {
-	MovementPoint(sf::Vector2f position)
+	MovementPoint(sf::Vector2f position, eDirection moveDirection)
 		: position(position),
 		moveDirection(moveDirection)
 	{}

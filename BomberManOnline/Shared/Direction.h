@@ -4,6 +4,6 @@ enum class eDirection
 {
 	eLeft = 0,
 	eRight,
-	eTop,
+	eUp,
 	eDown
 };
