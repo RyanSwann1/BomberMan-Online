@@ -29,7 +29,6 @@ void NetworkHandler::disconnectFromServer()
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_connectedToServer = false;
 
-
 		sf::Packet disconnectPacket;
 		disconnectPacket << eServerMessageType::eDisconnectFromServer;
 		m_tcpSocket->send(disconnectPacket);

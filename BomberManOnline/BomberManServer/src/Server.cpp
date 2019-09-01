@@ -141,7 +141,7 @@ void Server::listen()
 
 			if (m_socketSelector.isReady(*client.m_tcpSocket))
 			{
-				std::cout << "Player Ready\n";
+				//std::cout << "Player Ready\n";
 				sf::Packet receivedPacket;
 				if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 				{
@@ -167,6 +167,7 @@ void Server::listen()
 
 					case eServerMessageType::eDisconnectFromServer:
 					{
+						std::cout << "Hit\n";
 						m_clientsToRemove.push_back(client.m_ID);
 					}
 					break;
