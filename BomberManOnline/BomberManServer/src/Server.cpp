@@ -55,8 +55,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 
 		PathFinding::getInstance().initGraph(server->m_mapDimensions);
 
-		std::unique_ptr<Server> smartPointerServer = std::unique_ptr<Server>(server);
-		return smartPointerServer;
+		return std::unique_ptr<Server>(server);
 	}
 	else
 	{
@@ -142,6 +141,7 @@ void Server::listen()
 
 			if (m_socketSelector.isReady(*client.m_tcpSocket))
 			{
+				std::cout << "Player Ready\n";
 				sf::Packet receivedPacket;
 				if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 				{
@@ -248,12 +248,16 @@ void Server::update(float frameTime)
 		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->m_ID == clientIDToRemove; });
 		if (client != m_players.end())
 		{
+			if ((*client)->m_controllerType == ePlayerControllerType::eHuman)
+			{
+				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->m_tcpSocket);
+			}
+			std::cout << "Client Removed\n";
+			m_players.erase(client);
+
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
 			broadcastMessage(packetToSend);
-
-			std::cout << "Client Removed\n";
-			m_players.erase(client);
 		}
 
 		iter = m_clientsToRemove.erase(iter);

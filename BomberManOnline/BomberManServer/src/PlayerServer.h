@@ -30,6 +30,7 @@ struct PlayerServerHuman : public Player
 		: Player(ID, startingPosition, controllerType),
 		m_tcpSocket(std::move(tcpSocket))
 	{}
+	~PlayerServerHuman() override;
 
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 };
