@@ -14,7 +14,15 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName ani
 
 void AnimatedSprite::setPosition(sf::Vector2f position)
 {
-	m_sprite.setPosition(position);
+	if(Animations::getInstance().animations[static_cast<int>(m_animationName)].flipped)
+	{ 
+		position.x += 16;
+		m_sprite.setPosition(position);
+	}
+	else
+	{
+		m_sprite.setPosition(position);
+	}
 }
 
 void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
@@ -27,11 +35,11 @@ void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
 		m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
 		if (animationDetails.flipped)
 		{
-			//m_sprite.setScale(-1.f, 1.f);
+			m_sprite.setScale(-1.f, 1.f);
 		}
 		else
 		{
-			//m_sprite.setScale(1.f, 1.f);
+			m_sprite.setScale(1.f, 1.f);
 		}
 	}
 }

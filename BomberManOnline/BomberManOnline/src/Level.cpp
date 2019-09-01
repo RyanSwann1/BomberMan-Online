@@ -195,7 +195,7 @@ void Level::update(float deltaTime)
 		player->m_movementFactor += deltaTime * player->m_movementSpeed;
 		player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
 		player->m_sprite.setPosition(player->m_position);
-
+		//player->m_sprite.update(deltaTime);
 		//Reached destination
 		if (player->m_position == player->m_newPosition)
 		{
