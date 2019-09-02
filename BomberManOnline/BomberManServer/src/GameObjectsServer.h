@@ -16,7 +16,7 @@ enum class eAIState
 {
 	eIdle = 0,
 	eMoveToBox,
-	eMoveToPlayer,
+	eMoveToNearestPlayer,
 	eMoveToSafePosition,
 	ePlantBomb,
 	eSetSafePosition,

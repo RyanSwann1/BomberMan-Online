@@ -51,7 +51,7 @@ int main()
 				{
 				case eServerMessageType::eInitializeClientID:
 					receivedMessage >> localClientID;
-					break;
+				break;
 				case eServerMessageType::eInitialGameData:
 				{
 					ServerMessageInitialGameData initialGameData;

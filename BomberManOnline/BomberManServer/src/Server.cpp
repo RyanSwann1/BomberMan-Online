@@ -291,6 +291,8 @@ void Server::update(float frameTime)
 
 		if (bomb->m_lifeTime.isExpired())
 		{
+			onBombExplosion(bomb->m_position);
+
 			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
 			{
 				onBombExplosion(sf::Vector2f(x, bomb->m_position.y));
@@ -328,7 +330,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 					if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
 					{
 						targetFound = true;
-						player.m_currentState = eAIState::eMoveToPlayer;
+						player.m_currentState = eAIState::eMoveToNearestPlayer;
 						player.m_pathToTile.clear();
 						break;
 					}
@@ -380,7 +382,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 						if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
 						{
 							targetFound = true;
-							player.m_currentState = eAIState::eMoveToPlayer;
+							player.m_currentState = eAIState::eMoveToNearestPlayer;
 							player.m_pathToTile.clear();
 							break;
 						}
@@ -417,7 +419,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 					m_collisionLayer, m_mapDimensions, player.m_pathToTile);
 				if (!player.m_pathToTile.empty())
 				{
-					player.m_currentState = eAIState::eMoveToPlayer;
+					player.m_currentState = eAIState::eMoveToNearestPlayer;
 					player.m_moving = true;
 
 					player.m_newPosition = player.m_pathToTile.back();
@@ -433,7 +435,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	}
 		
 		break;
-	case eAIState::eMoveToPlayer :
+	case eAIState::eMoveToNearestPlayer :
 	{
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
 		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
