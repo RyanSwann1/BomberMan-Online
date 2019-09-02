@@ -20,7 +20,7 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position)
 {
-	return collisionLayer[position.y / 16][position.x / 16] != eCollidableTile::eNonCollidable;
+	return collisionLayer[static_cast<int>(position.y / 16)][static_cast<int>(position.x / 16)] != eCollidableTile::eNonCollidable;
 }
 
 int Utilities::getRandomNumber(int min, int max)

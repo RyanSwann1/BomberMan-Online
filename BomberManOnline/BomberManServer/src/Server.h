@@ -42,5 +42,5 @@ private:
 	void update(float frameTime);
 	void updateAI(PlayerServerAI& player, float frameTime);
 	
-	void onBombExplosion(sf::Vector2f position);
+	void onBombExplosion(sf::Vector2f explosionPosition);
 };

@@ -192,10 +192,10 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 
 void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
-	sf::Packet packetToSend;
 	//Invalid Move
 	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
 	{
+		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_previousPosition);
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
@@ -273,8 +273,6 @@ void Server::update(float frameTime)
 			{
 				player->m_movementFactor += frameTime * player->m_movementSpeed;
 				player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
-				player->m_AABB.left = player->m_position.x;
-				player->m_AABB.top = player->m_position.y;
 
 				if (player->m_position == player->m_newPosition)
 				{
@@ -538,21 +536,23 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	}
 }
 
-void Server::onBombExplosion(sf::Vector2f position)
+void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
-	sf::FloatRect explosionAABB(position, { 16, 16 });
-	if (m_collisionLayer[explosionAABB.left / 16][explosionAABB.top / 16] == eCollidableTile::eBox)
+	if (m_collisionLayer[static_cast<int>(explosionPosition.y / 16)][static_cast<int>(explosionPosition.x / 16)] == eCollidableTile::eBox)
 	{
-		m_collisionLayer[explosionAABB.left / 16][explosionAABB.top / 16] = eCollidableTile::eNonCollidable;
+		m_collisionLayer[static_cast<int>(explosionPosition.y / 16)][static_cast<int>(explosionPosition.x / 16)] = eCollidableTile::eNonCollidable;
 
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eDestroyBox << explosionAABB.left << explosionAABB.top;
+		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 		broadcastMessage(packetToSend);
 	}
 
-	auto player = std::find_if(m_players.begin(), m_players.end(), [explosionAABB] (const auto& player) { return explosionAABB.intersects(player->m_AABB); });
-	if (player != m_players.end())
+	for (const auto& player : m_players)
 	{
-		m_clientsToRemove.push_back(player->get()->m_ID);
+		sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / 16), static_cast<int>(player->m_position.y / 16));
+		if (sf::Vector2i(static_cast<int>(explosionPosition.x / 16), static_cast<int>(explosionPosition.y / 16)) == playerPosition)
+		{
+			m_clientsToRemove.push_back(player->m_ID);
+		}
 	}
 }

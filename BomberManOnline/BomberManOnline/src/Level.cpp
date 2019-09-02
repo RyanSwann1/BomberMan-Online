@@ -317,7 +317,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	{
 		sf::Vector2f boxPosition;
 		receivedMessage >> boxPosition.x >> boxPosition.y;
-		m_collisionLayer[boxPosition.y / tileSize][boxPosition.x / tileSize] = eCollidableTile::eNonCollidable;
+		m_collisionLayer[static_cast<int>(boxPosition.y / tileSize)][static_cast<int>(boxPosition.x / tileSize)] = eCollidableTile::eNonCollidable;
 	}
 		break;
 	case eServerMessageType::ePlayerDisconnected :
