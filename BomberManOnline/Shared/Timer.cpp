@@ -1,11 +1,16 @@
 #include "Timer.h"
 
+Timer::Timer(bool active)
+	: m_expirationTime(0),
+	m_elaspedTime(0),
+	m_active(active)
+{}
+
 Timer::Timer(float expirationTime, bool active)
 	: m_expirationTime(expirationTime),
 	m_elaspedTime(0),
 	m_active(active)
-{
-}
+{}
 
 float Timer::getExpirationTime() const
 {
@@ -15,6 +20,12 @@ float Timer::getExpirationTime() const
 bool Timer::isExpired() const
 {
 	return m_elaspedTime >= m_expirationTime;
+}
+
+void Timer::setExpiredTime(float expirationTime)
+{
+	m_elaspedTime = 0;
+	m_expirationTime = expirationTime;
 }
 
 void Timer::setActive(bool active)

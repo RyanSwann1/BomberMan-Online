@@ -7,7 +7,7 @@
 class AnimatedSprite
 {
 public:
-	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName);
+	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName startingAnimationName);
 
 	void setPosition(sf::Vector2f position);
 	void setNewAnimation(eAnimationName newAnimationName);
@@ -16,7 +16,8 @@ public:
 
 private:
 	int m_currentFrameID;
+	bool m_animationFinished;
 	sf::Sprite m_sprite;
 	eAnimationName m_animationName;
-	Timer m_animationTimer;
+	Timer m_frameTimer;
 };

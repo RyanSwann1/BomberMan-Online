@@ -5,6 +5,8 @@
 #include "AnimatedSprite.h"
 #include <vector>
 
+constexpr float BOMB_LIFETIME_DURATION = 2.0f;
+constexpr float EXPLOSION_LIFETIME_DURATION = 0.5f;
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
 struct MovementPoint

@@ -15,8 +15,8 @@ enum class eFrameID
 	ePlayerMoveRightEnd = 262,
 	ePlayerMoveLeftStart = 259,
 	ePlayerMoveLeftEnd = 262,
-	eBombEnd = 236,
-	eBombStart = 266,
+	eBombStart = 236,
+	eBombEnd = 266,
 	eExplosionStart = 284,
 	eExplosionEnd =	254
 };
@@ -42,14 +42,22 @@ enum class eAnimationFlipped
 	eTrue
 };
 
+enum class eAnimationRepeatable
+{
+	eFalse = 0,
+	eTrue
+};
+
 struct AnimationDetails
 {
-	AnimationDetails(eDirection type, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped = eAnimationFlipped::eFalse);
+	AnimationDetails(eDirection type, eFrameID startFrameID, eFrameID endFrameID, 
+		eAnimationRepeatable repeatable = eAnimationRepeatable::eTrue, eAnimationFlipped flipped = eAnimationFlipped::eFalse);
 
 	const eDirection direction;
 	const int startFrameID;
 	const int endFrameID;
 	const bool flipped;
+	const bool repeatable;
 };
 
 class Textures : private NonCopyable
@@ -89,11 +97,11 @@ public:
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpEnd),
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
-		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationFlipped::eTrue),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationRepeatable::eTrue, eAnimationFlipped::eTrue),
 		//Bomb
-		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd),
+		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd, eAnimationRepeatable::eFalse),
 		//Explosion
-		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd)
+		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse)
 	};
 
 private:

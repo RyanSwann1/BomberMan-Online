@@ -2,7 +2,8 @@
 
 enum class eDirection
 {
-	eLeft = 0,
+	eNone = 0,
+	eLeft,
 	eRight,
 	eUp,
 	eDown

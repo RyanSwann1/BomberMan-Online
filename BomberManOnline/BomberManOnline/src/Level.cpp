@@ -8,7 +8,7 @@
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
-constexpr float EXPLOSION_DURATION = 0.5f;
+
 
 Level::Level()
 	: m_levelName(),
@@ -31,7 +31,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	{
 		if (m_collisionLayer[bombExplodePosition.y / tileSize][x / tileSize] == eCollidableTile::eNonCollidable)
 		{
-			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
 	}
 
@@ -39,7 +39,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	{
 		if (m_collisionLayer[y / tileSize][bombExplodePosition.x / tileSize] == eCollidableTile::eNonCollidable)
 		{
-			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
 	}
 }
@@ -214,6 +214,7 @@ void Level::update(float deltaTime)
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
 		gameObject->m_lifeTimer.update(deltaTime);
+		gameObject->m_sprite.update(deltaTime);
 
 		if (gameObject->m_lifeTimer.isExpired())
 		{
@@ -307,10 +308,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	case eServerMessageType::ePlaceBomb :
 	{
 		sf::Vector2f placementPosition;
-		float lifeTime = 0;
-		receivedMessage >> placementPosition.x >> placementPosition.y >> lifeTime;
+		receivedMessage >> placementPosition.x >> placementPosition.y;
 
-		m_gameObjects.emplace_back(placementPosition, lifeTime, eAnimationName::eBomb, eGameObjectType::eBomb);
+		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :
