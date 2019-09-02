@@ -60,10 +60,10 @@
     <ClCompile Include="..\Shared\Texture.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObjects.cpp">
+    <ClCompile Include="src\AnimatedSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\AnimatedSprite.cpp">
+    <ClCompile Include="src\GameObjectsClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,13 +122,13 @@
     <ClInclude Include="..\Shared\GameObjects.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObjects.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\AnimatedSprite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\NetworkHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObjectsClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -29,7 +29,7 @@
     <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp" />
     <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp" />
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp" />
-    <ClCompile Include="src\GameObjects.cpp" />
+    <ClCompile Include="src\GameObjectsClient.cpp" />
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
@@ -53,7 +53,7 @@
     <ClInclude Include="..\Shared\XMLParser\Base64.h" />
     <ClInclude Include="..\Shared\XMLParser\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser\XMLParser.h" />
-    <ClInclude Include="src\GameObjects.h" />
+    <ClInclude Include="src\GameObjectsClient.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\AnimatedSprite.h" />
     <ClInclude Include="src\NetworkHandler.h" />

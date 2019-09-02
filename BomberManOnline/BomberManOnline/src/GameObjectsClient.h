@@ -41,21 +41,18 @@ struct PlayerClientLocalPlayer : public PlayerClient
 	std::vector<MovementPoint> m_previousPositions;
 };
 
-struct BombClient
+enum class eGameObjectType
 {
-	BombClient(sf::Vector2f startingPosition, float expirationTime);
-
-	sf::Vector2f m_position;
-	sf::Sprite m_sprite;
-	Timer m_lifeTimer;
+	eBomb = 0,
+	eExplosion
 };
 
-struct Explosion
+//Bomb, Explosion
+struct GameObjectClient
 {
-	Explosion(sf::Vector2f startingPosition, float expirationTime);
+	GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type);
 
-	void update(float deltaTime);
-
+	eGameObjectType m_type;
 	sf::Vector2f m_position;
 	AnimatedSprite m_sprite;
 	Timer m_lifeTimer;

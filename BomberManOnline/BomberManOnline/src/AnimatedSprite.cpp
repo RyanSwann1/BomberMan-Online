@@ -3,11 +3,11 @@
 #include "Texture.h"
 #include <assert.h>
 
-AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime)
+AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName)
 	: m_currentFrameID(Animations::getInstance().animations[static_cast<int>(animationName)].startFrameID),
 	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID)),
 	m_animationName(animationName),
-	m_animationTimer(frameExpirationTime)	
+	m_animationTimer(0)	
 {
 	m_sprite.setPosition(startingPosition);
 }

@@ -6,9 +6,8 @@
 #include <assert.h>
 #include "Utilities.h"
 
-constexpr size_t MAX_BOMBS = 50;
+constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
-constexpr size_t MAX_EXPLOSIONS = 50;
 constexpr float EXPLOSION_DURATION = 0.5f;
 
 Level::Level()
@@ -19,11 +18,10 @@ Level::Level()
 	m_collisionLayer(),
 	m_localPlayer(nullptr),
 	m_players(),
-	m_bombs(),
-	m_explosions()
+	m_gameObjects()
 {
 	m_players.reserve(MAX_PLAYERS);
-	m_explosions.reserve(MAX_EXPLOSIONS);
+	m_gameObjects.reserve(MAX_GAME_OBJECTS);
 }
 
 void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
@@ -33,7 +31,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	{
 		if (m_collisionLayer[bombExplodePosition.y / tileSize][x / tileSize] == eCollidableTile::eNonCollidable)
 		{
-			m_explosions.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_DURATION);
+			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
 	}
 
@@ -41,7 +39,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	{
 		if (m_collisionLayer[y / tileSize][bombExplodePosition.x / tileSize] == eCollidableTile::eNonCollidable)
 		{
-			m_explosions.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_DURATION);
+			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
 	}
 }
@@ -130,6 +128,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 void Level::render(sf::RenderWindow & window) const
 {
+	//Tile Layer
 	const auto& tileSheet = Textures::getInstance().getTileSheet();
 	for (const auto& tileLayer : m_tileLayers)
 	{
@@ -149,32 +148,30 @@ void Level::render(sf::RenderWindow & window) const
 		}
 	}
 
-	for (const auto& player : m_players)
-	{
-		player->m_sprite.render(window);
-	}
-
-	sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
+	//Collision Layer
 	for (int y = 0; y < m_levelSize.y; y++)
 	{
 		for (int x = 0; x < m_levelSize.x; x++)
 		{
 			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
 			{
+				sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
 				boxSprite.setPosition(sf::Vector2f(x * 16, y * 16));
 				window.draw(boxSprite);
 			}
 		}
 	}
 
-	for (const auto& bomb : m_bombs)
+	//Players
+	for (const auto& player : m_players)
 	{
-		window.draw(bomb.m_sprite);
+		player->m_sprite.render(window);
 	}
 
-	for (const auto& explosion : m_explosions)
+	//Game Objects
+	for (const auto& gameObject : m_gameObjects)
 	{
-		explosion.m_sprite.render(window);
+		gameObject.m_sprite.render(window);
 	}
 }
 
@@ -195,7 +192,8 @@ void Level::update(float deltaTime)
 		player->m_movementFactor += deltaTime * player->m_movementSpeed;
 		player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
 		player->m_sprite.setPosition(player->m_position);
-		//player->m_sprite.update(deltaTime);
+		player->m_sprite.update(deltaTime);
+
 		//Reached destination
 		if (player->m_position == player->m_newPosition)
 		{
@@ -213,32 +211,21 @@ void Level::update(float deltaTime)
 		}
 	}
 
-	for (auto iter = m_bombs.begin(); iter != m_bombs.end();)
+	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
-		iter->m_lifeTimer.update(deltaTime);
+		gameObject->m_lifeTimer.update(deltaTime);
 
-		if (iter->m_lifeTimer.isExpired())
+		if (gameObject->m_lifeTimer.isExpired())
 		{
-			spawnExplosions(iter->m_position);
-			iter = m_bombs.erase(iter);
+			if (gameObject->m_type == eGameObjectType::eBomb)
+			{
+				spawnExplosions(gameObject->m_position);
+			}
+			gameObject = m_gameObjects.erase(gameObject);
 		}
 		else
 		{
-			++iter;
-		}
-	}
-
-	for (auto iter = m_explosions.begin(); iter != m_explosions.end();)
-	{
-		iter->m_lifeTimer.update(deltaTime);
-
-		if (iter->m_lifeTimer.isExpired())
-		{
-			iter = m_explosions.erase(iter);
-		}
-		else
-		{
-			++iter;
+			++gameObject;
 		}
 	}
 }
@@ -277,7 +264,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 				++iter;
 			}
 		}
-
 
 		if (!previousPositionFound)
 		{
@@ -324,7 +310,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		float lifeTime = 0;
 		receivedMessage >> placementPosition.x >> placementPosition.y >> lifeTime;
 
-		m_bombs.emplace_back(placementPosition, lifeTime);
+		m_gameObjects.emplace_back(placementPosition, lifeTime, eAnimationName::eBomb, eGameObjectType::eBomb);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :

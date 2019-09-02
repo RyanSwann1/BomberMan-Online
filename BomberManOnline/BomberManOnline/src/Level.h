@@ -3,7 +3,7 @@
 #include "NonCopyable.h"
 #include "TileLayer.h"
 #include "Box.h"
-#include "GameObjects.h"
+#include "GameObjectsClient.h"
 #include "CollidableTile.h"
 #include "Direction.h"
 #include <vector>
@@ -34,8 +34,7 @@ private:
 
 	PlayerClientLocalPlayer* m_localPlayer;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
-	std::vector<BombClient> m_bombs;
-	std::vector<Explosion> m_explosions;
+	std::vector<GameObjectClient> m_gameObjects; //Bombs, Explosions
 
 	void spawnExplosions(sf::Vector2f bombExplodePosition);
 };

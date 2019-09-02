@@ -1,4 +1,4 @@
-#include "GameObjects.h"
+#include "GameObjectsClient.h"
 #include "NetworkHandler.h"
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
@@ -7,7 +7,7 @@
 //Player
 PlayerClient::PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
-	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown, 0.5f),
+	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown),
 	m_AABB(startingPosition, sf::Vector2f(static_cast<float>(tileSize), static_cast<float>(tileSize)))
 {}
 
@@ -52,29 +52,6 @@ void PlayerClient::plantBomb()
 	}
 }
 
-//Bomb
-BombClient::BombClient(sf::Vector2f startingPosition, float expirationTime)
-	: m_position(startingPosition),
-	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(236)),
-	m_lifeTimer(expirationTime, true)
-{
-	m_sprite.setPosition(startingPosition);
-}
-
-//Explosion
-Explosion::Explosion(sf::Vector2f startingPosition, float expirationTime)
-	: m_position(startingPosition),
-	m_sprite(startingPosition, eAnimationName::eExplosion, 0.5f),
-	m_lifeTimer(expirationTime, true)
-{
-	m_sprite.setPosition(startingPosition);
-}
-
-void Explosion::update(float deltaTime)
-{
-	m_lifeTimer.update(deltaTime);
-}
-
 void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
 {
 	PlayerClient::setNewPosition(newPosition);
@@ -85,3 +62,10 @@ void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
 	packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(m_newPosition, m_movementSpeed);
 	NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 }
+
+GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type)
+	: m_type(type),
+	m_position(startingPosition),
+	m_sprite(startingPosition, startingAnimationName),
+	m_lifeTimer(expirationTime)
+{}

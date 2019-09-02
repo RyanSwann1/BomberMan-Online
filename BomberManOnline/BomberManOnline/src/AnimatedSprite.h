@@ -7,7 +7,7 @@
 class AnimatedSprite
 {
 public:
-	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName, float frameExpirationTime);
+	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName);
 
 	void setPosition(sf::Vector2f position);
 	void setNewAnimation(eAnimationName newAnimationName);
@@ -19,7 +19,4 @@ private:
 	sf::Sprite m_sprite;
 	eAnimationName m_animationName;
 	Timer m_animationTimer;
-	
-	void updateHorizontalAnimation(AnimationDetails animationDetails);
-	void updateVerticalAnimation(AnimationDetails animationDetails);
 };
