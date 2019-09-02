@@ -29,7 +29,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	for (int x = bombExplodePosition.x - tileSize; x <= bombExplodePosition.x + tileSize; x += tileSize * 2)
 	{
-		if (m_collisionLayer[bombExplodePosition.y / tileSize][x / tileSize] == eCollidableTile::eNonCollidable)
+		if (m_collisionLayer[bombExplodePosition.y / tileSize][x / tileSize] != eCollidableTile::eWall)
 		{
 			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
@@ -37,7 +37,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 
 	for (int y = bombExplodePosition.y - tileSize; y <= bombExplodePosition.y + tileSize; y += tileSize * 2)
 	{
-		if (m_collisionLayer[y / tileSize][bombExplodePosition.x / tileSize] == eCollidableTile::eNonCollidable)
+		if (m_collisionLayer[y / tileSize][bombExplodePosition.x / tileSize] != eCollidableTile::eWall)
 		{
 			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
