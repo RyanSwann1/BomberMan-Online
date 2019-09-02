@@ -28,7 +28,6 @@ struct PlayerClient : public Player
 	void plantBomb();
 
 	AnimatedSprite m_sprite;
-	sf::FloatRect m_AABB;
 	eDirection m_moveDirection;
 };
 

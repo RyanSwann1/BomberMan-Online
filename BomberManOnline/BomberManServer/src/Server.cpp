@@ -295,40 +295,12 @@ void Server::update(float frameTime)
 		{
 			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
 			{
-				sf::Vector2f explosionPosition(x, bomb->m_position.y);
-				if (m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] == eCollidableTile::eBox)
-				{
-					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
-
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-					broadcastMessage(packetToSend);
-				}
-			
-				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
-				if (player != m_players.end())
-				{
-					m_clientsToRemove.push_back(player->get()->m_ID);
-				}
+				onBombExplosion(sf::Vector2f(x, bomb->m_position.y));
 			}
 			
 			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
 			{
-				sf::Vector2f explosionPosition(bomb->m_position.x, y);
-				if (m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] == eCollidableTile::eBox)
-				{
-					m_collisionLayer[explosionPosition.y / 16][explosionPosition.x / 16] = eCollidableTile::eNonCollidable;
-
-					sf::Packet packetToSend;
-					packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-					broadcastMessage(packetToSend);
-				}
-
-				auto player = std::find_if(m_players.begin(), m_players.end(), [explosionPosition](const auto& player) { return explosionPosition == player->m_position; });
-				if (player != m_players.end())
-				{
-					m_clientsToRemove.push_back(player->get()->m_ID);
-				}
+				onBombExplosion(sf::Vector2f(bomb->m_position.x, y));
 			}
 
 			bomb = m_bombs.erase(bomb);
@@ -563,5 +535,24 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	}
 		
 		break;
+	}
+}
+
+void Server::onBombExplosion(sf::Vector2f position)
+{
+	sf::FloatRect explosionAABB(position, { 16, 16 });
+	if (m_collisionLayer[explosionAABB.left / 16][explosionAABB.top / 16] == eCollidableTile::eBox)
+	{
+		m_collisionLayer[explosionAABB.left / 16][explosionAABB.top / 16] = eCollidableTile::eNonCollidable;
+
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eDestroyBox << explosionAABB.left << explosionAABB.top;
+		broadcastMessage(packetToSend);
+	}
+
+	auto player = std::find_if(m_players.begin(), m_players.end(), [explosionAABB](const auto& player) { return explosionAABB.intersects(player->m_AABB); });
+	if (player != m_players.end())
+	{
+		m_clientsToRemove.push_back(player->get()->m_ID);
 	}
 }
