@@ -21,16 +21,16 @@ private:
 	Server();
 	sf::TcpListener m_tcpListener;
 	sf::SocketSelector m_socketSelector;
-	bool m_running; 
 	std::vector<std::unique_ptr<Player>> m_players;
 	std::vector<int> m_clientsToRemove;
-	std::string m_levelName;
-	sf::Vector2i m_mapDimensions;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<BombServer> m_bombs;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
+	std::string m_levelName;
+	sf::Vector2i m_mapDimensions;
 	sf::Clock m_clock;
 	bool m_gameRunning;
+	bool m_running;
 
 	void addNewClient();
 	void listen();

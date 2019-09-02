@@ -15,16 +15,20 @@ constexpr int MAX_AI_PLAYERS =  2;
 Server::Server()
 	: m_tcpListener(),
 	m_socketSelector(),
-	m_running(false),
 	m_players(),
+	m_clientsToRemove(),
+	m_spawnPositions(),
+	m_bombs(),
+	m_collisionLayer(),
 	m_levelName(),
 	m_mapDimensions(),
-	m_collisionLayer(),
-	m_spawnPositions(),
 	m_clock(),
-	m_gameRunning(false)
+	m_gameRunning(false),
+	m_running(false)
 {
 	m_players.reserve(MAX_CLIENTS);
+	m_clientsToRemove.reserve(MAX_CLIENTS);
+	m_spawnPositions.reserve(MAX_CLIENTS);
 }
 
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
