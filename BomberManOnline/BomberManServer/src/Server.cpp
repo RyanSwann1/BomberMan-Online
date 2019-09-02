@@ -113,7 +113,6 @@ void Server::addNewClient()
 
 		if (m_players.size() >= 3)
 		{
-			//TODO: Send once max players have joined
 			packetToSend.clear();
 			packetToSend << eServerMessageType::eInitialGameData;
 			ServerMessageInitialGameData initialGameDataMessage;
@@ -141,7 +140,6 @@ void Server::listen()
 
 			if (m_socketSelector.isReady(*client.m_tcpSocket))
 			{
-				std::cout << "Player Ready\n";
 				sf::Packet receivedPacket;
 				if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 				{
@@ -275,6 +273,8 @@ void Server::update(float frameTime)
 			{
 				player->m_movementFactor += frameTime * player->m_movementSpeed;
 				player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
+				player->m_AABB.left = player->m_position.x;
+				player->m_AABB.top = player->m_position.y;
 
 				if (player->m_position == player->m_newPosition)
 				{
@@ -550,7 +550,7 @@ void Server::onBombExplosion(sf::Vector2f position)
 		broadcastMessage(packetToSend);
 	}
 
-	auto player = std::find_if(m_players.begin(), m_players.end(), [explosionAABB](const auto& player) { return explosionAABB.intersects(player->m_AABB); });
+	auto player = std::find_if(m_players.begin(), m_players.end(), [explosionAABB] (const auto& player) { return explosionAABB.intersects(player->m_AABB); });
 	if (player != m_players.end())
 	{
 		m_clientsToRemove.push_back(player->get()->m_ID);
