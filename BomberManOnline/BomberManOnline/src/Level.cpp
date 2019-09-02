@@ -243,26 +243,26 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		bool previousPositionFound = false;
 		bool clearRemaining = false;
-		for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
+		for (auto previousPosition = m_localPlayer->m_previousPositions.begin(); previousPosition != m_localPlayer->m_previousPositions.end();)
 		{
 			if (clearRemaining)
 			{
-				iter = m_localPlayer->m_previousPositions.erase(iter);
+				previousPosition = m_localPlayer->m_previousPositions.erase(previousPosition);
 			}
-			else if ((*iter).position == invalidMoveMessage.invalidPosition)
+			else if ((*previousPosition).position == invalidMoveMessage.invalidPosition)
 			{
 				m_localPlayer->m_position = invalidMoveMessage.lastValidPosition;
 				m_localPlayer->m_previousPosition = invalidMoveMessage.lastValidPosition;
 				m_localPlayer->m_moving = false;
 				m_localPlayer->m_movementFactor = 0;
 
-				iter = m_localPlayer->m_previousPositions.erase(iter);
+				previousPosition = m_localPlayer->m_previousPositions.erase(previousPosition);
 				clearRemaining = true;
 				previousPositionFound = true;
 			}
 			else
 			{
-				++iter;
+				++previousPosition;
 			}
 		}
 

@@ -196,9 +196,9 @@ void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playe
 {
 	sf::Packet packetToSend;
 	//Invalid Move
-	if (client.m_movementSpeed != playerMoveMessage.speed || client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
+	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
 	{
-		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_position);
+		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_previousPosition);
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
