@@ -67,5 +67,5 @@ GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirati
 	: m_type(type),
 	m_position(startingPosition),
 	m_sprite(startingPosition, startingAnimationName),
-	m_lifeTimer(expirationTime)
+	m_lifeTimer(expirationTime, true)
 {}
