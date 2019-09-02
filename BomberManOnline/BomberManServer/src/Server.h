@@ -32,7 +32,7 @@ private:
 	Server();
 	sf::TcpListener m_tcpListener;
 	sf::SocketSelector m_socketSelector;
-	bool m_running;
+	bool m_running; 
 	std::vector<std::unique_ptr<Player>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::string m_levelName;

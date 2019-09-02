@@ -56,6 +56,7 @@
     <ClInclude Include="src\GameObjects.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\AnimatedSprite.h" />
+    <ClInclude Include="src\NetworkHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

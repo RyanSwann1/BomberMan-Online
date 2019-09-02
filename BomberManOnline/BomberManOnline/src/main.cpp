@@ -80,7 +80,9 @@ int main()
 		{
 			if (sfmlEvent.type == sf::Event::Closed)
 			{
-				window.close();
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::eRequestDisconnection;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 			}
 			else if (sfmlEvent.type == sf::Event::KeyPressed)
 			{

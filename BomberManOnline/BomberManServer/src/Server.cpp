@@ -165,7 +165,7 @@ void Server::listen()
 					}
 					break;
 
-					case eServerMessageType::eDisconnectFromServer:
+					case eServerMessageType::eRequestDisconnection:
 					{
 						m_clientsToRemove.push_back(client.m_ID);
 					}
@@ -248,16 +248,16 @@ void Server::update(float frameTime)
 		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->m_ID == clientIDToRemove; });
 		if (client != m_players.end())
 		{
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
+			broadcastMessage(packetToSend);
+
 			if ((*client)->m_controllerType == ePlayerControllerType::eHuman)
 			{
 				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->m_tcpSocket);
 			}
 			std::cout << "Client Removed\n";
 			m_players.erase(client);
-
-			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
-			broadcastMessage(packetToSend);
 		}
 
 		iter = m_clientsToRemove.erase(iter);

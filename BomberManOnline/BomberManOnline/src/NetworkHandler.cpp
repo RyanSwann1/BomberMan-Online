@@ -31,7 +31,7 @@ void NetworkHandler::disconnectFromServer()
 
 
 		sf::Packet disconnectPacket;
-		disconnectPacket << eServerMessageType::eDisconnectFromServer;
+		disconnectPacket << eServerMessageType::eRequestDisconnection;
 		m_tcpSocket->send(disconnectPacket);
 		m_tcpSocket->disconnect();
 		m_listenThread.join();

@@ -30,5 +30,6 @@ private:
 	std::atomic<bool> m_connectedToServer;
 	std::thread m_listenThread;
 	std::mutex m_mutex;
+
 	void listen();
 };
