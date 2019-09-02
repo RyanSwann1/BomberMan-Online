@@ -50,3 +50,14 @@ struct PlayerServerAI : public Player
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
 };
+
+struct BombServer
+{
+	BombServer(sf::Vector2f startingPosition, float expirationTime)
+		: m_position(startingPosition),
+		m_lifeTime(expirationTime, true)
+	{}
+
+	sf::Vector2f m_position;
+	Timer m_lifeTime;
+};

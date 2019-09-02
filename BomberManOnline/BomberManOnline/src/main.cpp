@@ -20,7 +20,7 @@
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML_WINDOW", sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(336, 336), "SFML_WINDOW", sf::Style::Default);
 	
 	if (!NetworkHandler::getInstance().connectToServer())
 	{

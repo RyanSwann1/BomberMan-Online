@@ -2,21 +2,10 @@
 
 #include "NonCopyable.h"
 #include "CollidableTile.h"
-#include "Player.h"
+#include "GameObjectsServer.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
-
-struct BombServer
-{
-	BombServer(sf::Vector2f startingPosition, float expirationTime)
-		: m_position(startingPosition),
-		m_lifeTime(expirationTime, true)
-	{}
-
-	sf::Vector2f m_position;
-	Timer m_lifeTime;
-};
 
 struct ServerMessagePlayerMove;
 struct PlayerServerHuman;

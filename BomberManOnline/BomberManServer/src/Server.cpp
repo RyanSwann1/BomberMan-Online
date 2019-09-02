@@ -5,7 +5,7 @@
 #include "ServerMessages.h"
 #include <assert.h>
 #include "Utilities.h"
-#include "PlayerServer.h"
+#include "GameObjectsServer.h"
 #include "PathFinding.h"
 
 constexpr size_t MAX_CLIENTS = 4;
