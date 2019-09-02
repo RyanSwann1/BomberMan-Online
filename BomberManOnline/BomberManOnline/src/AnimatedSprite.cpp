@@ -56,39 +56,40 @@ void AnimatedSprite::update(float deltaTime)
 	if (m_animationTimer.isExpired())
 	{
 		AnimationDetails animationDetails = Animations::getInstance().animations[static_cast<int>(m_animationName)];
-
-		switch (animationDetails.type)
+		switch (animationDetails.direction)
 		{
-		case eAnimationType::eHorizontal:
-			updateHorizontalAnimation(animationDetails);
+		case eDirection::eRight :
+			if (m_currentFrameID + 1 < animationDetails.endFrameID)
+			{
+				++m_currentFrameID;
+			}
+			else
+			{
+				m_currentFrameID = animationDetails.startFrameID;
+			}
 			break;
-		case eAnimationType::eVertical:
-			updateVerticalAnimation(animationDetails);
+		case eDirection::eDown :
+			if (m_currentFrameID + 16 < animationDetails.endFrameID)
+			{
+				m_currentFrameID += 16;
+			}
+			else
+			{
+				m_currentFrameID = animationDetails.startFrameID;
+			}
+			break;
+		case eDirection::eUp :
+			if (m_currentFrameID - 16 < animationDetails.endFrameID)
+			{
+				m_currentFrameID -= 16;
+			}
+			else
+			{
+				m_currentFrameID = animationDetails.startFrameID;
+			}
 			break;
 		}
-	}
-}
 
-void AnimatedSprite::updateHorizontalAnimation(AnimationDetails animationDetails)
-{
-	if (m_currentFrameID + 1 < animationDetails.endFrameID)
-	{
-		++m_currentFrameID;
-	}
-	else
-	{
-		m_currentFrameID = animationDetails.startFrameID;
-	}
-}
-
-void AnimatedSprite::updateVerticalAnimation(AnimationDetails animationDetails)
-{
-	if (m_currentFrameID + 16 < animationDetails.endFrameID)
-	{
-		m_currentFrameID += 16;
-	}
-	else
-	{
-		m_currentFrameID = animationDetails.startFrameID;
+		m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
 	}
 }

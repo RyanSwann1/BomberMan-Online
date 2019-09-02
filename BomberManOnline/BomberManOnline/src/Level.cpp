@@ -174,7 +174,7 @@ void Level::render(sf::RenderWindow & window) const
 
 	for (const auto& explosion : m_explosions)
 	{
-		window.draw(explosion.m_sprite);
+		explosion.m_sprite.render(window);
 	}
 }
 
@@ -314,9 +314,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			assert(player != m_players.end());
 
 			(*player)->setNewPosition(newPosition);
-			//(*player)->m_newPosition = newPosition;
-			//(*player)->m_previousPosition = (*player)->m_position;
-			//(*player)->m_moving = true;
 		}
 	}
 		break;

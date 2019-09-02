@@ -26,8 +26,8 @@ const Texture & Textures::getTileSheet() const
 }
 
 //Animation Details
-AnimationDetails::AnimationDetails(eAnimationType type, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped)
-	: type(type),
+AnimationDetails::AnimationDetails(eDirection direction, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped)
+	: direction(direction),
 	startFrameID(static_cast<int>(startFrameID)),
 	endFrameID(static_cast<int>(endFrameID)),
 	flipped(static_cast<bool>(flipped))

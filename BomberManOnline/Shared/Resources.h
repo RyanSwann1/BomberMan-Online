@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Texture.h"
+#include "Direction.h"
 #include <array>
 #include <vector>
 
@@ -15,13 +16,9 @@ enum class eFrameID
 	ePlayerMoveLeftStart = 259,
 	ePlayerMoveLeftEnd = 262,
 	eBombEnd = 236,
-	eBombStart = 266
-};
-
-enum class eAnimationType
-{
-	eHorizontal = 0,
-	eVertical
+	eBombStart = 266,
+	eExplosionStart = 284,
+	eExplosionEnd =	254
 };
 
 enum class eAnimationName
@@ -35,6 +32,7 @@ enum class eAnimationName
 	ePlayerMoveRight,
 	ePlayerMoveLeft,
 	eBomb,
+	eExplosion,
 	eTotal
 };
 
@@ -46,9 +44,9 @@ enum class eAnimationFlipped
 
 struct AnimationDetails
 {
-	AnimationDetails(eAnimationType type, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped = eAnimationFlipped::eFalse);
+	AnimationDetails(eDirection type, eFrameID startFrameID, eFrameID endFrameID, eAnimationFlipped flipped = eAnimationFlipped::eFalse);
 
-	const eAnimationType type;
+	const eDirection direction;
 	const int startFrameID;
 	const int endFrameID;
 	const bool flipped;
@@ -83,17 +81,19 @@ public:
 	const std::array<AnimationDetails, static_cast<size_t>(eAnimationName::eTotal)> animations
 	{
 		//Player Idle
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpStart),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownStart),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightStart),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftStart),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpStart),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownStart),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightStart),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftStart),
 		//Player Move
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpEnd),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
-		AnimationDetails(eAnimationType::eHorizontal, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationFlipped::eTrue),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveUpStart, eFrameID::ePlayerMoveUpEnd),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
+		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationFlipped::eTrue),
 		//Bomb
-		AnimationDetails(eAnimationType::eVertical,  eFrameID::eBombStart, eFrameID::eBombEnd)
+		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd),
+		//Explosion
+		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd)
 	};
 
 private:

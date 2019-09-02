@@ -41,9 +41,9 @@ struct PlayerClientLocalPlayer : public PlayerClient
 	std::vector<MovementPoint> m_previousPositions;
 };
 
-struct Bomb
+struct BombClient
 {
-	Bomb(sf::Vector2f startingPosition, float expirationTime);
+	BombClient(sf::Vector2f startingPosition, float expirationTime);
 
 	sf::Vector2f m_position;
 	sf::Sprite m_sprite;
@@ -57,6 +57,6 @@ struct Explosion
 	void update(float deltaTime);
 
 	sf::Vector2f m_position;
-	sf::Sprite m_sprite;
+	AnimatedSprite m_sprite;
 	Timer m_lifeTimer;
 };
