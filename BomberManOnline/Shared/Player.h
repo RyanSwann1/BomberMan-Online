@@ -15,7 +15,7 @@ struct Player
 		m_controllerType(controllerType),
 		m_moveDirection(),
 		m_moving(false),
-		m_movementFactor(0),
+		m_movementFactor(0.0f),
 		m_movementSpeed(2.5f),
 		m_bombPlacementTimer(2.0f, true)
 	{}
