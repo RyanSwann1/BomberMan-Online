@@ -22,17 +22,18 @@ public:
 		return instance;
 	}
 
-	void initGraph(sf::Vector2i levelSize);
+	void createGraph(sf::Vector2i levelSize);
 
-	bool isPositionReachable(sf::Vector2i source, sf::Vector2i target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize);
+	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+		sf::Vector2i levelSize, sf::Vector2i tileSize);
 
-	void getPathToTile(sf::Vector2i source, sf::Vector2i destination, 
+	void getPathToTile(sf::Vector2f source, sf::Vector2f destination, 
 		const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
 
-	void pathToClosestBox(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+	void pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
 
-	void pathToClosestSafePosition(sf::Vector2i source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
+	void pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
 		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
 
 private:

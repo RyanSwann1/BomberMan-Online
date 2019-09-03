@@ -57,7 +57,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, ePlayerControllerType::eAI));
 		}
 
-		PathFinding::getInstance().initGraph(server->m_mapDimensions);
+		PathFinding::getInstance().createGraph(server->m_mapDimensions);
 
 		return std::unique_ptr<Server>(server);
 	}
@@ -325,13 +325,11 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		bool targetFound = false;
 		if (player.m_behavour == eAIBehaviour::eAggressive)
 		{
-			sf::Vector2i playerPosition(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y);
 			for (const auto& targetPlayer : m_players)
 			{
 				if (targetPlayer->m_ID != player.m_ID)
 				{
-					sf::Vector2i targetPosition(targetPlayer->m_position.x / m_tileSize.x, targetPlayer->m_position.y / m_tileSize.y);
-					if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+					if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
 					{
 						targetFound = true;
 						player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -343,8 +341,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		}
 		if (!targetFound || player.m_behavour == eAIBehaviour::ePassive)
 		{
-			PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
-				m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
+			PathFinding::getInstance().pathToClosestBox(player.m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 			if (!player.m_pathToTile.empty())
 			{
 				player.m_currentState = eAIState::eMoveToBox;
@@ -377,13 +374,11 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			bool targetFound = false;
 			if (player.m_behavour == eAIBehaviour::eAggressive)
 			{
-				sf::Vector2i playerPosition(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y);
 				for (const auto& targetPlayer : m_players)
 				{
 					if (targetPlayer->m_ID != player.m_ID)
 					{
-						sf::Vector2i targetPosition(targetPlayer->m_position.x / m_tileSize.x, targetPlayer->m_position.y / m_tileSize.y);
-						if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
+						if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
 						{
 							targetFound = true;
 							player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -419,8 +414,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		{
 			if (target->m_ID != player.m_ID)
 			{
-				PathFinding::getInstance().getPathToTile(sf::Vector2i(player.m_position.x, player.m_position.y), sf::Vector2i(target->m_position.x, target->m_position.y),
-					m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
+				PathFinding::getInstance().getPathToTile(player.m_position, target->m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 				if (!player.m_pathToTile.empty())
 				{
 					player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -469,8 +463,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		break;
 	case eAIState::eSetSafePosition :
 	{
-		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
-			m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
+		PathFinding::getInstance().pathToClosestSafePosition(player.m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
 
