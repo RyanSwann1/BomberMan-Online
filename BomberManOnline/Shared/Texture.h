@@ -13,7 +13,7 @@ public:
 	static std::unique_ptr<Texture> load(const std::string& levelName, const std::string& imageFileName);
 
 	const sf::Texture& getTexture() const;
-	int getTileSize() const;
+	sf::Vector2i getTileSize() const;
 
 	sf::IntRect getFrameRect(int tileID) const;
 
