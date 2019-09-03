@@ -56,16 +56,16 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	}
 
 	//Initialize Remote Players
-	for (const auto& player : initialGameData.playerDetails)
+	for (const auto& playerDetails : initialGameData.playerDetails)
 	{
-		if (player.ID == localClientID)
+		if (playerDetails.ID == localClientID)
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(playerDetails.ID, playerDetails.spawnPosition));
 			level->m_localPlayer = static_cast<PlayerClientLocalPlayer*>(level->m_players.back().get());
 		}
 		else
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClient>(player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition));
 		}
 	}
 

@@ -80,7 +80,7 @@ bool XMLParser::loadLevelAsClient(const std::string& levelName, sf::Vector2i& le
 
 
 bool XMLParser::loadLevelAsServer(const std::string & levelName, sf::Vector2i & levelSize, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
-	std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i tileSize)
+	std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i& tileSize)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(levelName))
