@@ -22,7 +22,7 @@ struct MovementPoint
 
 struct PlayerClient : public Player
 {
-	PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition);
+	PlayerClient(int ID, sf::Vector2f startingPosition);
 
 	virtual void setNewPosition(sf::Vector2f newPosition);
 	void plantBomb();
@@ -33,9 +33,7 @@ struct PlayerClient : public Player
 
 struct PlayerClientLocalPlayer : public PlayerClient
 {
-	PlayerClientLocalPlayer(int tileSize, int ID, sf::Vector2f startingPosition)
-		: PlayerClient(tileSize, ID, startingPosition)
-	{}
+	PlayerClientLocalPlayer(int ID, sf::Vector2f startingPosition);
 
 	void setNewPosition(sf::Vector2f newPosition) override final;
 

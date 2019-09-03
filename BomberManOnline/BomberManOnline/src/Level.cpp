@@ -60,12 +60,12 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	{
 		if (player.ID == localClientID)
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(player.ID, player.spawnPosition));
 			level->m_localPlayer = static_cast<PlayerClientLocalPlayer*>(level->m_players.back().get());
 		}
 		else
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(player.ID, player.spawnPosition));
 		}
 	}
 

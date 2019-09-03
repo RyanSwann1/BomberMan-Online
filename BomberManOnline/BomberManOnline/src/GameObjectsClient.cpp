@@ -4,8 +4,8 @@
 #include "ServerMessages.h"
 #include "Resources.h"
 
-//Player
-PlayerClient::PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition)
+//Player Client
+PlayerClient::PlayerClient(int ID, sf::Vector2f startingPosition)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
 	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown)
 {}
@@ -51,6 +51,11 @@ void PlayerClient::plantBomb()
 	}
 }
 
+//Player Client Local Player
+PlayerClientLocalPlayer::PlayerClientLocalPlayer(int ID, sf::Vector2f startingPosition)
+	: PlayerClient(ID, startingPosition)
+{}
+
 void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
 {
 	PlayerClient::setNewPosition(newPosition);
@@ -62,6 +67,7 @@ void PlayerClientLocalPlayer::setNewPosition(sf::Vector2f newPosition)
 	NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 }
 
+//Game Object Client
 GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type)
 	: m_type(type),
 	m_position(startingPosition),
