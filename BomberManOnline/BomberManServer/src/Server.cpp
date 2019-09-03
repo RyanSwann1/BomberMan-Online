@@ -41,7 +41,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		server->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_mapDimensions,
-			server->m_collisionLayer, server->m_spawnPositions))
+			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
 			return std::unique_ptr<Server>();
 		}
@@ -197,7 +197,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	//Invalid Move
-	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
+	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_previousPosition);
@@ -222,7 +222,7 @@ void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playe
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
+	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
@@ -297,12 +297,12 @@ void Server::update(float frameTime)
 		{
 			onBombExplosion(bomb->m_position);
 
-			for (int x = bomb->m_position.x - 16; x <= bomb->m_position.x + 16; x += 32)
+			for (int x = bomb->m_position.x - m_tileSize.x; x <= bomb->m_position.x + m_tileSize.x; x += m_tileSize.x * 2)
 			{
 				onBombExplosion(sf::Vector2f(x, bomb->m_position.y));
 			}
 			
-			for (int y = bomb->m_position.y - 16; y <= bomb->m_position.y + 16; y += 32)
+			for (int y = bomb->m_position.y - m_tileSize.y; y <= bomb->m_position.y + m_tileSize.y; y += m_tileSize.y * 2)
 			{
 				onBombExplosion(sf::Vector2f(bomb->m_position.x, y));
 			}
@@ -325,12 +325,12 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		bool targetFound = false;
 		if (player.m_behavour == eAIBehaviour::eAggressive)
 		{
-			sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
+			sf::Vector2i playerPosition(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y);
 			for (const auto& targetPlayer : m_players)
 			{
 				if (targetPlayer->m_ID != player.m_ID)
 				{
-					sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
+					sf::Vector2i targetPosition(targetPlayer->m_position.x / m_tileSize.x, targetPlayer->m_position.y / m_tileSize.y);
 					if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
 					{
 						targetFound = true;
@@ -343,8 +343,8 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		}
 		if (!targetFound || player.m_behavour == eAIBehaviour::ePassive)
 		{
-			PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16),
-				m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+			PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
+				m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 			if (!player.m_pathToTile.empty())
 			{
 				player.m_currentState = eAIState::eMoveToBox;
@@ -377,12 +377,12 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			bool targetFound = false;
 			if (player.m_behavour == eAIBehaviour::eAggressive)
 			{
-				sf::Vector2i playerPosition(player.m_position.x / 16, player.m_position.y / 16);
+				sf::Vector2i playerPosition(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y);
 				for (const auto& targetPlayer : m_players)
 				{
 					if (targetPlayer->m_ID != player.m_ID)
 					{
-						sf::Vector2i targetPosition(targetPlayer->m_position.x / 16, targetPlayer->m_position.y / 16);
+						sf::Vector2i targetPosition(targetPlayer->m_position.x / m_tileSize.x, targetPlayer->m_position.y / m_tileSize.y);
 						if (PathFinding::getInstance().isPositionReachable(playerPosition, targetPosition, m_collisionLayer, m_mapDimensions))
 						{
 							targetFound = true;
@@ -420,7 +420,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			if (target->m_ID != player.m_ID)
 			{
 				PathFinding::getInstance().getPathToTile(sf::Vector2i(player.m_position.x, player.m_position.y), sf::Vector2i(target->m_position.x, target->m_position.y),
-					m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+					m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 				if (!player.m_pathToTile.empty())
 				{
 					player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -469,8 +469,8 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		break;
 	case eAIState::eSetSafePosition :
 	{
-		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / 16, player.m_position.y / 16),
-			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
+			m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
 
@@ -544,9 +544,9 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
-	if (m_collisionLayer[static_cast<int>(explosionPosition.y / 16)][static_cast<int>(explosionPosition.x / 16)] == eCollidableTile::eBox)
+	if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
 	{
-		m_collisionLayer[static_cast<int>(explosionPosition.y / 16)][static_cast<int>(explosionPosition.x / 16)] = eCollidableTile::eNonCollidable;
+		m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] = eCollidableTile::eNonCollidable;
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
@@ -555,8 +555,8 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 
 	for (const auto& player : m_players)
 	{
-		sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / 16), static_cast<int>(player->m_position.y / 16));
-		if (sf::Vector2i(static_cast<int>(explosionPosition.x / 16), static_cast<int>(explosionPosition.y / 16)) == playerPosition)
+		sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / m_tileSize.x), static_cast<int>(player->m_position.y / m_tileSize.y));
+		if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
 		{
 			m_clientsToRemove.push_back(player->m_ID);
 		}

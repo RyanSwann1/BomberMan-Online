@@ -68,17 +68,19 @@ bool XMLParser::loadLevelAsClient(const std::string& levelName, sf::Vector2i& le
 		row = col;
 	}
 	
+
 	tileLayers = parseTileLayers(*rootElement, levelSize);
-	spawnPositions = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Spawn Position Layer");
-	parseCollisionLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
-	parseBoxLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
+	sf::Vector2i tileSize = parseTileSize(*rootElement);
+	spawnPositions = parseObjectLayer(*rootElement, tileSize, "Spawn Position Layer");
+	parseCollisionLayer(*rootElement, tileSize, collisionLayer);
+	parseBoxLayer(*rootElement, tileSize, collisionLayer);
 	
 	return true;
 }
 
 
 bool XMLParser::loadLevelAsServer(const std::string & levelName, sf::Vector2i & levelSize, std::vector<std::vector<eCollidableTile>>& collisionLayer, 
-	std::vector<sf::Vector2f>& spawnPositions)
+	std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i tileSize)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(levelName))
@@ -97,9 +99,10 @@ bool XMLParser::loadLevelAsServer(const std::string & levelName, sf::Vector2i & 
 		row = col;
 	}
 
-	spawnPositions = parseObjectLayer(*rootElement, parseTileSize(*rootElement), "Spawn Position Layer");
-	parseCollisionLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
-	parseBoxLayer(*rootElement, parseTileSize(*rootElement), collisionLayer);
+	tileSize = parseTileSize(*rootElement);
+	spawnPositions = parseObjectLayer(*rootElement, tileSize, "Spawn Position Layer");
+	parseCollisionLayer(*rootElement, tileSize, collisionLayer);
+	parseBoxLayer(*rootElement, tileSize, collisionLayer);
 
 	return true;
 }

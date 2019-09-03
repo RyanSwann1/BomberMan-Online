@@ -27,18 +27,18 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 {
 	m_gameObjects.emplace_back(bombExplodePosition, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 	
-	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	for (int x = bombExplodePosition.x - tileSize; x <= bombExplodePosition.x + tileSize; x += tileSize * 2)
+	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	for (int x = bombExplodePosition.x - tileSize.x; x <= bombExplodePosition.x + tileSize.x; x += tileSize.x * 2)
 	{
-		if (m_collisionLayer[static_cast<int>(bombExplodePosition.y / tileSize)][static_cast<int>(x / tileSize)] != eCollidableTile::eWall)
+		if (m_collisionLayer[static_cast<int>(bombExplodePosition.y / tileSize.y)][static_cast<int>(x / tileSize.y)] != eCollidableTile::eWall)
 		{
 			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
 	}
 
-	for (int y = bombExplodePosition.y - tileSize; y <= bombExplodePosition.y + tileSize; y += tileSize * 2)
+	for (int y = bombExplodePosition.y - tileSize.y; y <= bombExplodePosition.y + tileSize.y; y += tileSize.y * 2)
 	{
-		if (m_collisionLayer[static_cast<int>(y / tileSize)][static_cast<int>(bombExplodePosition.x / tileSize)] != eCollidableTile::eWall)
+		if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(bombExplodePosition.x / tileSize.x)] != eCollidableTile::eWall)
 		{
 			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
@@ -74,13 +74,13 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 
 void Level::handleInput(const sf::Event & sfmlEvent)
 {
-	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x - tileSize, m_localPlayer->m_position.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
+		sf::Vector2f newPosition(m_localPlayer->m_position.x - tileSize.x, m_localPlayer->m_position.y);
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 		}
@@ -90,8 +90,8 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 	case sf::Keyboard::D:
 	{
-		sf::Vector2f newPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize, m_localPlayer->m_position.y));
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
+		sf::Vector2f newPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y));
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 		}
@@ -101,8 +101,8 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 	case sf::Keyboard::W:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
+		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize.y);
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 		}
@@ -112,8 +112,8 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 	case sf::Keyboard::S:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition))
+		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize.y);
+		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);
 		}
@@ -141,7 +141,7 @@ void Level::render(sf::RenderWindow & window) const
 				if (tileID > 0)
 				{
 					sf::Sprite tileSprite(Textures::getInstance().getTileSheet().getTexture(), tileSheet.getFrameRect(tileID));
-					tileSprite.setPosition(x * tileSheet.getTileSize(), y * tileSheet.getTileSize());
+					tileSprite.setPosition(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y);
 
 					window.draw(tileSprite);
 				}
@@ -157,7 +157,7 @@ void Level::render(sf::RenderWindow & window) const
 			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
 			{
 				sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
-				boxSprite.setPosition(sf::Vector2f(x * 16, y * 16));
+				boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
 				window.draw(boxSprite);
 			}
 		}
@@ -234,7 +234,6 @@ void Level::update(float deltaTime)
 
 void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet & receivedMessage, sf::RenderWindow& window)
 {
-	int tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	switch (receivedMessageType)
 	{
 	case eServerMessageType::eInvalidMoveRequest :
@@ -316,9 +315,10 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	case eServerMessageType::eDestroyBox :
 	{
+		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 		sf::Vector2f boxPosition;
 		receivedMessage >> boxPosition.x >> boxPosition.y;
-		m_collisionLayer[static_cast<int>(boxPosition.y / tileSize)][static_cast<int>(boxPosition.x / tileSize)] = eCollidableTile::eNonCollidable;
+		m_collisionLayer[static_cast<int>(boxPosition.y / tileSize.y)][static_cast<int>(boxPosition.x / tileSize.x)] = eCollidableTile::eNonCollidable;
 	}
 		break;
 	case eServerMessageType::ePlayerDisconnected :

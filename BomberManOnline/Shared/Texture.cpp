@@ -6,11 +6,10 @@
 std::unique_ptr<Texture> Texture::load(const std::string & levelName, const std::string& imageFileName)
 {
 	Texture* texture = new Texture();
-	std::unique_ptr<Texture> uniqueTexture = std::unique_ptr<Texture>(texture);
-	if (XMLParser::parseTextureDetails(uniqueTexture->m_tileSize, uniqueTexture->m_size, uniqueTexture->m_columns, levelName, imageFileName)
+	if (XMLParser::parseTextureDetails(texture->m_tileSize, texture->m_size, texture->m_columns, levelName, imageFileName)
 		 && texture->m_texture.loadFromFile(imageFileName + ".png"))
 	{
-		return uniqueTexture;
+		return std::unique_ptr<Texture>(texture);
 	}
 	else
 	{
@@ -23,10 +22,9 @@ const sf::Texture & Texture::getTexture() const
 	return m_texture;
 }
 
-int Texture::getTileSize() const
+sf::Vector2i Texture::getTileSize() const
 {
-	assert(m_tileSize.x == m_tileSize.y);
-	return m_tileSize.x;
+	return m_tileSize;
 }
 
 sf::IntRect Texture::getFrameRect(int tileID) const

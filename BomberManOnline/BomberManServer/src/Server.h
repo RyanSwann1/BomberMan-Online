@@ -28,6 +28,7 @@ private:
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
+	sf::Vector2i m_tileSize;
 	sf::Clock m_clock;
 	bool m_gameRunning;
 	bool m_running;
