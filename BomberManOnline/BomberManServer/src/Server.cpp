@@ -197,7 +197,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	//Invalid Move
-	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition))
+	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_previousPosition);
@@ -222,7 +222,7 @@ void Server::movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playe
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition))
+	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
