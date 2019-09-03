@@ -18,9 +18,9 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 	return pointA + (pointB - pointA) * factor;
 }
 
-bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position)
+bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
 {
-	return collisionLayer[static_cast<int>(position.y / 16)][static_cast<int>(position.x / 16)] != eCollidableTile::eNonCollidable;
+	return collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eNonCollidable;
 }
 
 int Utilities::getRandomNumber(int min, int max)
