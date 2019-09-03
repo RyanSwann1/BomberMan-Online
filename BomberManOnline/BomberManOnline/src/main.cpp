@@ -37,7 +37,7 @@ int main()
 	sf::Clock gameClock;
 	float deltaTime = 0;
 	int localClientID = 0;
-
+	
 	while (window.isOpen())
 	{
 		//Handle Server Messages

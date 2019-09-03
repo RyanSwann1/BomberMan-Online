@@ -10,7 +10,7 @@
 
 constexpr size_t MAX_CLIENTS = 4;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
-constexpr int MAX_AI_PLAYERS =  2;
+constexpr int MAX_AI_PLAYERS = 3;
 
 Server::Server()
 	: m_tcpListener(),
@@ -329,13 +329,16 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			{
 				if (targetPlayer->m_ID != player.m_ID)
 				{
-					if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
-					{
-						targetFound = true;
-						player.m_currentState = eAIState::eMoveToNearestPlayer;
-						player.m_pathToTile.clear();
-						break;
-					}
+				
+					continue;
+				}
+
+				if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
+				{
+					targetFound = true;
+					player.m_currentState = eAIState::eMoveToNearestPlayer;
+					player.m_pathToTile.clear();
+					break;
 				}
 			}
 		}
