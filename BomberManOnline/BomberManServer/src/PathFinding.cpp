@@ -19,7 +19,6 @@ GraphNode::GraphNode(sf::Vector2i cameFrom)
 {}
 
 void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph);
-bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position);
 
 void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours,
 	const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize);
@@ -33,11 +32,6 @@ void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& gra
 			graph[y][x] = GraphNode();
 		}
 	}
-}
-
-bool isNodeVisited(const std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position)
-{
-	return graph[position.y][position.x].visited;
 }
 
 float distanceFromDestination(sf::Vector2i source, sf::Vector2i destination)
@@ -101,7 +95,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 				return true;
 			}
 			else if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eNonCollidable &&
-				!isNodeVisited(m_graph, neighbourPosition))
+				!m_graph[neighbourPosition.y][neighbourPosition.x].visited)
 			{
 				m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 				frontier.push(neighbourPosition);
@@ -116,6 +110,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize)
 {
+	pathToTile.clear();
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
 	sf::Vector2i positionAtDestination(destination.x / tileSize.x, destination.y / tileSize.y);
 	resetGraph(levelSize, m_graph);
@@ -174,6 +169,7 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, c
 void PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize)
 {
+	pathToTile.clear();
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
 	resetGraph(levelSize, m_graph);
 
@@ -186,8 +182,7 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::v
 	std::vector<sf::Vector2i> boxSelection;
 	boxSelection.reserve(MAX_BOX_SELECTION);
 	sf::Vector2i lastPosition;
-	bool boxFound = false;
-	while (!frontier.empty())
+	while (!frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
 	{
 		lastPosition = frontier.front();
 		frontier.pop();
@@ -196,32 +191,15 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::v
 		{
 			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
 			{
-				if (lastPosition == positionAtSource)
-				{
-					continue;
-				}
-
 				if (boxSelection.size() < MAX_BOX_SELECTION)
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					boxSelection.push_back(neighbourPosition);
 				}
-				else
-				{
-					break;
-					boxFound = true;
-				}
-
-				if (lastPosition == positionAtSource)
-				{
-					pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
-					boxFound = true;
-					break;
-				}
 			}
 			else
 			{
-				if (!isNodeVisited(m_graph, neighbourPosition))
+				if (!m_graph[neighbourPosition.y][neighbourPosition.x].visited)
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					frontier.push(neighbourPosition);
@@ -230,11 +208,6 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::v
 		}
 
 		neighbours.clear();
-
-		if (boxFound)
-		{
-			break;
-		}
 	}
 
 	if (!boxSelection.empty())
@@ -262,6 +235,7 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, const std::vector<std::v
 void PathFinding::pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
 	sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize)
 {
+	pathToTile.clear();
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
 	resetGraph(levelSize, m_graph);
 
@@ -307,7 +281,7 @@ void PathFinding::pathToClosestSafePosition(sf::Vector2f source, const std::vect
 			}
 			else
 			{
-				if (!isNodeVisited(m_graph, neighbourPosition))
+				if (!m_graph[neighbourPosition.y][neighbourPosition.x].visited)
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					frontier.push(neighbourPosition);

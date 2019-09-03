@@ -14,7 +14,7 @@ enum class eAIBehaviour
 
 enum class eAIState
 {
-	eIdle = 0,
+	eMakeDecision = 0,
 	eMoveToBox,
 	eMoveToNearestPlayer,
 	eMoveToSafePosition,
@@ -40,7 +40,7 @@ struct PlayerServerAI : public Player
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
 		m_behavour(eAIBehaviour::ePassive),
-		m_currentState(eAIState::eIdle),
+		m_currentState(eAIState::eMakeDecision),
 		m_pathToTile(),
 		m_waitTimer(2.5f)
 	{}
