@@ -49,7 +49,7 @@ bool XMLParser::parseTextureDetails(sf::Vector2i& tileSize, sf::Vector2i& textur
 
 bool XMLParser::loadLevelAsClient(const std::string& levelName, sf::Vector2i& levelSize,
 	std::vector<TileLayer>& tileLayers, std::vector<std::vector<eCollidableTile>>& collisionLayer,
-	std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i tileSize)
+	std::vector<sf::Vector2f>& spawnPositions)
 {
 	TiXmlDocument xmlFile;
 	if (!xmlFile.LoadFile(levelName))
@@ -70,7 +70,7 @@ bool XMLParser::loadLevelAsClient(const std::string& levelName, sf::Vector2i& le
 	
 
 	tileLayers = parseTileLayers(*rootElement, levelSize);
-	tileSize = parseTileSize(*rootElement);
+	sf::Vector2i tileSize = parseTileSize(*rootElement);
 	spawnPositions = parseObjectLayer(*rootElement, tileSize, "Spawn Position Layer");
 	parseCollisionLayer(*rootElement, tileSize, collisionLayer);
 	parseBoxLayer(*rootElement, tileSize, collisionLayer);
