@@ -136,7 +136,7 @@ void Server::addNewClient()
 
 void Server::listen()
 {
-	for (auto& player : m_players)
+	for (const auto& player : m_players)
 	{
 		if (player->m_controllerType == ePlayerControllerType::eHuman)
 		{
@@ -181,7 +181,7 @@ void Server::listen()
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
 {
-	for (auto& player : m_players)
+	for (const auto& player : m_players)
 	{
 		if(player->m_controllerType == ePlayerControllerType::eHuman)
 		{
