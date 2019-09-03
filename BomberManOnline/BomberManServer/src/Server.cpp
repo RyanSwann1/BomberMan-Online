@@ -344,7 +344,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		if (!targetFound || player.m_behavour == eAIBehaviour::ePassive)
 		{
 			PathFinding::getInstance().pathToClosestBox(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
-				m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+				m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 			if (!player.m_pathToTile.empty())
 			{
 				player.m_currentState = eAIState::eMoveToBox;
@@ -420,7 +420,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			if (target->m_ID != player.m_ID)
 			{
 				PathFinding::getInstance().getPathToTile(sf::Vector2i(player.m_position.x, player.m_position.y), sf::Vector2i(target->m_position.x, target->m_position.y),
-					m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+					m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 				if (!player.m_pathToTile.empty())
 				{
 					player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -470,7 +470,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	case eAIState::eSetSafePosition :
 	{
 		PathFinding::getInstance().pathToClosestSafePosition(sf::Vector2i(player.m_position.x / m_tileSize.x, player.m_position.y / m_tileSize.y),
-			m_collisionLayer, m_mapDimensions, player.m_pathToTile);
+			m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
 
