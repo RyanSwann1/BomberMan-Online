@@ -24,8 +24,7 @@ Server::Server()
 	m_mapDimensions(),
 	m_clock(),
 	m_gameRunning(false),
-	m_running(false),
-	m_initialAIMovementMessageSent(false)
+	m_running(false)
 {
 	m_players.reserve(MAX_CLIENTS);
 	m_clientsToRemove.reserve(MAX_CLIENTS);
@@ -356,7 +355,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				sf::Packet globalPacket;
 				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
 				broadcastMessage(globalPacket);
-				m_initialAIMovementMessageSent = true;
 			}
 		}
 	}
@@ -372,14 +370,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			std::cout << "Reached New Position\n";
 			player.m_movementFactor = 0;
 			player.m_previousPosition = player.m_position;
-
-			if (!m_initialAIMovementMessageSent)
-			{
-				sf::Packet globalPacket;
-				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_position.x << player.m_position.y << player.m_ID;
-				broadcastMessage(globalPacket);
-			}
-			m_initialAIMovementMessageSent = false;
 
 			if(!player.m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_collisionLayer, player.m_pathToTile.front(), m_tileSize, m_mapDimensions))
 			{
@@ -399,6 +389,9 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				player.m_moving = true;
 				player.m_newPosition = player.m_pathToTile.back();
 				player.m_pathToTile.pop_back();
+				sf::Packet globalPacket;
+				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
+				broadcastMessage(globalPacket);
 			}
 
 			std::cout << "Finished reaching new position\n";

@@ -32,7 +32,6 @@ private:
 	sf::Clock m_clock;
 	bool m_gameRunning;
 	bool m_running;
-	bool m_initialAIMovementMessageSent;
 
 	void addNewClient();
 	void listen();
