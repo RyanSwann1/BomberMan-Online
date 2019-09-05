@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "Direction.h"
 
+constexpr float MOVEMENT_SPEED_INCREMENT = 0.2f;
+
 struct Player
 {
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)

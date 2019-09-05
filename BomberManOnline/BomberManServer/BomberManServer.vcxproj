@@ -142,6 +142,7 @@
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
     <ClInclude Include="..\Shared\CollidableTile.h" />
     <ClInclude Include="..\Shared\Direction.h" />
+    <ClInclude Include="..\Shared\GameObjectType.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\Player.h" />
     <ClInclude Include="..\Shared\PlayerControllerType.h" />

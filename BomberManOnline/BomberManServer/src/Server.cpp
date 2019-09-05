@@ -18,7 +18,7 @@ Server::Server()
 	m_players(),
 	m_clientsToRemove(),
 	m_spawnPositions(),
-	m_bombs(),
+	m_gameObjects(),
 	m_collisionLayer(),
 	m_levelName(),
 	m_mapDimensions(),
@@ -232,7 +232,7 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 		broadcastMessage(packetToSend);
 		std::cout << "Place Bomb\n";
-		m_bombs.emplace_back(placementPosition, client.m_bombPlacementTimer.getExpirationTime());
+		m_gameObjects.emplace_back(placementPosition, client.m_bombPlacementTimer.getExpirationTime());
 		client.m_bombPlacementTimer.resetElaspedTime();
 	}
 }
@@ -289,29 +289,38 @@ void Server::update(float frameTime)
 		}
 	}
 
-	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
+	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
-		bomb->m_lifeTime.update(frameTime);
+		gameObject->m_lifeTime.update(frameTime);
+		
 
-		if (bomb->m_lifeTime.isExpired())
+		if (gameObject->m_lifeTime.isExpired())
 		{
-			onBombExplosion(bomb->m_position);
-
-			for (int x = bomb->m_position.x - m_tileSize.x; x <= bomb->m_position.x + m_tileSize.x; x += m_tileSize.x * 2)
+			if (gameObject->m_type == eGameObjectType::eBomb)
 			{
-				onBombExplosion(sf::Vector2f(x, bomb->m_position.y));
+				onBombExplosion(gameObject->m_position);
+
+				for (int x = gameObject->m_position.x - m_tileSize.x; x <= gameObject->m_position.x + m_tileSize.x; x += m_tileSize.x * 2)
+				{
+					onBombExplosion(sf::Vector2f(x, gameObject->m_position.y));
+				}
+
+				for (int y = gameObject->m_position.y - m_tileSize.y; y <= gameObject->m_position.y + m_tileSize.y; y += m_tileSize.y * 2)
+				{
+					onBombExplosion(sf::Vector2f(gameObject->m_position.x, y));
+				}
 			}
-			
-			for (int y = bomb->m_position.y - m_tileSize.y; y <= bomb->m_position.y + m_tileSize.y; y += m_tileSize.y * 2)
+			else if (gameObject->m_type == eGameObjectType::eMovementPickUp)
 			{
-				onBombExplosion(sf::Vector2f(bomb->m_position.x, y));
+
 			}
 
-			bomb = m_bombs.erase(bomb);
+
+			gameObject = m_gameObjects.erase(gameObject);
 		}
 		else
 		{
-			++bomb;
+			++gameObject;
 		}
 	}
 }
@@ -503,7 +512,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 			broadcastMessage(packetToSend);
-			m_bombs.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
+			m_gameObjects.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
 
 			player.m_currentState = eAIState::eSetPositionAtSafeArea;
 		}

@@ -26,7 +26,7 @@ private:
 	std::vector<std::unique_ptr<Player>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
-	std::vector<BombServer> m_bombs;
+	std::vector<GameObjectServer> m_gameObjects;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;

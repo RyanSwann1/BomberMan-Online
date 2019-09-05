@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "GameObjectType.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <utility>
@@ -51,13 +52,17 @@ struct PlayerServerAI : public Player
 	Timer m_waitTimer;
 };
 
-struct BombServer
+//Pick Up
+//Bomb
+struct GameObjectServer
 {
-	BombServer(sf::Vector2f startingPosition, float expirationTime)
-		: m_position(startingPosition),
+	GameObjectServer(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type)
+		: m_type(type),
+		m_position(startingPosition),
 		m_lifeTime(expirationTime, true)
 	{}
 
+	eGameObjectType m_type;
 	sf::Vector2f m_position;
 	Timer m_lifeTime;
 };
