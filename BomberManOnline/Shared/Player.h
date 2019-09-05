@@ -14,6 +14,7 @@ struct Player
 		m_previousPosition(),
 		m_position(startingPosition),
 		m_newPosition(),
+		m_AABB(startingPosition, sf::Vector2f(16, 16)),
 		m_controllerType(controllerType),
 		m_moveDirection(),
 		m_moving(false),
@@ -27,6 +28,7 @@ struct Player
 	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_position;
 	sf::Vector2f m_newPosition;
+	sf::FloatRect m_AABB;
 	ePlayerControllerType m_controllerType;
 	eDirection m_moveDirection;
 	bool m_moving;
