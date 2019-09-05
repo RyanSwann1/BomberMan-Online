@@ -327,7 +327,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		{
 			for (const auto& targetPlayer : m_players)
 			{
-				if (targetPlayer->m_ID != player.m_ID)
+				if (targetPlayer->m_ID == player.m_ID)
 				{
 					continue;
 				}
@@ -369,18 +369,8 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		if (player.m_position == player.m_newPosition)
 		{
 			std::cout << "Reached new position\n";
-			//std::cout << "Reached New Position\n";
 			player.m_movementFactor = 0;
 			player.m_previousPosition = player.m_position;
-
-
-			if(!player.m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_collisionLayer, player.m_pathToTile.front(), m_tileSize, m_mapDimensions))
-			{
-				//std::cout << "Box Not Found\n";
-				//player.m_moving = false;
-				//player.m_currentState = eAIState::eMakeDecision;
-				//break;
-			}
 
 			if (player.m_pathToTile.empty())
 			{
@@ -393,23 +383,22 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				player.m_newPosition = player.m_pathToTile.back();
 				if (!Utilities::isPositionNeighbouringBox(m_collisionLayer, player.m_pathToTile.front(), m_tileSize, m_mapDimensions))
 				{
+					player.m_moving = false;
+					player.m_currentState = eAIState::eMakeDecision;
 					std::cout << "Box Not Found\n";
 				}
-				player.m_pathToTile.pop_back();
 
+				player.m_pathToTile.pop_back();
 			}
 
 			sf::Packet globalPacket;
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
 			broadcastMessage(globalPacket);
-
-
-			//std::cout << "Finished reaching new position\n";
 		}
 	}
 		
 		break;
-	case eAIState::eSetTargetPosition :
+	case eAIState::eSetPositionToNearestPlayer :
 	{
 		for (const auto& target : m_players)
 		{
@@ -463,7 +452,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	}
 	
 		break;
-	case eAIState::eSetSafePosition :
+	case eAIState::eSetPositionAtSafeArea :
 	{
 		PathFinding::getInstance().pathToClosestSafePosition(player.m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
 		player.m_currentState = eAIState::eMoveToSafePosition;
@@ -516,7 +505,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			broadcastMessage(packetToSend);
 			m_bombs.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
 
-			player.m_currentState = eAIState::eSetSafePosition;
+			player.m_currentState = eAIState::eSetPositionAtSafeArea;
 		}
 	}
 		
