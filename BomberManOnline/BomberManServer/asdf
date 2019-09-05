@@ -1,0 +1,20 @@
+bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, 
+	sf::Vector2i tileSize, sf::Vector2i levelSize)
+{
+	sf::Vector2i roundedPosition(position.x / tileSize.x, position.y / tileSize.y);
+	if (   roundedPosition.x < 0 || roundedPosition.x >= levelSize.x
+	    || roundedPosition.y < 0 || roundedPosition.y >= levelSize.y) {
+		assert(false);
+		return false;
+	}
+
+	if (roundedPosition.x > 0 && collisionLayer[roundedPosition.y][roundedPosition.x-1] == eCollidableTile::eBox)
+		return true;
+
+	if (roundedPosition.x < levelSize.x && collisionLayer[roundedPosition.y][roundedPosition.x+1] == eCollidableTile::eBox)
+		return true;
+
+	// same for y's
+
+	return false;
+}

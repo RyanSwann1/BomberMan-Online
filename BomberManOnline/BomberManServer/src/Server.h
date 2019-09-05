@@ -7,6 +7,8 @@
 #include <memory>
 #include <vector>
 
+//https://stackoverflow.com/questions/385506/when-is-optimisation-premature
+
 struct ServerMessagePlayerMove;
 struct PlayerServerHuman;
 struct PlayerServerAI;
