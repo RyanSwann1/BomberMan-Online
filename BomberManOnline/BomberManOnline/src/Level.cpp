@@ -90,7 +90,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 	case sf::Keyboard::D:
 	{
-		sf::Vector2f newPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y));
+		sf::Vector2f newPosition(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y);
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);

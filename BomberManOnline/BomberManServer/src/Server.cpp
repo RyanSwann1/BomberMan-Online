@@ -292,35 +292,44 @@ void Server::update(float frameTime)
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
 		gameObject->m_lifeTime.update(frameTime);
-		
 
-		if (gameObject->m_lifeTime.isExpired())
+		sf::Vector2f gameObjectPosition(gameObject->m_position);
+		auto iter = std::find_if(m_players.begin(), m_players.end(), [gameObjectPosition] (const auto& player) { return player->m_position == gameObjectPosition; });
+		if (iter != m_players.end())
 		{
-			if (gameObject->m_type == eGameObjectType::eBomb)
-			{
-				onBombExplosion(gameObject->m_position);
-
-				for (int x = gameObject->m_position.x - m_tileSize.x; x <= gameObject->m_position.x + m_tileSize.x; x += m_tileSize.x * 2)
-				{
-					onBombExplosion(sf::Vector2f(x, gameObject->m_position.y));
-				}
-
-				for (int y = gameObject->m_position.y - m_tileSize.y; y <= gameObject->m_position.y + m_tileSize.y; y += m_tileSize.y * 2)
-				{
-					onBombExplosion(sf::Vector2f(gameObject->m_position.x, y));
-				}
-			}
-			else if (gameObject->m_type == eGameObjectType::eMovementPickUp)
-			{
-
-			}
-
-
+			handlePickUpCollision(*iter->get(), gameObject->m_type);
 			gameObject = m_gameObjects.erase(gameObject);
 		}
 		else
 		{
-			++gameObject;
+			if (gameObject->m_lifeTime.isExpired())
+			{
+				if (gameObject->m_type == eGameObjectType::eBomb)
+				{
+					onBombExplosion(gameObject->m_position);
+
+					for (int x = gameObject->m_position.x - m_tileSize.x; x <= gameObject->m_position.x + m_tileSize.x; x += m_tileSize.x * 2)
+					{
+						onBombExplosion(sf::Vector2f(x, gameObject->m_position.y));
+					}
+
+					for (int y = gameObject->m_position.y - m_tileSize.y; y <= gameObject->m_position.y + m_tileSize.y; y += m_tileSize.y * 2)
+					{
+						onBombExplosion(sf::Vector2f(gameObject->m_position.x, y));
+					}
+				}
+				else if (gameObject->m_type == eGameObjectType::eMovementPickUp)
+				{
+
+				}
+
+
+				gameObject = m_gameObjects.erase(gameObject);
+			}
+			else
+			{
+				++gameObject;
+			}
 		}
 	}
 }
@@ -552,5 +561,14 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		{
 			m_clientsToRemove.push_back(player->m_ID);
 		}
+	}
+}
+
+void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType)
+{
+	switch (gameObjectType)
+	{
+	case eGameObjectType::eMovementPickUp :
+		break;
 	}
 }

@@ -46,4 +46,5 @@ private:
 	void updateAI(PlayerServerAI& player, float frameTime);
 	
 	void onBombExplosion(sf::Vector2f explosionPosition);
+	void handlePickUpCollision(Player& player, eGameObjectType gameObjectType);
 };
