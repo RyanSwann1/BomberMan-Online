@@ -35,6 +35,7 @@ private:
 	PlayerClientLocalPlayer* m_localPlayer;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; //Bombs, Explosions
+	std::vector<PickUpClient> m_pickUps;
 
 	void spawnExplosions(sf::Vector2f bombExplodePosition);
 };

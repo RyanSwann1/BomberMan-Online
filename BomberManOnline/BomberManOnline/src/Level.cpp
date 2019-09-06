@@ -21,6 +21,7 @@ Level::Level()
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_gameObjects.reserve(MAX_GAME_OBJECTS);
+	m_pickUps.reserve(MAX_GAME_OBJECTS);
 }
 
 void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
@@ -173,6 +174,12 @@ void Level::render(sf::RenderWindow & window) const
 	for (const auto& gameObject : m_gameObjects)
 	{
 		gameObject.m_sprite.render(window);
+	}
+
+	//Pick Up
+	for (const auto& pickUp : m_pickUps)
+	{
+		window.draw(pickUp.m_shape);
 	}
 }
 
@@ -336,6 +343,13 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			
 			m_players.erase(iter);
 		}
+	}
+		break;
+	case eServerMessageType::eSpawnMovementPickUp :
+	{
+		sf::Vector2f position;
+		receivedMessage >> position.x >> position.y;
+		m_pickUps.emplace_back(position, sf::Color::Red, Textures::getInstance().getTileSheet().getTileSize(), eGameObjectType::eMovementPickUp);
 	}
 		break;
 	}

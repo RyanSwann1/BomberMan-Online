@@ -300,10 +300,10 @@ void Server::update(float frameTime)
 		if (bomb->m_lifeTime.isExpired())
 		{
 			onBombExplosion(bomb->m_position);
-			onBombExplosion(sf::Vector2f(bomb->m_position.x - 1, bomb->m_position.y));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x + 1, bomb->m_position.y));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y - 1));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y + 1));
+			onBombExplosion(sf::Vector2f(bomb->m_position.x - m_tileSize.x, bomb->m_position.y));
+			onBombExplosion(sf::Vector2f(bomb->m_position.x + m_tileSize.x, bomb->m_position.y));
+			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y - m_tileSize.y));
+			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y + m_tileSize.y));
 		
 			bomb = m_bombs.erase(bomb);
 		}
@@ -314,20 +314,20 @@ void Server::update(float frameTime)
 	}
 
 	//Pick Ups
-	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
-	{
-		sf::Vector2f pickUpPosition = pickUp->m_position;
-		auto iter = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
-		if (iter != m_players.end())
-		{
-			handlePickUpCollision(*iter->get(), pickUp->m_type);
-			pickUp = m_pickUps.erase(pickUp);
-		}
-		else
-		{
-			++pickUp;
-		}
-	}
+	//for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
+	//{
+	//	sf::Vector2f pickUpPosition = pickUp->m_position;
+	//	auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
+	//	if (player != m_players.end())
+	//	{
+	//		handlePickUpCollision(*player->get(), pickUp->m_type, pickUpPosition);
+	//		pickUp = m_pickUps.erase(pickUp);
+	//	}
+	//	else
+	//	{
+	//		++pickUp;
+	//	}
+	//}
 }
 
 void Server::updateAI(PlayerServerAI& player, float frameTime)
@@ -544,21 +544,19 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
 	{
 		m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] = eCollidableTile::eNonCollidable;
-
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
+		broadcastMessage(packetToSend);
 
 		if(Utilities::getRandomNumber(0, 10) > 7)
 		{
-			sf::Packet packetToSend;
+			packetToSend.clear();
 			packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
 			broadcastMessage(packetToSend);
 
 			std::cout << "Spawn Pickup\n";
 			m_pickUps.emplace_back(explosionPosition, eGameObjectType::eMovementPickUp);
 		}
-
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-		broadcastMessage(packetToSend);
 	}
 
 	for (const auto& player : m_players)
@@ -571,12 +569,15 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	}
 }
 
-void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType)
+void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType, sf::Vector2f position)
 {
 	switch (gameObjectType)
 	{
 	case eGameObjectType::eMovementPickUp :
 		
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eSpawnMovementPickUp << position.x << position.y;
+		broadcastMessage(packetToSend);
 		break;
 	}
 }

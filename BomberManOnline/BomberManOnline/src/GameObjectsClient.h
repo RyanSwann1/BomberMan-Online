@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Direction.h"
 #include "AnimatedSprite.h"
+#include "GameObjectType.h"
 #include <vector>
 
 constexpr float BOMB_LIFETIME_DURATION = 2.0f;
@@ -40,12 +41,6 @@ struct PlayerClientLocalPlayer : public PlayerClient
 	std::vector<MovementPoint> m_previousPositions;
 };
 
-enum class eGameObjectType
-{
-	eBomb = 0,
-	eExplosion
-};
-
 //Bomb, Explosion
 struct GameObjectClient
 {
@@ -55,4 +50,20 @@ struct GameObjectClient
 	sf::Vector2f m_position;
 	AnimatedSprite m_sprite;
 	Timer m_lifeTimer;
+};
+
+struct PickUpClient
+{
+	PickUpClient(sf::Vector2f startingPosition, sf::Color color, sf::Vector2i tileSize, eGameObjectType pickUpType)
+		: m_position(startingPosition),
+		m_shape(sf::Vector2f(tileSize.x, tileSize.y)),
+		m_type(pickUpType)
+	{
+		m_shape.setFillColor(color);
+		m_shape.setPosition(startingPosition);
+	}
+
+	sf::Vector2f m_position;
+	sf::RectangleShape m_shape;
+	eGameObjectType m_type;
 };

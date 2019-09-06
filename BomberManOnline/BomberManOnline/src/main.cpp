@@ -37,7 +37,6 @@ int main()
 	sf::Clock gameClock;
 	float deltaTime = 0;
 	int localClientID = 0;
-	
 	while (window.isOpen())
 	{
 		//Handle Server Messages
@@ -59,14 +58,8 @@ int main()
 					level = Level::create(localClientID, initialGameData);
 				}
 				break;
-				case eServerMessageType::eInvalidMoveRequest:
-				case eServerMessageType::eNewPlayerPosition:
-				case eServerMessageType::ePlaceBomb:
-				case eServerMessageType::eDestroyBox:
-				case eServerMessageType::ePlayerDisconnected :
-				{
+				default:
 					level->onReceivedServerMessage(messageType, receivedMessage, window);
-				}
 				break;
 				}
 			}
