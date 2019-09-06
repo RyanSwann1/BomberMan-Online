@@ -66,3 +66,25 @@ struct GameObjectServer
 	sf::Vector2f m_position;
 	Timer m_lifeTime;
 };
+
+struct BombServer
+{
+	BombServer(sf::Vector2f startingPosition, float expirationTime)
+		: m_position(startingPosition),
+		m_lifeTime(expirationTime, true)
+	{}
+
+	sf::Vector2f m_position;
+	Timer m_lifeTime;
+};
+
+struct PickUpServer
+{
+	PickUpServer(sf::Vector2f position, eGameObjectType type)
+		: m_position(position),
+		m_type(type)
+	{}
+
+	sf::Vector2f m_position;
+	eGameObjectType m_type;
+};

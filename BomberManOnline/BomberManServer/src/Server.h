@@ -26,8 +26,9 @@ private:
 	std::vector<std::unique_ptr<Player>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
-	std::vector<GameObjectServer> m_gameObjects;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
+	std::vector<BombServer> m_bombs;
+	std::vector<PickUpServer> m_pickUps;
 	std::string m_levelName;
 	sf::Vector2i m_mapDimensions;
 	sf::Vector2i m_tileSize;
@@ -39,7 +40,7 @@ private:
 	void listen();
 	void broadcastMessage(sf::Packet& packetToSend);
 
-	void movePlayer(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage);
+	void setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage);
 	void placeBomb(PlayerServerHuman& client, sf::Vector2f placementPosition);
 
 	void update(float frameTime);
