@@ -574,10 +574,7 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 	switch (gameObjectType)
 	{
 	case eGameObjectType::eMovementPickUp :
-		
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eSpawnMovementPickUp << position.x << position.y;
-		broadcastMessage(packetToSend);
+	
 		break;
 	}
 }

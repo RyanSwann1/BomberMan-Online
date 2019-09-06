@@ -10,7 +10,6 @@
 #include <string>
 #include <memory>
 #include <SFML/Network.hpp>
-#include <SFML/Window.hpp>
 
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable

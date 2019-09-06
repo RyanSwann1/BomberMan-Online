@@ -185,11 +185,13 @@ void Level::render(sf::RenderWindow & window) const
 
 void Level::update(float deltaTime)
 {
+	//Local Player
 	if (m_localPlayer)
 	{
 		m_localPlayer->m_bombPlacementTimer.update(deltaTime);
 	}
 
+	//Players
 	for (auto& player : m_players)
 	{
 		if (!player->m_moving)
@@ -219,6 +221,7 @@ void Level::update(float deltaTime)
 		}
 	}
 
+	//Game Objects
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
 		gameObject->m_lifeTimer.update(deltaTime);
@@ -235,6 +238,21 @@ void Level::update(float deltaTime)
 		else
 		{
 			++gameObject;
+		}
+	}
+
+	//Pick Ups
+	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
+	{
+		sf::Vector2f pickUpPosition(pickUp->m_position);
+		auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->m_position == pickUpPosition; });
+		if (player != m_players.cend())
+		{
+			pickUp = m_pickUps.erase(pickUp);
+		}
+		else
+		{
+			++pickUp;
 		}
 	}
 }
