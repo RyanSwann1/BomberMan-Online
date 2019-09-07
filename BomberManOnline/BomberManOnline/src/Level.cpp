@@ -21,6 +21,7 @@ Level::Level()
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_gameObjects.reserve(MAX_GAME_OBJECTS);
+	m_pickUps.reserve(MAX_GAME_OBJECTS);
 }
 
 void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
@@ -56,16 +57,16 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	}
 
 	//Initialize Remote Players
-	for (const auto& player : initialGameData.playerDetails)
+	for (const auto& playerDetails : initialGameData.playerDetails)
 	{
-		if (player.ID == localClientID)
+		if (playerDetails.ID == localClientID)
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(playerDetails.ID, playerDetails.spawnPosition));
 			level->m_localPlayer = static_cast<PlayerClientLocalPlayer*>(level->m_players.back().get());
 		}
 		else
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClient>(Textures::getInstance().getTileSheet().getTileSize(), player.ID, player.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition));
 		}
 	}
 
@@ -90,7 +91,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 	case sf::Keyboard::D:
 	{
-		sf::Vector2f newPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y));
+		sf::Vector2f newPosition(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y);
 		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
 		{
 			m_localPlayer->setNewPosition(newPosition);
@@ -174,15 +175,23 @@ void Level::render(sf::RenderWindow & window) const
 	{
 		gameObject.m_sprite.render(window);
 	}
+
+	//Pick Up
+	for (const auto& pickUp : m_pickUps)
+	{
+		window.draw(pickUp.m_shape);
+	}
 }
 
 void Level::update(float deltaTime)
 {
+	//Local Player
 	if (m_localPlayer)
 	{
 		m_localPlayer->m_bombPlacementTimer.update(deltaTime);
 	}
 
+	//Players
 	for (auto& player : m_players)
 	{
 		if (!player->m_moving)
@@ -212,6 +221,7 @@ void Level::update(float deltaTime)
 		}
 	}
 
+	//Game Objects
 	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
 	{
 		gameObject->m_lifeTimer.update(deltaTime);
@@ -228,6 +238,21 @@ void Level::update(float deltaTime)
 		else
 		{
 			++gameObject;
+		}
+	}
+
+	//Pick Ups
+	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
+	{
+		sf::Vector2f pickUpPosition(pickUp->m_position);
+		auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->m_position == pickUpPosition; });
+		if (player != m_players.cend())
+		{
+			pickUp = m_pickUps.erase(pickUp);
+		}
+		else
+		{
+			++pickUp;
 		}
 	}
 }
@@ -335,6 +360,29 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			assert(iter != m_players.end());
 			
 			m_players.erase(iter);
+		}
+	}
+		break;
+	case eServerMessageType::eSpawnMovementPickUp :
+	{
+		sf::Vector2f position;
+		receivedMessage >> position.x >> position.y;
+		m_pickUps.emplace_back(position, sf::Color::Red, Textures::getInstance().getTileSheet().getTileSize(), eGameObjectType::eMovementPickUp);
+	}
+		break;
+		
+	case eServerMessageType::eMovementPickUpCollision :
+	{
+		int clientID = 0;
+		float movementSpeedIncrement = 0;
+		receivedMessage >> clientID >> movementSpeedIncrement;
+		for (auto& player : m_players)
+		{
+			if (clientID == player->m_ID)
+			{
+				player->m_movementSpeed += movementSpeedIncrement;
+				break;
+			}
 		}
 	}
 		break;

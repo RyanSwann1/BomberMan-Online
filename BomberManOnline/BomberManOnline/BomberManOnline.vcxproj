@@ -41,6 +41,7 @@
     <ClInclude Include="..\Shared\Direction.h" />
     <ClInclude Include="..\Shared\FrameDetails.h" />
     <ClInclude Include="..\Shared\GameObjects.h" />
+    <ClInclude Include="..\Shared\GameObjectType.h" />
     <ClInclude Include="..\Shared\NonCopyable.h" />
     <ClInclude Include="..\Shared\PlayerControllerType.h" />
     <ClInclude Include="..\Shared\Resources.h" />

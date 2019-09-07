@@ -14,5 +14,8 @@ enum class eServerMessageType
 	eExplodeBomb,
 	eDestroyBox,
 	ePlayerDisconnected,
-	eRequestDisconnection
+	eRequestDisconnection,
+	//PickUps
+	eSpawnMovementPickUp,
+	eMovementPickUpCollision
 };

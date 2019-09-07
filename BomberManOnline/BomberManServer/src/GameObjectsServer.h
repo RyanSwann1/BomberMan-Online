@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Player.h"
+#include "GameObjectType.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <utility>
@@ -14,13 +15,13 @@ enum class eAIBehaviour
 
 enum class eAIState
 {
-	eIdle = 0,
+	eMakeDecision = 0,
 	eMoveToBox,
 	eMoveToNearestPlayer,
 	eMoveToSafePosition,
 	ePlantBomb,
-	eSetSafePosition,
-	eSetTargetPosition,
+	eSetPositionAtSafeArea,
+	eSetPositionToNearestPlayer,
 	eWait
 };
 
@@ -40,7 +41,7 @@ struct PlayerServerAI : public Player
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
 		m_behavour(eAIBehaviour::ePassive),
-		m_currentState(eAIState::eIdle),
+		m_currentState(eAIState::eMakeDecision),
 		m_pathToTile(),
 		m_waitTimer(2.5f)
 	{}
@@ -49,6 +50,21 @@ struct PlayerServerAI : public Player
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
+};
+
+//Pick Up
+//Bomb
+struct GameObjectServer
+{
+	GameObjectServer(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type)
+		: m_type(type),
+		m_position(startingPosition),
+		m_lifeTime(expirationTime, true)
+	{}
+
+	eGameObjectType m_type;
+	sf::Vector2f m_position;
+	Timer m_lifeTime;
 };
 
 struct BombServer
@@ -60,4 +76,15 @@ struct BombServer
 
 	sf::Vector2f m_position;
 	Timer m_lifeTime;
+};
+
+struct PickUpServer
+{
+	PickUpServer(sf::Vector2f position, eGameObjectType type)
+		: m_position(position),
+		m_type(type)
+	{}
+
+	sf::Vector2f m_position;
+	eGameObjectType m_type;
 };

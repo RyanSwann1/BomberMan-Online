@@ -10,7 +10,6 @@
 #include <string>
 #include <memory>
 #include <SFML/Network.hpp>
-#include <SFML/Window.hpp>
 
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable
@@ -35,6 +34,7 @@ private:
 	PlayerClientLocalPlayer* m_localPlayer;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; //Bombs, Explosions
+	std::vector<PickUpClient> m_pickUps;
 
 	void spawnExplosions(sf::Vector2f bombExplodePosition);
 };

@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "Direction.h"
 
+constexpr float MOVEMENT_SPEED_INCREMENT = 0.2f;
+
 struct Player
 {
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
@@ -15,7 +17,7 @@ struct Player
 		m_controllerType(controllerType),
 		m_moveDirection(),
 		m_moving(false),
-		m_movementFactor(0),
+		m_movementFactor(0.0f),
 		m_movementSpeed(2.5f),
 		m_bombPlacementTimer(2.0f, true)
 	{}

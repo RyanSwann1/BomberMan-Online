@@ -131,5 +131,8 @@
     <ClInclude Include="src\GameObjectsClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\GameObjectType.h">
+      <Filter>Shared</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

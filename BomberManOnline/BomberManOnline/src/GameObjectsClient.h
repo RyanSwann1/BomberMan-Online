@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Direction.h"
 #include "AnimatedSprite.h"
+#include "GameObjectType.h"
 #include <vector>
 
 constexpr float BOMB_LIFETIME_DURATION = 2.0f;
@@ -22,7 +23,7 @@ struct MovementPoint
 
 struct PlayerClient : public Player
 {
-	PlayerClient(int tileSize, int ID, sf::Vector2f startingPosition);
+	PlayerClient(int ID, sf::Vector2f startingPosition);
 
 	virtual void setNewPosition(sf::Vector2f newPosition);
 	void plantBomb();
@@ -33,19 +34,11 @@ struct PlayerClient : public Player
 
 struct PlayerClientLocalPlayer : public PlayerClient
 {
-	PlayerClientLocalPlayer(int tileSize, int ID, sf::Vector2f startingPosition)
-		: PlayerClient(tileSize, ID, startingPosition)
-	{}
+	PlayerClientLocalPlayer(int ID, sf::Vector2f startingPosition);
 
 	void setNewPosition(sf::Vector2f newPosition) override final;
 
 	std::vector<MovementPoint> m_previousPositions;
-};
-
-enum class eGameObjectType
-{
-	eBomb = 0,
-	eExplosion
 };
 
 //Bomb, Explosion
@@ -57,4 +50,20 @@ struct GameObjectClient
 	sf::Vector2f m_position;
 	AnimatedSprite m_sprite;
 	Timer m_lifeTimer;
+};
+
+struct PickUpClient
+{
+	PickUpClient(sf::Vector2f startingPosition, sf::Color color, sf::Vector2i tileSize, eGameObjectType pickUpType)
+		: m_position(startingPosition),
+		m_shape(sf::Vector2f(tileSize.x, tileSize.y)),
+		m_type(pickUpType)
+	{
+		m_shape.setFillColor(color);
+		m_shape.setPosition(startingPosition);
+	}
+
+	sf::Vector2f m_position;
+	sf::RectangleShape m_shape;
+	eGameObjectType m_type;
 };

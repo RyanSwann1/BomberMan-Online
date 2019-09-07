@@ -70,3 +70,13 @@ struct ServerMessageBombPlacement
 	sf::Vector2f position;
 	float lifeTimeDuration;
 };
+
+struct ServerMessagePickUpCollision
+{
+	ServerMessagePickUpCollision()
+	{
+
+	}
+
+
+};
