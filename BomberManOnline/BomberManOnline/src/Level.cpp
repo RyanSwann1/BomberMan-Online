@@ -370,5 +370,21 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		m_pickUps.emplace_back(position, sf::Color::Red, Textures::getInstance().getTileSheet().getTileSize(), eGameObjectType::eMovementPickUp);
 	}
 		break;
+		
+	case eServerMessageType::eMovementPickUpCollision :
+	{
+		int clientID = 0;
+		float movementSpeedIncrement = 0;
+		receivedMessage >> clientID >> movementSpeedIncrement;
+		for (auto& player : m_players)
+		{
+			if (clientID == player->m_ID)
+			{
+				player->m_movementSpeed += movementSpeedIncrement;
+				break;
+			}
+		}
+	}
+		break;
 	}
 }

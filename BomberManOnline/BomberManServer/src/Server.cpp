@@ -314,20 +314,20 @@ void Server::update(float frameTime)
 	}
 
 	//Pick Ups
-	//for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
-	//{
-	//	sf::Vector2f pickUpPosition = pickUp->m_position;
-	//	auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
-	//	if (player != m_players.end())
-	//	{
-	//		handlePickUpCollision(*player->get(), pickUp->m_type, pickUpPosition);
-	//		pickUp = m_pickUps.erase(pickUp);
-	//	}
-	//	else
-	//	{
-	//		++pickUp;
-	//	}
-	//}
+	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
+	{
+		sf::Vector2f pickUpPosition = pickUp->m_position;
+		auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
+		if (player != m_players.end())
+		{
+			handlePickUpCollision(*player->get(), pickUp->m_type, pickUpPosition);
+			pickUp = m_pickUps.erase(pickUp);
+		}
+		else
+		{
+			++pickUp;
+		}
+	}
 }
 
 void Server::updateAI(PlayerServerAI& player, float frameTime)
@@ -574,7 +574,14 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 	switch (gameObjectType)
 	{
 	case eGameObjectType::eMovementPickUp :
-	
+	{
+		player.m_movementSpeed += MOVEMENT_SPEED_INCREMENT;
+
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eMovementPickUpCollision << player.m_ID << MOVEMENT_SPEED_INCREMENT;
+		broadcastMessage(packetToSend);
+	}
+		
 		break;
 	}
 }
