@@ -70,6 +70,19 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 	}
 }
 
+sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize, sf::Vector2i tileSize)
+{
+	resetGraph(levelSize, m_graph);
+
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y)));
+
+	std::vector<sf::Vector2i> neighbours;
+	neighbours.reserve(MAX_NEIGHBOURS);
+
+	
+}
+
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 	sf::Vector2i levelSize, sf::Vector2i tileSize)
 {

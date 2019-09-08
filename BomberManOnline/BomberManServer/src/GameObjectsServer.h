@@ -21,7 +21,6 @@ enum class eAIState
 	eMoveToSafePosition,
 	ePlantBomb,
 	eSetPositionAtSafeArea,
-	eSetPositionToNearestPlayer,
 	eWait
 };
 
@@ -40,7 +39,7 @@ struct PlayerServerAI : public Player
 {
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 		: Player(ID, startingPosition, controllerType),
-		m_behavour(eAIBehaviour::ePassive),
+		m_behavour(eAIBehaviour::eAggressive),
 		m_currentState(eAIState::eMakeDecision),
 		m_pathToTile(),
 		m_waitTimer(2.5f)

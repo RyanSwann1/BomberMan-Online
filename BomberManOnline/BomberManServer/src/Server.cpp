@@ -439,6 +439,17 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		break;
 	case eAIState::eMoveToNearestPlayer :
 	{
+		for (auto& target : m_players)
+		{
+			//Don't target self
+			if (target->m_ID == player.m_ID)
+			{
+				continue;
+			}
+
+			//sf
+		}
+
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
 		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
 
@@ -584,4 +595,34 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 		
 		break;
 	}
+}
+
+bool Server::onAIStateMoveToPlayer(PlayerServerAI& player)
+{
+	
+
+	for (const auto& targetPlayer : m_players)
+	{
+		//Don't target same player
+		if (targetPlayer->m_ID == player.m_ID)
+		{
+			continue;
+		}
+
+		//is Target Reachable
+		if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
+		{
+
+
+			sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(player.m_position, 
+				targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize);
+
+			player.m_newPosition = newPosition;
+			player.m_previousPosition = player.m_position;
+			player.m_moving = true;
+		}
+	}
+
+	//No players reachable
+	return false;
 }

@@ -48,4 +48,7 @@ private:
 	
 	void onBombExplosion(sf::Vector2f explosionPosition);
 	void handlePickUpCollision(Player& player, eGameObjectType gameObjectType, sf::Vector2f position);
+
+	//Return if target reachable
+	bool onAIStateMoveToPlayer(PlayerServerAI& player);
 };

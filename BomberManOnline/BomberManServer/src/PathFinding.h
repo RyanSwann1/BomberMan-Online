@@ -24,6 +24,9 @@ public:
 
 	void createGraph(sf::Vector2i levelSize);
 
+	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
+		sf::Vector2i levelSize, sf::Vector2i tileSize);
+
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
 		sf::Vector2i levelSize, sf::Vector2i tileSize);
 
