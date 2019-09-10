@@ -416,7 +416,9 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	{
 		if (player.m_position == player.m_newPosition)
 		{
-			sf::Vector2f closestTargetPosition(m_levelSize.x * m_tileSize.x, m_levelSize.y * m_tileSize.y);
+			float distance = m_levelSize.x * m_levelSize.y;
+			int closestTargetPlayerID = 0;
+
 			for (const auto& target : m_players)
 			{
 				//Don't target self
@@ -424,7 +426,20 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 				{
 					continue;
 				}
+
+				if (Utilities::distance(player.m_position, target->m_position, m_tileSize) < distance)
+				{
+					closestTargetPlayerID = target->m_ID;
+					distance = Utilities::distance(player.m_position, target->m_position, m_tileSize);
+				}
 			}
+
+			auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [closestTargetPlayerID](const auto& target) { return target->m_ID == closestTargetPlayerID; });
+			assert(cIter != m_players.cend());
+			sf::Vector2f positionToMoveTo = PathFinding::getInstance().getPositionClosestToTarget(player.m_position, 
+				(*cIter)->m_position, m_collisionLayer, m_levelSize, m_tileSize);
+
+			
 		}
 
 
@@ -434,7 +449,6 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		if (player.m_position == player.m_newPosition)
 		{
 			player.m_movementFactor = 0;
-
 
 			if (player.m_pathToTile.empty())
 			{
@@ -588,8 +602,6 @@ bool Server::onAIStateMoveToPlayer(PlayerServerAI& player)
 		//is Target Reachable
 		if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize))
 		{
-
-
 			sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(player.m_position, 
 				targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize);
 

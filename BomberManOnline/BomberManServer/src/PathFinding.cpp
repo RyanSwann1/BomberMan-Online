@@ -34,16 +34,6 @@ void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& gra
 	}
 }
 
-float distance(sf::Vector2i source, sf::Vector2f target)
-{
-	return std::abs(static_cast<float>(source.x - destination.x)) + static_cast<float>(std::abs(source.y - destination.y));
-}
-
-float distance(sf::Vector2i source, sf::Vector2i destination)
-{
-	return std::abs(static_cast<float>(source.x - destination.x)) + static_cast<float>(std::abs(source.y - destination.y));
-}
-
 void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours,
 	const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize)
 {
@@ -87,7 +77,7 @@ sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Ve
 
 	for (sf::Vector2i neighbour : neighbours)
 	{
-		if (distance(neighbour, roundedTargetPosition) < distance(closestPosition, roundedTargetPosition))
+		if (Utilities::distance(neighbour, roundedTargetPosition) < Utilities::distance(closestPosition, roundedTargetPosition))
 		{
 			closestPosition = neighbour;
 		}
@@ -162,7 +152,7 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, c
 
 			if (pathToTile.empty())
 			{
-				if (distance(neighbourPosition, positionAtDestination) < distance(positionAtSource, positionAtDestination))
+				if (Utilities::distance(neighbourPosition, positionAtDestination) < Utilities::distance(positionAtSource, positionAtDestination))
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
@@ -172,7 +162,7 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, c
 			}
 			else
 			{
-				if (distance(neighbourPosition, positionAtDestination) < distance(lastPosition, positionAtDestination))
+				if (Utilities::distance(neighbourPosition, positionAtDestination) < Utilities::distance(lastPosition, positionAtDestination))
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);

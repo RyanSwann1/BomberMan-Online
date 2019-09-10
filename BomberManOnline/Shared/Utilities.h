@@ -7,8 +7,9 @@ enum class eCollidableTile;
 struct Box;
 namespace Utilities
 {
-	float distance();
-	bool isPositionNeighbouringPlayer();
+	float distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
+	float distance(sf::Vector2i source, sf::Vector2i destination);
+	//bool isPositionNeighbouringPlayer();
 
 	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, 
 		sf::Vector2i tileSize, sf::Vector2i levelSize);
