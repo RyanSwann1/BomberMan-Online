@@ -34,7 +34,12 @@ void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& gra
 	}
 }
 
-float distanceFromDestination(sf::Vector2i source, sf::Vector2i destination)
+float distance(sf::Vector2i source, sf::Vector2f target)
+{
+	return std::abs(static_cast<float>(source.x - destination.x)) + static_cast<float>(std::abs(source.y - destination.y));
+}
+
+float distance(sf::Vector2i source, sf::Vector2i destination)
 {
 	return std::abs(static_cast<float>(source.x - destination.x)) + static_cast<float>(std::abs(source.y - destination.y));
 }
@@ -70,17 +75,25 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 	}
 }
 
-sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize, sf::Vector2i tileSize)
+sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
+	sf::Vector2i levelSize, sf::Vector2i tileSize)
 {
-	resetGraph(levelSize, m_graph);
-
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y)));
-
 	std::vector<sf::Vector2i> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
-
 	
+	sf::Vector2i roundedTargetPosition(static_cast<int>(target.x / tileSize.x), static_cast<int>(target.y / tileSize.y));
+	sf::Vector2i closestPosition = sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y));
+	getNeighbouringPoints(closestPosition, neighbours, collisionLayer, levelSize);
+
+	for (sf::Vector2i neighbour : neighbours)
+	{
+		if (distance(neighbour, roundedTargetPosition) < distance(closestPosition, roundedTargetPosition))
+		{
+			closestPosition = neighbour;
+		}
+	}
+
+	return sf::Vector2f(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y);
 }
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
@@ -149,7 +162,7 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, c
 
 			if (pathToTile.empty())
 			{
-				if (distanceFromDestination(neighbourPosition, positionAtDestination) < distanceFromDestination(positionAtSource, positionAtDestination))
+				if (distance(neighbourPosition, positionAtDestination) < distance(positionAtSource, positionAtDestination))
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
@@ -159,7 +172,7 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, c
 			}
 			else
 			{
-				if (distanceFromDestination(neighbourPosition, positionAtDestination) < distanceFromDestination(lastPosition, positionAtDestination))
+				if (distance(neighbourPosition, positionAtDestination) < distance(lastPosition, positionAtDestination))
 				{
 					m_graph[neighbourPosition.y][neighbourPosition.x] = GraphNode(lastPosition);
 					pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);

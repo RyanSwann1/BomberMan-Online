@@ -30,7 +30,7 @@ private:
 	std::vector<BombServer> m_bombs;
 	std::vector<PickUpServer> m_pickUps;
 	std::string m_levelName;
-	sf::Vector2i m_mapDimensions;
+	sf::Vector2i m_levelSize;
 	sf::Vector2i m_tileSize;
 	sf::Clock m_clock;
 	bool m_gameRunning;

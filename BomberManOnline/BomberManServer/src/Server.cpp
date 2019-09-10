@@ -22,7 +22,7 @@ Server::Server()
 	m_bombs(),
 	m_pickUps(),
 	m_levelName(),
-	m_mapDimensions(),
+	m_levelSize(),
 	m_clock(),
 	m_gameRunning(false),
 	m_running(false)
@@ -41,7 +41,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
 		std::vector<sf::Vector2f> collisionLayer;
-		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_mapDimensions,
+		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
 			return std::unique_ptr<Server>();
@@ -58,7 +58,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, ePlayerControllerType::eAI));
 		}
 
-		PathFinding::getInstance().createGraph(server->m_mapDimensions);
+		PathFinding::getInstance().createGraph(server->m_levelSize);
 
 		return std::unique_ptr<Server>(server);
 	}
@@ -346,7 +346,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 					continue;
 				}
 
-				if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
+				if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize))
 				{
 					targetFound = true;
 					player.m_currentState = eAIState::eMoveToNearestPlayer;
@@ -356,7 +356,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		}
 		if (!targetFound || player.m_behavour == eAIBehaviour::ePassive)
 		{
-			PathFinding::getInstance().pathToClosestBox(player.m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
+			PathFinding::getInstance().pathToClosestBox(player.m_position, m_collisionLayer, m_levelSize, player.m_pathToTile, m_tileSize);
 			if (!player.m_pathToTile.empty())
 			{
 				std::cout << "Move To Box\n";
@@ -395,7 +395,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 			{
 				player.m_moving = true;
 				player.m_newPosition = player.m_pathToTile.back();
-				if (!Utilities::isPositionNeighbouringBox(m_collisionLayer, player.m_pathToTile.front(), m_tileSize, m_mapDimensions))
+				if (!Utilities::isPositionNeighbouringBox(m_collisionLayer, player.m_pathToTile.front(), m_tileSize, m_levelSize))
 				{
 					player.m_moving = false;
 					player.m_currentState = eAIState::eMakeDecision;
@@ -412,43 +412,21 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 	}
 		
 		break;
-	case eAIState::eSetPositionToNearestPlayer :
+	case eAIState::eMoveToNearestPlayer :
 	{
-		for (const auto& target : m_players)
+		if (player.m_position == player.m_newPosition)
 		{
-			if (target->m_ID != player.m_ID)
+			sf::Vector2f closestTargetPosition(m_levelSize.x * m_tileSize.x, m_levelSize.y * m_tileSize.y);
+			for (const auto& target : m_players)
 			{
-				PathFinding::getInstance().getPathToTile(player.m_position, target->m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
-				if (!player.m_pathToTile.empty())
+				//Don't target self
+				if (target->m_ID == player.m_ID)
 				{
-					player.m_currentState = eAIState::eMoveToNearestPlayer;
-					player.m_moving = true;
-
-					player.m_newPosition = player.m_pathToTile.back();
-					player.m_pathToTile.pop_back();
-					player.m_previousPosition = player.m_position;
-
-					sf::Packet globalPacket;
-					globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << player.m_newPosition.x << player.m_newPosition.y << player.m_ID;
-					broadcastMessage(globalPacket);
+					continue;
 				}
 			}
 		}
-	}
-		
-		break;
-	case eAIState::eMoveToNearestPlayer :
-	{
-		for (auto& target : m_players)
-		{
-			//Don't target self
-			if (target->m_ID == player.m_ID)
-			{
-				continue;
-			}
 
-			//sf
-		}
 
 		player.m_movementFactor += frameTime * player.m_movementSpeed;
 		player.m_position = Utilities::Interpolate(player.m_previousPosition, player.m_newPosition, player.m_movementFactor);
@@ -479,7 +457,7 @@ void Server::updateAI(PlayerServerAI& player, float frameTime)
 		break;
 	case eAIState::eSetPositionAtSafeArea :
 	{
-		PathFinding::getInstance().pathToClosestSafePosition(player.m_position, m_collisionLayer, m_mapDimensions, player.m_pathToTile, m_tileSize);
+		PathFinding::getInstance().pathToClosestSafePosition(player.m_position, m_collisionLayer, m_levelSize, player.m_pathToTile, m_tileSize);
 		player.m_currentState = eAIState::eMoveToSafePosition;
 		player.m_moving = true;
 
@@ -599,8 +577,6 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 
 bool Server::onAIStateMoveToPlayer(PlayerServerAI& player)
 {
-	
-
 	for (const auto& targetPlayer : m_players)
 	{
 		//Don't target same player
@@ -610,12 +586,12 @@ bool Server::onAIStateMoveToPlayer(PlayerServerAI& player)
 		}
 
 		//is Target Reachable
-		if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize))
+		if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize))
 		{
 
 
 			sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(player.m_position, 
-				targetPlayer->m_position, m_collisionLayer, m_mapDimensions, m_tileSize);
+				targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize);
 
 			player.m_newPosition = newPosition;
 			player.m_previousPosition = player.m_position;
