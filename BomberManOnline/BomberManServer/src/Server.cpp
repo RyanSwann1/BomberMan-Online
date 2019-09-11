@@ -364,30 +364,36 @@ void Server::update(float frameTime)
 
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
-	if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
+	assert(explosionPosition.x >= 0 && explosionPosition.x < m_levelSize.x * m_tileSize.x && explosionPosition.y >= 0 && explosionPosition.y < m_levelSize.y * m_tileSize.y);
+	
+	if (explosionPosition.x >= 0 && explosionPosition.x < m_levelSize.x * m_tileSize.x && explosionPosition.y >= 0 && explosionPosition.y < m_levelSize.y * m_tileSize.y)
 	{
-		m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] = eCollidableTile::eNonCollidable;
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-		broadcastMessage(packetToSend);
 
-		if(Utilities::getRandomNumber(0, 10) > 7)
+		if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
 		{
-			packetToSend.clear();
-			packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+			m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] = eCollidableTile::eNonCollidable;
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 			broadcastMessage(packetToSend);
 
-			std::cout << "Spawn Pickup\n";
-			m_pickUps.emplace_back(explosionPosition, eGameObjectType::eMovementPickUp);
-		}
-	}
+			if (Utilities::getRandomNumber(0, 10) > 7)
+			{
+				packetToSend.clear();
+				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+				broadcastMessage(packetToSend);
 
-	for (const auto& player : m_players)
-	{
-		sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / m_tileSize.x), static_cast<int>(player->m_position.y / m_tileSize.y));
-		if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
+				std::cout << "Spawn Pickup\n";
+				m_pickUps.emplace_back(explosionPosition, eGameObjectType::eMovementPickUp);
+			}
+		}
+
+		for (const auto& player : m_players)
 		{
-			m_clientsToRemove.push_back(player->m_ID);
+			sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / m_tileSize.x), static_cast<int>(player->m_position.y / m_tileSize.y));
+			if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
+			{
+				m_clientsToRemove.push_back(player->m_ID);
+			}
 		}
 	}
 }
