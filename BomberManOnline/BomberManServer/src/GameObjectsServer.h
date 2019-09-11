@@ -35,6 +35,7 @@ struct PlayerServerHuman : public Player
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 };
 
+class Server;
 struct PlayerServerAI : public Player
 {
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
@@ -44,6 +45,8 @@ struct PlayerServerAI : public Player
 		m_pathToTile(),
 		m_waitTimer(2.5f)
 	{}
+
+	void update(Server& server, float frameTime);
 
 	eAIBehaviour m_behavour;
 	eAIState m_currentState;
