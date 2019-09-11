@@ -12,6 +12,7 @@ struct GraphNode
 	bool visited;
 };
 
+class Server;
 enum class eCollidableTile;
 class PathFinding
 {
@@ -24,20 +25,15 @@ public:
 
 	void createGraph(sf::Vector2i levelSize);
 
-	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
-		sf::Vector2i levelSize, sf::Vector2i tileSize);
+	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
-	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
-		sf::Vector2i levelSize, sf::Vector2i tileSize);
+	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
-	void getPathToTile(sf::Vector2f source, sf::Vector2f destination, 
-		const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
+	void getPathToTile(sf::Vector2f source, sf::Vector2f destination, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
-	void pathToClosestBox(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer, 
-		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
+	void pathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
-	void pathToClosestSafePosition(sf::Vector2f source, const std::vector<std::vector<eCollidableTile>>& collisionLayer,
-		sf::Vector2i levelSize, std::vector<sf::Vector2f>& pathToTile, sf::Vector2i tileSize);
+	void pathToClosestSafePosition(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
 private:
 	std::vector<std::vector<GraphNode>> m_graph;
