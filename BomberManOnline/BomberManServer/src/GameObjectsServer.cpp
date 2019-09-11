@@ -3,7 +3,9 @@
 #include "PathFinding.h"
 #include "Server.h"
 #include "ServerMessageType.h"
+#include "ServerMessages.h"
 #include <iostream>
+#include <assert.h>
 
 PlayerServerHuman::~PlayerServerHuman()
 {
@@ -14,6 +16,7 @@ PlayerServerHuman::~PlayerServerHuman()
 void PlayerServerAI::update(Server& server, float frameTime)
 {
 	const auto& collisionLayer = server.getCollisionLayer();
+	const auto& players = server.getPlayers();
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i levelSize = server.getLevelSize();
 
@@ -31,7 +34,7 @@ void PlayerServerAI::update(Server& server, float frameTime)
 					continue;
 				}
 
-				if (PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->m_position, collisionLayer, levelSize, tileSize))
+				if (PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->m_position, server))
 				{
 					targetFound = true;
 					m_currentState = eAIState::eMoveToNearestPlayer;
@@ -41,7 +44,12 @@ void PlayerServerAI::update(Server& server, float frameTime)
 		}
 		if (!targetFound || m_behavour == eAIBehaviour::ePassive)
 		{
-			PathFinding::getInstance().pathToClosestBox(m_position, collisionLayer, levelSize, m_pathToTile, tileSize);
+			for (const auto& pickUp : server.getPickUps())
+			{
+				
+			}
+
+			PathFinding::getInstance().pathToClosestBox(m_position, m_pathToTile, server);
 			if (!m_pathToTile.empty())
 			{
 				std::cout << "Move To Box\n";
@@ -54,7 +62,7 @@ void PlayerServerAI::update(Server& server, float frameTime)
 
 				sf::Packet globalPacket;
 				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
-				broadcastMessage(globalPacket);
+				server.broadcastMessage(globalPacket);
 			}
 		}
 	}
@@ -92,7 +100,7 @@ void PlayerServerAI::update(Server& server, float frameTime)
 
 			sf::Packet globalPacket;
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
-			broadcastMessage(globalPacket);
+			server.broadcastMessage(globalPacket);
 		}
 	}
 
@@ -104,7 +112,7 @@ void PlayerServerAI::update(Server& server, float frameTime)
 			float distance = levelSize.x * levelSize.y;
 			int closestTargetPlayerID = 0;
 
-			for (const auto& target : m_players)
+			for (const auto& target : players)
 			{
 				//Don't target self
 				if (target->m_ID == m_ID)
@@ -119,12 +127,9 @@ void PlayerServerAI::update(Server& server, float frameTime)
 				}
 			}
 
-			auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [closestTargetPlayerID](const auto& target) { return target->m_ID == closestTargetPlayerID; });
-			assert(cIter != m_players.cend());
-			sf::Vector2f positionToMoveTo = PathFinding::getInstance().getPositionClosestToTarget(m_position,
-				(*cIter)->m_position, collisionLayer, levelSize, tileSize);
-
-
+			auto cIter = std::find_if(players.cbegin(), players.cend(), [closestTargetPlayerID](const auto& target) { return target->m_ID == closestTargetPlayerID; });
+			assert(cIter != players.cend());
+			sf::Vector2f positionToMoveTo = PathFinding::getInstance().getPositionClosestToTarget(m_position, (*cIter)->m_position, server);
 		}
 
 
@@ -149,14 +154,14 @@ void PlayerServerAI::update(Server& server, float frameTime)
 
 			sf::Packet globalPacket;
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_position.x << m_position.y << m_ID;
-			broadcastMessage(globalPacket);
+			server.broadcastMessage(globalPacket);
 		}
 	}
 
 	break;
 	case eAIState::eSetPositionAtSafeArea:
 	{
-		PathFinding::getInstance().pathToClosestSafePosition(m_position, collisionLayer, levelSize, m_pathToTile, tileSize);
+		PathFinding::getInstance().pathToClosestSafePosition(m_position, m_pathToTile, server);
 		m_currentState = eAIState::eMoveToSafePosition;
 		m_moving = true;
 
@@ -189,7 +194,7 @@ void PlayerServerAI::update(Server& server, float frameTime)
 
 			sf::Packet globalPacket;
 			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_position.x << m_position.y << m_ID;
-			broadcastMessage(globalPacket);
+			server.broadcastMessage(globalPacket);
 		}
 	}
 
@@ -204,8 +209,8 @@ void PlayerServerAI::update(Server& server, float frameTime)
 
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
-			broadcastMessage(packetToSend);
-			m_bombs.emplace_back(bombPlacementMessage.position, bombPlacementMessage.lifeTimeDuration);
+			server.broadcastMessage(packetToSend);
+			server.placeBomb(m_position, m_bombPlacementTimer.getExpirationTime());
 
 			m_currentState = eAIState::eSetPositionAtSafeArea;
 		}

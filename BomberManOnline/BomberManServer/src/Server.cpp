@@ -24,7 +24,7 @@ Server::Server()
 	m_levelName(),
 	m_levelSize(),
 	m_clock(),
-	m_gameRunning(false),
+	m_currentState(eServerState::eLobby),
 	m_running(false)
 {
 	m_players.reserve(MAX_CLIENTS);
@@ -44,6 +44,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
+			delete server;
 			return std::unique_ptr<Server>();
 		}
 
@@ -64,6 +65,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	}
 	else
 	{
+		delete server;
 		return std::unique_ptr<Server>();
 	}
 }
@@ -78,6 +80,11 @@ const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() con
 	return m_collisionLayer;
 }
 
+const std::vector<PickUpServer>& Server::getPickUps() const
+{
+	return m_pickUps;
+}
+
 sf::Vector2i Server::getTileSize() const
 {
 	return m_tileSize;
@@ -88,10 +95,6 @@ sf::Vector2i Server::getLevelSize() const
 	return m_levelSize;
 }
 
-void Server::addToServerMessageQueue(sf::Packet & packet)
-{
-}
-
 void Server::run()
 {
 	std::cout << "Started listening\n";
@@ -99,8 +102,11 @@ void Server::run()
 	while (m_running)
 	{
 		float frameTime = m_clock.restart().asSeconds();
-		update(frameTime);
-
+		if (m_currentState == eServerState::eGame)
+		{
+			update(frameTime);
+		}
+		
 		if (m_socketSelector.wait(TIME_OUT_DURATION))
 		{
 			if (m_socketSelector.isReady(m_tcpListener))
@@ -142,6 +148,7 @@ void Server::addNewClient()
 
 		if (m_players.size() == 4)
 		{
+			m_currentState = eServerState::eGame;
 			packetToSend.clear();
 			packetToSend << eServerMessageType::eInitialGameData;
 			ServerMessageInitialGameData initialGameDataMessage;
@@ -153,8 +160,6 @@ void Server::addNewClient()
 
 			packetToSend << initialGameDataMessage;
 			broadcastMessage(packetToSend);
-
-			m_gameRunning = true;
 		}
 	}
 }
@@ -202,6 +207,13 @@ void Server::listen()
 			}
 		}
 	}
+}
+
+void Server::placeBomb(sf::Vector2f position, float lifeTimeDuration)
+{
+	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
+
+	m_bombs.emplace_back(position, lifeTimeDuration);
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
@@ -264,11 +276,6 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
-	if (!m_gameRunning)
-	{
-		return;
-	}
-
 	//Clients To Remove
 	for (auto clientToRemove = m_clientsToRemove.begin(); clientToRemove != m_clientsToRemove.end();)
 	{
@@ -345,7 +352,7 @@ void Server::update(float frameTime)
 		auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
 		if (player != m_players.end())
 		{
-			handlePickUpCollision(*player->get(), pickUp->m_type, pickUpPosition);
+			handlePickUpCollision(*player->get(), pickUp->m_type);
 			pickUp = m_pickUps.erase(pickUp);
 		}
 		else
@@ -385,7 +392,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	}
 }
 
-void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType, sf::Vector2f position)
+void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType)
 {
 	switch (gameObjectType)
 	{
@@ -400,30 +407,4 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 		
 		break;
 	}
-}
-
-bool Server::onAIStateMoveToPlayer(PlayerServerAI& player)
-{
-	for (const auto& targetPlayer : m_players)
-	{
-		//Don't target same player
-		if (targetPlayer->m_ID == player.m_ID)
-		{
-			continue;
-		}
-
-		//is Target Reachable
-		if (PathFinding::getInstance().isPositionReachable(player.m_position, targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize))
-		{
-			sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(player.m_position, 
-				targetPlayer->m_position, m_collisionLayer, m_levelSize, m_tileSize);
-
-			player.m_newPosition = newPosition;
-			player.m_previousPosition = player.m_position;
-			player.m_moving = true;
-		}
-	}
-
-	//No players reachable
-	return false;
 }
