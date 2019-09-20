@@ -53,6 +53,7 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	if (!XMLParser::loadLevelAsClient(level->m_levelName, level->m_levelSize, level->m_tileLayers,
 		level->m_collisionLayer, level->m_spawnPositions))
 	{
+		delete level;
 		return std::unique_ptr<Level>();
 	}
 
