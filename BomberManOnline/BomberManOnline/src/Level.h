@@ -11,6 +11,17 @@
 #include <memory>
 #include <SFML/Network.hpp>
 
+struct MovementPoint
+{
+	MovementPoint(sf::Vector2f position, eDirection moveDirection)
+		: position(position),
+		moveDirection(moveDirection)
+	{}
+
+	sf::Vector2f position;
+	eDirection moveDirection;
+};
+
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable
 {
@@ -30,8 +41,8 @@ private:
 	std::vector<TileLayer> m_tileLayers;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
-
-	PlayerClientLocalPlayer* m_localPlayer;
+	PlayerClient* m_localPlayer;
+	std::vector<MovementPoint> m_localPlayerPreviousPositions;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; //Bombs, Explosions
 	std::vector<PickUpClient> m_pickUps;

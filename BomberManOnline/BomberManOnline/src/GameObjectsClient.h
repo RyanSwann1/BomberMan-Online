@@ -10,35 +10,19 @@ constexpr float BOMB_LIFETIME_DURATION = 2.0f;
 constexpr float EXPLOSION_LIFETIME_DURATION = 0.5f;
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
-struct MovementPoint
-{
-	MovementPoint(sf::Vector2f position, eDirection moveDirection)
-		: position(position),
-		moveDirection(moveDirection)
-	{}
-
-	sf::Vector2f position;
-	eDirection moveDirection;
-};
-
+enum class eCollidableTile;
+struct MovementPoint;
 struct PlayerClient : public Player
 {
 	PlayerClient(int ID, sf::Vector2f startingPosition);
 
-	virtual void setNewPosition(sf::Vector2f newPosition);
+	void setRemotePlayerPosition(sf::Vector2f newPosition);
+	void setLocalPlayerPosition(sf::Vector2f newPosition, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i tileSize,
+		std::vector<MovementPoint>& localPlayerPreviousPositions);
 	void plantBomb();
 
 	AnimatedSprite m_sprite;
 	eDirection m_moveDirection;
-};
-
-struct PlayerClientLocalPlayer : public PlayerClient
-{
-	PlayerClientLocalPlayer(int ID, sf::Vector2f startingPosition);
-
-	void setNewPosition(sf::Vector2f newPosition) override final;
-
-	std::vector<MovementPoint> m_previousPositions;
 };
 
 //Bomb, Explosion

@@ -31,7 +31,7 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	for (int x = bombExplodePosition.x - tileSize.x; x <= bombExplodePosition.x + tileSize.x; x += tileSize.x * 2)
 	{
-		if (m_collisionLayer[static_cast<int>(bombExplodePosition.y / tileSize.y)][static_cast<int>(x / tileSize.y)] != eCollidableTile::eWall)
+		if (m_collisionLayer[static_cast<int>(bombExplodePosition.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
 		{
 			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 		}
@@ -62,8 +62,8 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 	{
 		if (playerDetails.ID == localClientID)
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClientLocalPlayer>(playerDetails.ID, playerDetails.spawnPosition));
-			level->m_localPlayer = static_cast<PlayerClientLocalPlayer*>(level->m_players.back().get());
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition));
+			level->m_localPlayer = level->m_players.back().get();
 		}
 		else
 		{
@@ -77,48 +77,38 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 void Level::handleInput(const sf::Event & sfmlEvent)
 {
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	assert(m_localPlayer);
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x - tileSize.x, m_localPlayer->m_position.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
-		{
-			m_localPlayer->setNewPosition(newPosition);
-		}
+		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x - tileSize.x, m_localPlayer->m_position.y), 
+			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 	}
 
 	case sf::Keyboard::D:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
-		{
-			m_localPlayer->setNewPosition(newPosition);
-		}
+		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y),
+			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 	}
 
 	case sf::Keyboard::W:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
-		{
-			m_localPlayer->setNewPosition(newPosition);
-		}
+		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize.y),
+			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 	}
 
 	case sf::Keyboard::S:
 	{
-		sf::Vector2f newPosition(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize.y);
-		if (!m_localPlayer->m_moving && !Utilities::isPositionCollidable(m_collisionLayer, newPosition, tileSize))
-		{
-			m_localPlayer->setNewPosition(newPosition);
-		}
+		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize.y),
+			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
+
 		break;
 	}
 
@@ -208,11 +198,11 @@ void Level::update(float deltaTime)
 		//Reached destination
 		if (player->m_position == player->m_newPosition)
 		{
-			if (m_localPlayer->m_previousPositions.size() > MAX_PREVIOUS_POINTS)
+			if (m_localPlayerPreviousPositions.size() > MAX_PREVIOUS_POINTS)
 			{
-				for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
+				for (auto iter = m_localPlayerPreviousPositions.begin(); iter != m_localPlayerPreviousPositions.end();)
 				{
-					m_localPlayer->m_previousPositions.erase(iter);
+					m_localPlayerPreviousPositions.erase(iter);
 					break;
 				}
 			}
@@ -269,11 +259,11 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		bool previousPositionFound = false;
 		bool clearRemaining = false;
-		for (auto previousPosition = m_localPlayer->m_previousPositions.begin(); previousPosition != m_localPlayer->m_previousPositions.end();)
+		for (auto previousPosition = m_localPlayerPreviousPositions.begin(); previousPosition != m_localPlayerPreviousPositions.end();)
 		{
 			if (clearRemaining)
 			{
-				previousPosition = m_localPlayer->m_previousPositions.erase(previousPosition);
+				previousPosition = m_localPlayerPreviousPositions.erase(previousPosition);
 			}
 			else if ((*previousPosition).position == invalidMoveMessage.invalidPosition)
 			{
@@ -282,7 +272,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 				m_localPlayer->m_moving = false;
 				m_localPlayer->m_movementFactor = 0;
 
-				previousPosition = m_localPlayer->m_previousPositions.erase(previousPosition);
+				previousPosition = m_localPlayerPreviousPositions.erase(previousPosition);
 				clearRemaining = true;
 				previousPositionFound = true;
 			}
@@ -308,11 +298,11 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> newPosition.x >> newPosition.y >> clientID;
 		if (clientID == m_localPlayer->m_ID)
 		{
-			for (auto iter = m_localPlayer->m_previousPositions.begin(); iter != m_localPlayer->m_previousPositions.end();)
+			for (auto iter = m_localPlayerPreviousPositions.begin(); iter != m_localPlayerPreviousPositions.end();)
 			{
 				if ((*iter).position == newPosition)
 				{
-					iter = m_localPlayer->m_previousPositions.erase(iter);
+					iter = m_localPlayerPreviousPositions.erase(iter);
 					break;
 				}
 				else
@@ -323,10 +313,10 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto player = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
-			assert(player != m_players.end());
+			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
+			assert(remotePlayer != m_players.end());
 
-			(*player)->setNewPosition(newPosition);
+			(*remotePlayer)->setRemotePlayerPosition(newPosition);
 		}
 	}
 		break;
