@@ -81,36 +81,28 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
-	{
 		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x - tileSize.x, m_localPlayer->m_position.y), 
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	}
-
+	
 	case sf::Keyboard::D:
-	{
 		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x + tileSize.x, m_localPlayer->m_position.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	}
 
 	case sf::Keyboard::W:
-	{
 		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x, m_localPlayer->m_position.y - tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	}
 
 	case sf::Keyboard::S:
-	{
 		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(m_localPlayer->m_position.x, m_localPlayer->m_position.y + tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	}
 
 	case sf::Keyboard::Space:
 		m_localPlayer->plantBomb();
