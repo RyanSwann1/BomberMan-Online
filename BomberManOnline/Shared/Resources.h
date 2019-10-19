@@ -7,6 +7,7 @@
 
 enum class eFrameID
 {
+	
 	ePlayerMoveUpStart = 263,
 	ePlayerMoveUpEnd = 264,
 	ePlayerMoveDownStart = 256,
@@ -18,7 +19,8 @@ enum class eFrameID
 	eBombStart = 236,
 	eBombEnd = 266,
 	eExplosionStart = 284,
-	eExplosionEnd =	254
+	eExplosionEnd =	254,
+	eMovementSpeedPickUp = 254
 };
 
 enum class eAnimationName
@@ -86,6 +88,15 @@ public:
 		return instance;
 	}
 
+	const AnimationDetails& getAnimationDetails(eAnimationName animationName)
+	{
+		return animations[static_cast<int>(animationName)];
+	}
+
+
+private:
+	Animations() {}
+
 	const std::array<AnimationDetails, static_cast<size_t>(eAnimationName::eTotal)> animations
 	{
 		//Player Idle
@@ -103,7 +114,4 @@ public:
 		//Explosion
 		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse)
 	};
-
-private:
-	Animations() {}
 };
