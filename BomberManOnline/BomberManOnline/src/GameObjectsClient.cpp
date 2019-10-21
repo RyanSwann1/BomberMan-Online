@@ -92,10 +92,13 @@ void PlayerClient::plantBomb()
 	}
 }
 
-//Game Object Client
-GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type)
-	: m_type(type),
-	m_position(startingPosition),
-	m_sprite(startingPosition, startingAnimationName),
-	m_lifeTimer(expirationTime, true)
+GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, eGameObjectTag tag)
+	: GameObject(startingPosition, expirationTime, type, tag),
+	m_sprite(startingPosition, startingAnimationName)
 {}
+
+void GameObjectClient::update(float deltaTime)
+{
+	m_lifeTimer.update(deltaTime);
+	m_sprite.update(deltaTime);
+}
