@@ -44,8 +44,7 @@ private:
 	PlayerClient* m_localPlayer;
 	std::vector<MovementPoint> m_localPlayerPreviousPositions;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
-	std::vector<GameObjectClient> m_gameObjects; //Bombs, Explosions
-	std::vector<PickUpClient> m_pickUps;
+	std::vector<GameObjectClient> m_gameObjects; 
 
 	void spawnExplosions(sf::Vector2f bombExplodePosition);
 };
