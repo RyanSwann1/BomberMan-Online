@@ -12,6 +12,22 @@ PlayerClient::PlayerClient(int ID, sf::Vector2f startingPosition)
 	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown)
 {}
 
+void PlayerClient::update(float deltaTime)
+{
+	Player::update(deltaTime);
+
+	if (m_moving)
+	{
+		m_sprite.setPosition(m_position);
+		m_sprite.update(deltaTime);
+	}
+}
+
+void PlayerClient::render(sf::RenderWindow & window) const
+{
+	m_sprite.render(window);
+}
+
 void PlayerClient::setRemotePlayerPosition(sf::Vector2f newPosition)
 {
 	m_newPosition = newPosition;
@@ -90,6 +106,14 @@ void PlayerClient::plantBomb()
 		packetToSend << eServerMessageType::ePlayerBombPlacementRequest << m_position.x << m_position.y;
 		NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 	}
+}
+
+void PlayerClient::stopAtPosition(sf::Vector2f position)
+{
+	m_position = position;
+	m_previousPosition = position;
+	m_moving = false;
+	m_movementFactor = 0;
 }
 
 GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, eGameObjectTag tag)
