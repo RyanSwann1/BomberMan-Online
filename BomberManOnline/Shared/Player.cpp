@@ -45,3 +45,8 @@ void Player::stop()
 	m_moving = false;
 	m_movementFactor = 0;
 }
+
+void Player::increaseMovementSpeed(float amount)
+{
+	m_movementSpeed += amount;
+}

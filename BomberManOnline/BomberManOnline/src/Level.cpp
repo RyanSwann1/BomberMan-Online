@@ -327,10 +327,8 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	{
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
-		//GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone);
-		m_gameObjects.emplace_back(startingPosition, 0.0f, eAnimationName::eMovementSpeedPickUp, )
 
-		m_pickUps.emplace_back(position, sf::Color::Red, Textures::getInstance().getTileSheet().getTileSize(), eGameObjectType::eMovementPickUp);
+		m_gameObjects.emplace_back(startingPosition, 0.0f, eAnimationName::eMovementSpeedPickUp, eGameObjectType::eMovementPickUp);
 	}
 		break;
 		
@@ -341,9 +339,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> clientID >> movementSpeedIncrement;
 		for (auto& player : m_players)
 		{
-			if (clientID == player->m_ID)
+			if (clientID == player->getID())
 			{
-				player->m_movementSpeed += movementSpeedIncrement;
+				player->increaseMovementSpeed(movementSpeedIncrement);
 				break;
 			}
 		}

@@ -19,6 +19,7 @@ public:
 
 	virtual void update(float deltaTime);
 	void stop();
+	void increaseMovementSpeed(float amount);
 
 protected:
 	int m_ID;
