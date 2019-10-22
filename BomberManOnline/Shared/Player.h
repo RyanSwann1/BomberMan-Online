@@ -7,22 +7,20 @@
 
 constexpr float MOVEMENT_SPEED_INCREMENT = 0.2f;
 
-struct Player
+class Player
 {
-	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
-		: m_ID(ID),
-		m_previousPosition(),
-		m_position(startingPosition),
-		m_newPosition(),
-		m_controllerType(controllerType),
-		m_moveDirection(),
-		m_moving(false),
-		m_movementFactor(0.0f),
-		m_movementSpeed(2.5f),
-		m_bombPlacementTimer(2.0f, true)
-	{}
+public:
+	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 	virtual ~Player() {}
 
+	int getID() const;
+	sf::Vector2f getCurrentPosition() const;
+	sf::Vector2f getNewPosition() const;
+
+	virtual void update(float deltaTime);
+	void stop();
+
+protected:
 	int m_ID;
 	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_position;
