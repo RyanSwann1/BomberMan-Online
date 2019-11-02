@@ -113,10 +113,11 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 	m_position = position;
 	m_previousPosition = position;
 	m_moving = false;
-	m_movementFactor = 0;
+	m_movementFactor = 0.0f;
 }
 
-GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, eGameObjectTag tag)
+GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, 
+	eGameObjectTag tag, eTimerActive timerActive)
 	: GameObject(startingPosition, expirationTime, type, tag),
 	m_sprite(startingPosition, startingAnimationName)
 {}

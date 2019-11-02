@@ -7,8 +7,9 @@
 #include <iostream>
 #include <assert.h>
 
-PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType, Server & server)
-	: Player(ID, startingPosition, controllerType),
+//Player AI
+PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
+	: Player(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
 	m_behavour(eAIBehaviour::eAggressive),
 	m_currentState(eAIState::eMakeDecision),
@@ -127,18 +128,17 @@ void PlayerServerAI::update(float frameTime)
 				}
 			}
 
-			auto cIter = std::find_if(players.cbegin(), players.cend(), [closestTargetPlayerID](const auto& target) { return target->m_ID == closestTargetPlayerID; });
+			auto cIter = std::find_if(players.cbegin(), players.cend(), [closestTargetPlayerID](const auto& target) { return target->getID() == closestTargetPlayerID; });
 			assert(cIter != players.cend());
 			sf::Vector2f positionToMoveTo = PathFinding::getInstance().getPositionClosestToTarget(m_position, (*cIter)->getPosition(), m_server);
 		}
-
 
 		m_movementFactor += frameTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
 
 		if (m_position == m_newPosition)
 		{
-			m_movementFactor = 0;
+			m_movementFactor = 0.0f;
 
 			if (m_pathToTile.empty())
 			{
@@ -178,7 +178,7 @@ void PlayerServerAI::update(float frameTime)
 
 		if (m_position == m_newPosition)
 		{
-			m_movementFactor = 0;
+			m_movementFactor = 0.0f;
 
 			if (m_pathToTile.empty())
 			{
@@ -210,7 +210,7 @@ void PlayerServerAI::update(float frameTime)
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 			m_server.broadcastMessage(packetToSend);
-			m_server.placeBomb(m_position, m_bombPlacementTimer.getExpirationTime());
+			m_server.placeBomb(m_position);
 
 			m_currentState = eAIState::eSetPositionAtSafeArea;
 		}
@@ -232,8 +232,21 @@ void PlayerServerAI::update(float frameTime)
 	}
 }
 
+//Player Human
+PlayerServerHuman::PlayerServerHuman(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, sf::SocketSelector& socketSelector)
+	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
+	m_tcpSocket(std::move(tcpSocket))
+{ 
+	socketSelector.add(*m_tcpSocket.get());
+}
+
 PlayerServerHuman::~PlayerServerHuman()
 {
 	std::cout << "Destroyed Human Player\n";
 	m_tcpSocket->disconnect();
+}
+
+std::unique_ptr<sf::TcpSocket>& PlayerServerHuman::getTCPSocket()
+{
+	return m_tcpSocket;
 }

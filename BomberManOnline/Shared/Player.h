@@ -24,7 +24,7 @@ public:
 	virtual void update(float deltaTime);
 	void stop();
 	void increaseMovementSpeed(float amount);
-	virtual void setNewPosition(sf::Vector2f newPosition);
+	void setNewPosition(sf::Vector2f newPosition);
 
 protected:
 	int m_ID;

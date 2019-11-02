@@ -13,10 +13,7 @@
 
 struct MovementPoint
 {
-	MovementPoint(sf::Vector2f position, eDirection moveDirection)
-		: position(position),
-		moveDirection(moveDirection)
-	{}
+	MovementPoint(sf::Vector2f position, eDirection moveDirection);
 
 	sf::Vector2f position;
 	eDirection moveDirection;

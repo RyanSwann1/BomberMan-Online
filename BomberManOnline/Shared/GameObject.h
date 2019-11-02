@@ -3,6 +3,8 @@
 #include "Timer.h"
 #include <SFML/Graphics.hpp>
 
+constexpr float BOMB_LIFETIME_DURATION = 2.0f;
+
 enum class eGameObjectType
 {
 	eBomb = 0,
@@ -19,7 +21,8 @@ enum class eGameObjectTag
 class GameObject
 {
 public:
-	GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone);
+	GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone, 
+		eTimerActive timerActive = eTimerActive::eTrue);
 
 	eGameObjectType getType() const;
 	eGameObjectTag getTag() const;

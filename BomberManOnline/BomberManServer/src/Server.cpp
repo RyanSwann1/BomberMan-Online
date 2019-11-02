@@ -55,7 +55,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 			sf::Vector2f startingPosition = server->m_spawnPositions.back();
 			server->m_spawnPositions.pop_back();
 			
-			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, ePlayerControllerType::eAI));
+			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, *server));
 		}
 
 		PathFinding::getInstance().createGraph(server->m_levelSize);
@@ -99,9 +99,9 @@ void Server::run()
 
 	while (m_running)
 	{
-		float frameTime = m_clock.restart().asSeconds();
 		if (m_currentState == eServerState::eGame)
 		{
+			float frameTime = m_clock.restart().asSeconds();
 			update(frameTime);
 		}
 		
@@ -139,12 +139,10 @@ void Server::addNewClient()
 		sf::Vector2f startingPosition = m_spawnPositions.back();
 		m_spawnPositions.pop_back();
 
-		std::unique_ptr<Player> newPlayer = std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, ePlayerControllerType::eHuman);
-		m_socketSelector.add(*static_cast<PlayerServerHuman*>(newPlayer.get())->m_tcpSocket.get());
-		m_players.emplace_back(std::move(newPlayer));
+		m_players.push_back(std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, m_socketSelector));
 		std::cout << "New client added to server\n";
 
-		if (m_players.size() == 4)
+		if (m_players.size() == MAX_CLIENTS)
 		{
 			m_currentState = eServerState::eGame;
 			packetToSend.clear();
@@ -170,10 +168,10 @@ void Server::listen()
 		{
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
 
-			if (m_socketSelector.isReady(*client.m_tcpSocket))
+			if (m_socketSelector.isReady(*client.getTCPSocket()))
 			{
 				sf::Packet receivedPacket;
-				if (client.m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
+				if (client.getTCPSocket()->receive(receivedPacket) == sf::Socket::Done)
 				{
 					eServerMessageType serverMessageType;
 					receivedPacket >> serverMessageType;
@@ -207,11 +205,11 @@ void Server::listen()
 	}
 }
 
-void Server::placeBomb(sf::Vector2f position, float lifeTimeDuration)
+void Server::placeBomb(sf::Vector2f position)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
 
-	m_gameObjects.emplace_back(position, lifeTimeDuration, eGameObjectType::eBomb);
+	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eGameObjectTag::eNone, eTimerActive::eTrue);
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
@@ -221,7 +219,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 		if(player->getControllerType() == ePlayerControllerType::eHuman)
 		{
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
-			if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+			if (client.getTCPSocket()->send(packetToSend) != sf::Socket::Done)
 			{
 				std::cout << "Cannot send message to client\n";
 			}
@@ -237,7 +235,7 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
-		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
+		if (client.getTCPSocket()->send(packetToSend) != sf::Socket::Done)
 		{
 			std::cout << "Failed to send message to client\n";
 		}
@@ -277,7 +275,7 @@ void Server::update(float frameTime)
 	for (auto clientToRemove = m_clientsToRemove.begin(); clientToRemove != m_clientsToRemove.end();)
 	{
 		int clientIDToRemove = (*clientToRemove);
-		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->m_ID == clientIDToRemove; });
+		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->getID() == clientIDToRemove; });
 		if (client != m_players.end())
 		{
 			sf::Packet packetToSend;
@@ -286,8 +284,9 @@ void Server::update(float frameTime)
 
 			if ((*client)->getControllerType() == ePlayerControllerType::eHuman)
 			{
-				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->m_tcpSocket);
+				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->getTCPSocket());
 			}
+
 			std::cout << "Client Removed\n";
 			m_players.erase(client);
 		}
@@ -306,6 +305,7 @@ void Server::update(float frameTime)
 	{
 		gameObject->update(frameTime);
 
+		bool gameObjectDestroyed = false;
 		if (gameObject->getType() == eGameObjectType::eBomb && gameObject->getTimer().isExpired())
 		{
 			onBombExplosion(gameObject->getPosition());
@@ -313,19 +313,26 @@ void Server::update(float frameTime)
 			onBombExplosion(sf::Vector2f(gameObject->getPosition().x + m_tileSize.x, gameObject->getPosition().y));
 			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y - m_tileSize.y));
 			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y + m_tileSize.y));
+
+			gameObject = m_gameObjects.erase(gameObject);
+			gameObjectDestroyed = true;
 		}
-		else if(gameObject->getType() == eGameObjectType::eMovementPickUp)
+		else if (gameObject->getType() == eGameObjectType::eMovementPickUp)
 		{
 			sf::Vector2f pickUpPosition = gameObject->getPosition();
-			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->m_position == pickUpPosition; });
+			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
 			if (player != m_players.end())
 			{
 				handlePickUpCollision(*player->get(), gameObject->getType());
 				gameObject = m_gameObjects.erase(gameObject);
+				gameObjectDestroyed = true;
 			}
 		}
 
-		++gameObject;
+		if (!gameObjectDestroyed)
+		{
+			++gameObject;
+		}
 	}
 }
 

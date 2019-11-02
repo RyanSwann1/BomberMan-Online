@@ -10,8 +10,8 @@
 //https://stackoverflow.com/questions/385506/when-is-optimisation-premature
 
 struct ServerMessagePlayerMove;
-struct PlayerServerHuman;
-struct PlayerServerAI;
+class PlayerServerHuman;
+class PlayerServerAI;
 class Server : private NonCopyable
 {
 	enum class eServerState
@@ -29,7 +29,7 @@ public:
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
 
-	void placeBomb(sf::Vector2f position, float lifeTimeDuration);
+	void placeBomb(sf::Vector2f position);
 	void broadcastMessage(sf::Packet& packetToSend);
 	void run();
 

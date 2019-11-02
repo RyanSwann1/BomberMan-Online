@@ -1,9 +1,9 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag)
+GameObject::GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag, eTimerActive timerActive)
 	: m_type(type),
 	m_position(startingPosition),
-	m_lifeTimer(expirationTime),
+	m_lifeTimer(expirationTime, timerActive),
 	m_tag(tag)
 {}
 

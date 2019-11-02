@@ -3,6 +3,13 @@
 #include <assert.h>
 #include "XMLParser/XMLParser.h"
 
+Texture::Texture()
+	: m_texture(),
+	m_tileSize(),
+	m_size(),
+	m_columns(0)
+{}
+
 std::unique_ptr<Texture> Texture::load(const std::string & levelName, const std::string& imageFileName)
 {
 	Texture* texture = new Texture();
@@ -13,6 +20,7 @@ std::unique_ptr<Texture> Texture::load(const std::string & levelName, const std:
 	}
 	else
 	{
+		delete texture;
 		return std::unique_ptr<Texture>();
 	}
 }

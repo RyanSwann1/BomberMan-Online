@@ -6,7 +6,6 @@
 #include "GameObject.h"
 #include <vector>
 
-constexpr float BOMB_LIFETIME_DURATION = 2.0f;
 constexpr float EXPLOSION_LIFETIME_DURATION = 0.5f;
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
@@ -36,7 +35,7 @@ class GameObjectClient : public GameObject
 {
 public:
 	GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName,
-		eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone);
+		eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone, eTimerActive timerActive = eTimerActive::eFalse);
 
 	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);

@@ -18,7 +18,7 @@ public:
 	sf::IntRect getFrameRect(int tileID) const;
 
 private:
-	Texture() {}
+	Texture();
 	sf::Texture m_texture;
 	sf::Vector2i m_tileSize;
 	sf::Vector2i m_size;

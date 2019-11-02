@@ -12,7 +12,7 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName sta
 	m_animationFinished(false),
 	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID)),
 	m_animationName(startingAnimationName),
-	m_frameTimer(0.0f, true)	
+	m_frameTimer(0.0f, eTimerActive::eTrue)	
 {
 	m_sprite.setPosition(startingPosition);
 

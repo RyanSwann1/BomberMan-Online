@@ -11,7 +11,7 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_moving(false),
 	m_movementFactor(0.0f),
 	m_movementSpeed(2.5f),
-	m_bombPlacementTimer(2.0f, true)
+	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
 {}
 
 Timer & Player::getBombPlacementTimer()
@@ -61,7 +61,7 @@ void Player::update(float deltaTime)
 		if (m_position == m_newPosition)
 		{
 			m_moving = false;
-			m_movementFactor = 0;
+			m_movementFactor = 0.0f;
 		}
 	}
 }
@@ -69,7 +69,7 @@ void Player::update(float deltaTime)
 void Player::stop()
 {
 	m_moving = false;
-	m_movementFactor = 0;
+	m_movementFactor = 0.0f;
 }
 
 void Player::increaseMovementSpeed(float amount)

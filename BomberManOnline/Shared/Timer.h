@@ -1,10 +1,16 @@
 #pragma once
 
+enum class eTimerActive
+{
+	eFalse = 0,
+	eTrue
+};
+
 class Timer
 {
 public:
-	Timer(bool active = false);
-	Timer(float expirationTime, bool active = false);
+	Timer(eTimerActive active = eTimerActive::eFalse);
+	Timer(float expirationTime, eTimerActive active = eTimerActive::eFalse);
 
 	float getExpirationTime() const;
 	bool isExpired() const;

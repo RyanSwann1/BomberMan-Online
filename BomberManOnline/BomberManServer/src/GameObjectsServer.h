@@ -28,7 +28,7 @@ class Server;
 class PlayerServerAI : public Player
 {
 public:
-	PlayerServerAI(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType, Server& server);
+	PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server);
 
 	void update(float frameTime) override final;
 
@@ -40,13 +40,14 @@ private:
 	Timer m_waitTimer;
 };
 
-struct PlayerServerHuman : public Player
+class PlayerServerHuman : public Player
 {
-	PlayerServerHuman(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
-		: Player(ID, startingPosition, controllerType),
-		m_tcpSocket(std::move(tcpSocket))
-	{}
+public:
+	PlayerServerHuman(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, sf::SocketSelector& socketSelector);
 	~PlayerServerHuman() override;
+	
+	std::unique_ptr<sf::TcpSocket>& getTCPSocket();
 
+private:
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 };

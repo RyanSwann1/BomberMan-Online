@@ -191,7 +191,7 @@ void Level::update(float deltaTime)
 		if (gameObject->getTag() == eGameObjectTag::ePickUp)
 		{
 			sf::Vector2f pickUpPosition(gameObject->getPosition());
-			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getCurrentPosition() == pickUpPosition; });
+			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
 			if (player != m_players.cend())
 			{
 				gameObject = m_gameObjects.erase(gameObject);
@@ -295,7 +295,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
 
-		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb);
+		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eGameObjectTag::eNone, eTimerActive::eTrue);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :
@@ -349,3 +349,8 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	}
 }
+
+MovementPoint::MovementPoint(sf::Vector2f position, eDirection moveDirection)
+	: position(position),
+	moveDirection(moveDirection)
+{}
