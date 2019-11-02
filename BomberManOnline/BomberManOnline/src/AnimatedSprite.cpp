@@ -8,19 +8,21 @@ constexpr float TOTAL_BOMB_ANIMATIONS = 3.0f;
 constexpr float TOTAL_EXPLOSION_ANIMATIONS = 3.0f;
 
 AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName startingAnimationName)
-	: m_currentFrameID(Animations::getInstance().animations[static_cast<int>(startingAnimationName)].startFrameID),
+	: m_currentFrameID(Animations::getInstance().getAnimationDetails(startingAnimationName).startFrameID),
 	m_animationFinished(false),
 	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID)),
 	m_animationName(startingAnimationName),
 	m_frameTimer(0.0f, true)	
 {
 	m_sprite.setPosition(startingPosition);
+
 	switch (startingAnimationName)
 	{
 	case eAnimationName::ePlayerIdleDown :
 	case eAnimationName::ePlayerIdleLeft :
 	case eAnimationName::ePlayerIdleRight :
 	case eAnimationName::ePlayerIdleUp :
+	case eAnimationName::eMovementSpeedPickUp :
 		m_frameTimer.setExpiredTime(0.0f);
 		break;
 	case eAnimationName::ePlayerMoveLeft :
@@ -40,7 +42,7 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName sta
 
 void AnimatedSprite::setPosition(sf::Vector2f position)
 {
-	if(Animations::getInstance().animations[static_cast<int>(m_animationName)].flipped)
+	if(Animations::getInstance().getAnimationDetails(m_animationName).flipped)
 	{ 
 		position.x += 16;
 		m_sprite.setPosition(position);
@@ -56,7 +58,7 @@ void AnimatedSprite::setNewAnimation(eAnimationName newAnimationName)
 	if (m_animationName != newAnimationName)
 	{
 		m_animationName = newAnimationName;
-		AnimationDetails animationDetails = Animations::getInstance().animations[static_cast<int>(m_animationName)];
+		const AnimationDetails& animationDetails = Animations::getInstance().getAnimationDetails(m_animationName);
 		m_currentFrameID = animationDetails.startFrameID;
 		m_sprite.setTextureRect(Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID));
 		if (animationDetails.flipped)
@@ -83,7 +85,7 @@ void AnimatedSprite::update(float deltaTime)
 	{
 		m_frameTimer.resetElaspedTime();
 
-		AnimationDetails animationDetails = Animations::getInstance().animations[static_cast<int>(m_animationName)];
+		const AnimationDetails& animationDetails = Animations::getInstance().getAnimationDetails(m_animationName);
 		switch (animationDetails.direction)
 		{
 		case eDirection::eRight:

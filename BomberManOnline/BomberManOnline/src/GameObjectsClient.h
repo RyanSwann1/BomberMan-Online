@@ -32,12 +32,15 @@ private:
 	eDirection m_moveDirection;
 };
 
-struct GameObjectClient : public GameObject
+class GameObjectClient : public GameObject
 {
+public:
 	GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName,
 		eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone);
 
+	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);
-
+	
+private:
 	AnimatedSprite m_sprite;
 };

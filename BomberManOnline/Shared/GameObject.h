@@ -16,15 +16,19 @@ enum class eGameObjectTag
 	ePickUp
 };
 
-struct GameObject
+class GameObject
 {
-	GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone)
-		: m_type(type),
-		m_position(startingPosition),
-		m_lifeTimer(expirationTime),
-		m_tag(tag)
-	{}
+public:
+	GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone);
 
+	eGameObjectType getType() const;
+	eGameObjectTag getTag() const;
+	const Timer& getTimer() const;
+	sf::Vector2f getPosition() const;
+
+	void update(float frameTime);
+
+private:
 	eGameObjectType m_type;
 	sf::Vector2f m_position;
 	Timer m_lifeTimer;

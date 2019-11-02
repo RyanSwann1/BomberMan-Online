@@ -13,13 +13,18 @@ public:
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 	virtual ~Player() {}
 
+	Timer& getBombPlacementTimer();
+	bool isMoving() const;
+	ePlayerControllerType getControllerType() const;
 	int getID() const;
-	sf::Vector2f getCurrentPosition() const;
+	sf::Vector2f getPosition() const;
 	sf::Vector2f getNewPosition() const;
+	sf::Vector2f getPreviousPosition() const;
 
 	virtual void update(float deltaTime);
 	void stop();
 	void increaseMovementSpeed(float amount);
+	virtual void setNewPosition(sf::Vector2f newPosition);
 
 protected:
 	int m_ID;

@@ -6,8 +6,7 @@
 #include <vector>
 
 enum class eFrameID
-{
-	
+{	
 	ePlayerMoveUpStart = 263,
 	ePlayerMoveUpEnd = 264,
 	ePlayerMoveDownStart = 256,
@@ -35,6 +34,7 @@ enum class eAnimationName
 	ePlayerMoveLeft,
 	eBomb,
 	eExplosion,
+	eMovementSpeedPickUp,
 	eTotal
 };
 
@@ -93,7 +93,6 @@ public:
 		return animations[static_cast<int>(animationName)];
 	}
 
-
 private:
 	Animations() {}
 
@@ -112,6 +111,8 @@ private:
 		//Bomb
 		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd, eAnimationRepeatable::eFalse),
 		//Explosion
-		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse)
+		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse),
+		//PickUps
+		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp)
 	};
 };

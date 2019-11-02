@@ -14,12 +14,27 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_bombPlacementTimer(2.0f, true)
 {}
 
+Timer & Player::getBombPlacementTimer()
+{
+	return m_bombPlacementTimer;
+}
+
+bool Player::isMoving() const
+{
+	return m_moving;
+}
+
+ePlayerControllerType Player::getControllerType() const
+{
+	return m_controllerType;
+}
+
 int Player::getID() const
 {
 	return m_ID;
 }
 
-sf::Vector2f Player::getCurrentPosition() const
+sf::Vector2f Player::getPosition() const
 {
 	return m_position;
 }
@@ -29,15 +44,26 @@ sf::Vector2f Player::getNewPosition() const
 	return m_newPosition;
 }
 
+sf::Vector2f Player::getPreviousPosition() const
+{
+	return m_previousPosition;
+}
+
 void Player::update(float deltaTime)
 {
+	m_bombPlacementTimer.update(deltaTime);
+
 	if (m_moving)
 	{
 		m_movementFactor += deltaTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-	}
 
-	m_bombPlacementTimer.update(deltaTime);
+		if (m_position == m_newPosition)
+		{
+			m_moving = false;
+			m_movementFactor = 0;
+		}
+	}
 }
 
 void Player::stop()
@@ -49,4 +75,11 @@ void Player::stop()
 void Player::increaseMovementSpeed(float amount)
 {
 	m_movementSpeed += amount;
+}
+
+void Player::setNewPosition(sf::Vector2f newPosition)
+{
+	m_newPosition = newPosition;
+	m_previousPosition = m_position;
+	m_moving = true;
 }

@@ -19,8 +19,7 @@ Server::Server()
 	m_clientsToRemove(),
 	m_spawnPositions(),
 	m_collisionLayer(),
-	m_bombs(),
-	m_pickUps(),
+	m_gameObjects(),
 	m_levelName(),
 	m_levelSize(),
 	m_clock(),
@@ -60,7 +59,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		}
 
 		PathFinding::getInstance().createGraph(server->m_levelSize);
-
 		return std::unique_ptr<Server>(server);
 	}
 	else
@@ -80,9 +78,9 @@ const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() con
 	return m_collisionLayer;
 }
 
-const std::vector<PickUpServer>& Server::getPickUps() const
+const std::vector<GameObject>& Server::getGameObjects() const
 {
-	return m_pickUps;
+	return m_gameObjects;
 }
 
 sf::Vector2i Server::getTileSize() const
@@ -155,7 +153,7 @@ void Server::addNewClient()
 			initialGameDataMessage.levelName = m_levelName;
 			for (const auto& player : m_players)
 			{
-				initialGameDataMessage.playerDetails.emplace_back(player->m_ID, player->m_position);
+				initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());
 			}
 
 			packetToSend << initialGameDataMessage;
@@ -168,7 +166,7 @@ void Server::listen()
 {
 	for (const auto& player : m_players)
 	{
-		if (player->m_controllerType == ePlayerControllerType::eHuman)
+		if (player->getControllerType() == ePlayerControllerType::eHuman)
 		{
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
 
@@ -199,7 +197,7 @@ void Server::listen()
 
 					case eServerMessageType::eRequestDisconnection:
 					{
-						m_clientsToRemove.push_back(client.m_ID);
+						m_clientsToRemove.push_back(client.getID());
 					}
 					break;
 					}
@@ -213,14 +211,14 @@ void Server::placeBomb(sf::Vector2f position, float lifeTimeDuration)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
 
-	m_bombs.emplace_back(position, lifeTimeDuration);
+	m_gameObjects.emplace_back(position, lifeTimeDuration, eGameObjectType::eBomb);
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
 {
 	for (const auto& player : m_players)
 	{
-		if(player->m_controllerType == ePlayerControllerType::eHuman)
+		if(player->getControllerType() == ePlayerControllerType::eHuman)
 		{
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
 			if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
@@ -234,10 +232,10 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	//Invalid Move
-	if (client.m_moving || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
+	if (client.isMoving() || Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
 	{
 		sf::Packet packetToSend;
-		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.m_previousPosition);
+		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
 		packetToSend << eServerMessageType::eInvalidMoveRequest << invalidMoveMessage;
 		if (client.m_tcpSocket->send(packetToSend) != sf::Socket::Done)
 		{
@@ -247,30 +245,29 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 	//Valid Move
 	else
 	{
-		client.m_newPosition = playerMoveMessage.newPosition;
-		client.m_previousPosition = client.m_position;
-		client.m_moving = true;
+		client.setNewPosition(playerMoveMessage.newPosition);
 
 		sf::Packet globalPacket;
-		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y << client.m_ID;
+		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y << client.getID();
 		broadcastMessage(globalPacket);
 	}
 }
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	if (client.m_bombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
+	Timer& clientBombPlacementTimer = client.getBombPlacementTimer();
+	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
-		bombPlacementMessage.lifeTimeDuration = client.m_bombPlacementTimer.getExpirationTime();
+		bombPlacementMessage.lifeTimeDuration = clientBombPlacementTimer.getExpirationTime();
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 		broadcastMessage(packetToSend);
 		std::cout << "Place Bomb\n";
-		m_bombs.emplace_back(placementPosition, client.m_bombPlacementTimer.getExpirationTime());
-		client.m_bombPlacementTimer.resetElaspedTime();
+		m_gameObjects.emplace_back(placementPosition, clientBombPlacementTimer.getExpirationTime(), eGameObjectType::eBomb);
+		clientBombPlacementTimer.resetElaspedTime();
 	}
 }
 
@@ -287,7 +284,7 @@ void Server::update(float frameTime)
 			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
 			broadcastMessage(packetToSend);
 
-			if ((*client)->m_controllerType == ePlayerControllerType::eHuman)
+			if ((*client)->getControllerType() == ePlayerControllerType::eHuman)
 			{
 				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->m_tcpSocket);
 			}
@@ -301,64 +298,34 @@ void Server::update(float frameTime)
 	//Players
 	for (auto& player : m_players)
 	{
-		player->m_bombPlacementTimer.update(frameTime);
+		player->update(frameTime);
+	}
 
-		if (player->m_controllerType == ePlayerControllerType::eAI)
+	//Game Objects
+	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
+	{
+		gameObject->update(frameTime);
+
+		if (gameObject->getType() == eGameObjectType::eBomb && gameObject->getTimer().isExpired())
 		{
-		
-			static_cast<PlayerServerAI*>(player.get())->update(*this, frameTime);
+			onBombExplosion(gameObject->getPosition());
+			onBombExplosion(sf::Vector2f(gameObject->getPosition().x - m_tileSize.x, gameObject->getPosition().y));
+			onBombExplosion(sf::Vector2f(gameObject->getPosition().x + m_tileSize.x, gameObject->getPosition().y));
+			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y - m_tileSize.y));
+			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y + m_tileSize.y));
 		}
-		else
+		else if(gameObject->getType() == eGameObjectType::eMovementPickUp)
 		{
-			if (player->m_moving)
+			sf::Vector2f pickUpPosition = gameObject->getPosition();
+			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->m_position == pickUpPosition; });
+			if (player != m_players.end())
 			{
-				player->m_movementFactor += frameTime * player->m_movementSpeed;
-				player->m_position = Utilities::Interpolate(player->m_previousPosition, player->m_newPosition, player->m_movementFactor);
-
-				if (player->m_position == player->m_newPosition)
-				{
-					player->m_moving = false;
-					player->m_movementFactor = 0;
-				}
+				handlePickUpCollision(*player->get(), gameObject->getType());
+				gameObject = m_gameObjects.erase(gameObject);
 			}
 		}
-	}
 
-	//Bombs
-	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
-	{
-		bomb->m_lifeTime.update(frameTime);
-
-		if (bomb->m_lifeTime.isExpired())
-		{
-			onBombExplosion(bomb->m_position);
-			onBombExplosion(sf::Vector2f(bomb->m_position.x - m_tileSize.x, bomb->m_position.y));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x + m_tileSize.x, bomb->m_position.y));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y - m_tileSize.y));
-			onBombExplosion(sf::Vector2f(bomb->m_position.x, bomb->m_position.y + m_tileSize.y));
-		
-			bomb = m_bombs.erase(bomb);
-		}
-		else
-		{
-			++bomb;
-		}
-	}
-
-	//Pick Ups
-	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
-	{
-		sf::Vector2f pickUpPosition = pickUp->m_position;
-		auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition] (const auto& player) { return player->m_position == pickUpPosition; });
-		if (player != m_players.end())
-		{
-			handlePickUpCollision(*player->get(), pickUp->m_type);
-			pickUp = m_pickUps.erase(pickUp);
-		}
-		else
-		{
-			++pickUp;
-		}
+		++gameObject;
 	}
 }
 
@@ -368,7 +335,6 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	
 	if (explosionPosition.x >= 0 && explosionPosition.x < m_levelSize.x * m_tileSize.x && explosionPosition.y >= 0 && explosionPosition.y < m_levelSize.y * m_tileSize.y)
 	{
-
 		if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
 		{
 			m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] = eCollidableTile::eNonCollidable;
@@ -382,17 +348,16 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
 				broadcastMessage(packetToSend);
 
-				std::cout << "Spawn Pickup\n";
-				m_pickUps.emplace_back(explosionPosition, eGameObjectType::eMovementPickUp);
+				m_gameObjects.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 			}
 		}
 
 		for (const auto& player : m_players)
 		{
-			sf::Vector2i playerPosition(static_cast<int>(player->m_position.x / m_tileSize.x), static_cast<int>(player->m_position.y / m_tileSize.y));
+			sf::Vector2i playerPosition(static_cast<int>(player->getPosition().x / m_tileSize.x), static_cast<int>(player->getPosition().y / m_tileSize.y));
 			if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
 			{
-				m_clientsToRemove.push_back(player->m_ID);
+				m_clientsToRemove.push_back(player->getID());
 			}
 		}
 	}
@@ -404,13 +369,12 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 	{
 	case eGameObjectType::eMovementPickUp :
 	{
-		player.m_movementSpeed += MOVEMENT_SPEED_INCREMENT;
+		player.increaseMovementSpeed(MOVEMENT_SPEED_INCREMENT);
 
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eMovementPickUpCollision << player.m_ID << MOVEMENT_SPEED_INCREMENT;
+		packetToSend << eServerMessageType::eMovementPickUpCollision << player.getID() << MOVEMENT_SPEED_INCREMENT;
 		broadcastMessage(packetToSend);
 	}
-		
 		break;
 	}
 }

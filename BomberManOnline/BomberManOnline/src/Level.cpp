@@ -77,7 +77,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 {
 	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
 	assert(m_localPlayer);
-	sf::Vector2f playerPosition(m_localPlayer->getCurrentPosition());
+	sf::Vector2f playerPosition(m_localPlayer->getPosition());
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
@@ -156,7 +156,7 @@ void Level::render(sf::RenderWindow & window) const
 	//Game Objects
 	for (const auto& gameObject : m_gameObjects)
 	{
-		gameObject.m_sprite.render(window);
+		gameObject.render(window);
 	}
 }
 
@@ -168,7 +168,7 @@ void Level::update(float deltaTime)
 		player->update(deltaTime);
 
 		//Reached destination
-		if (player->getCurrentPosition() == player->getNewPosition())
+		if (player->getPosition() == player->getNewPosition())
 		{
 			if (m_localPlayerPreviousPositions.size() > MAX_PREVIOUS_POINTS)
 			{
@@ -188,10 +188,10 @@ void Level::update(float deltaTime)
 	{
 		gameObject->update(deltaTime);
 
-		if (gameObject->m_tag == eGameObjectTag::ePickUp)
+		if (gameObject->getTag() == eGameObjectTag::ePickUp)
 		{
-			sf::Vector2f pickUpPosition(gameObject->m_position);
-			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->m_position == pickUpPosition; });
+			sf::Vector2f pickUpPosition(gameObject->getPosition());
+			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getCurrentPosition() == pickUpPosition; });
 			if (player != m_players.cend())
 			{
 				gameObject = m_gameObjects.erase(gameObject);
@@ -201,13 +201,13 @@ void Level::update(float deltaTime)
 				++gameObject;
 			}
 		}
-		else if(gameObject->m_tag == eGameObjectTag::eNone)
+		else if(gameObject->getTag() == eGameObjectTag::eNone)
 		{
-			if (gameObject->m_lifeTimer.isExpired())
+			if (gameObject->getTimer().isExpired())
 			{
-				if (gameObject->m_type == eGameObjectType::eBomb)
+				if (gameObject->getType() == eGameObjectType::eBomb)
 				{
-					spawnExplosions(gameObject->m_position);
+					spawnExplosions(gameObject->getPosition());
 				}
 
 				gameObject = m_gameObjects.erase(gameObject);
@@ -282,7 +282,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
+			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->getID() == clientID; });
 			assert(remotePlayer != m_players.end());
 
 			(*remotePlayer)->setRemotePlayerPosition(newPosition);
@@ -316,7 +316,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->m_ID == clientID; });
+			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->getID() == clientID; });
 			assert(iter != m_players.end());
 			
 			m_players.erase(iter);

@@ -25,7 +25,7 @@ public:
 
 	const std::vector<std::unique_ptr<Player>>& getPlayers() const;
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
-	const std::vector<PickUpServer>& getPickUps() const;
+	const std::vector<GameObject>& getGameObjects() const;
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
 
@@ -41,8 +41,7 @@ private:
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
-	std::vector<BombServer> m_bombs;
-	std::vector<PickUpServer> m_pickUps;
+	std::vector<GameObject> m_gameObjects;
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;
 	sf::Vector2i m_tileSize;

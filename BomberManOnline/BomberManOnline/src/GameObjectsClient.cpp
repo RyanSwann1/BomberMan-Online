@@ -121,8 +121,12 @@ GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirati
 	m_sprite(startingPosition, startingAnimationName)
 {}
 
+void GameObjectClient::render(sf::RenderWindow & window) const
+{
+	m_sprite.render(window);
+}
+
 void GameObjectClient::update(float deltaTime)
 {
-	m_lifeTimer.update(deltaTime);
 	m_sprite.update(deltaTime);
 }
