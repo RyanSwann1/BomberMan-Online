@@ -4,13 +4,14 @@
 #include "NetworkHandler.h"
 #include "ServerMessages.h"
 #include <assert.h>
+#include <utility>
 #include "Utilities.h"
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
 
-Level::Level()
-	: m_levelName(),
+Level::Level(std::string&& levelName)
+	: m_levelName(std::move(levelName)),
 	m_levelSize(),
 	m_tileLayers(),
 	m_spawnPositions(),
@@ -45,10 +46,25 @@ void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
 	}
 }
 
-std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageInitialGameData & initialGameData)
+void Level::spawnBomb(sf::Vector2f position)
 {
-	Level* level = new Level;
-	level->m_levelName = initialGameData.levelName;
+	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eTrue);
+}
+
+void Level::spawnPickUp(sf::Vector2f position, eGameObjectType type)
+{
+	switch (type)
+	{
+	case eGameObjectType::eMovementPickUp :
+		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eMovementSpeedPickUp, type);
+		break;
+	}
+}
+
+std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGameData & initialGameData)
+{
+	//Load Level
+	Level* level = new Level(std::move(initialGameData.levelName));
 	if (!XMLParser::loadLevelAsClient(level->m_levelName, level->m_levelSize, level->m_tileLayers,
 		level->m_collisionLayer, level->m_spawnPositions))
 	{
@@ -75,9 +91,9 @@ std::unique_ptr<Level> Level::create(int localClientID, const ServerMessageIniti
 
 void Level::handleInput(const sf::Event & sfmlEvent)
 {
-	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
 	assert(m_localPlayer);
 	sf::Vector2f playerPosition(m_localPlayer->getPosition());
+	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
@@ -114,7 +130,6 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 void Level::render(sf::RenderWindow & window) const
 {
 	//Tile Layer
-	const auto& tileSheet = Textures::getInstance().getTileSheet();
 	for (const auto& tileLayer : m_tileLayers)
 	{
 		for (int y = 0; y < m_levelSize.y; ++y)
@@ -124,7 +139,8 @@ void Level::render(sf::RenderWindow & window) const
 				int tileID = tileLayer.m_tileLayer[y][x];
 				if (tileID > 0)
 				{
-					sf::Sprite tileSprite(Textures::getInstance().getTileSheet().getTexture(), tileSheet.getFrameRect(tileID));
+					const auto& tileSheet = Textures::getInstance().getTileSheet();
+					sf::Sprite tileSprite(tileSheet.getTexture(), tileSheet.getFrameRect(tileID));
 					tileSprite.setPosition(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y);
 
 					window.draw(tileSprite);
@@ -140,8 +156,10 @@ void Level::render(sf::RenderWindow & window) const
 		{
 			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
 			{
-				sf::Sprite boxSprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(204));
+				const auto& tileSheet = Textures::getInstance().getTileSheet();
+				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(204));
 				boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
+
 				window.draw(boxSprite);
 			}
 		}
@@ -188,7 +206,7 @@ void Level::update(float deltaTime)
 	{
 		gameObject->update(deltaTime);
 
-		if (gameObject->getTag() == eGameObjectTag::ePickUp)
+		if (gameObject->getType() == eGameObjectType::eMovementPickUp) 
 		{
 			sf::Vector2f pickUpPosition(gameObject->getPosition());
 			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
@@ -201,7 +219,7 @@ void Level::update(float deltaTime)
 				++gameObject;
 			}
 		}
-		else if(gameObject->getTag() == eGameObjectTag::eNone)
+		else
 		{
 			if (gameObject->getTimer().isExpired())
 			{
@@ -295,14 +313,14 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
 
-		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eGameObjectTag::eNone, eTimerActive::eTrue);
+		spawnBomb(placementPosition);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :
 	{
-		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 		sf::Vector2f boxPosition;
 		receivedMessage >> boxPosition.x >> boxPosition.y;
+		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 		m_collisionLayer[static_cast<int>(boxPosition.y / tileSize.y)][static_cast<int>(boxPosition.x / tileSize.x)] = eCollidableTile::eNonCollidable;
 	}
 		break;
@@ -328,7 +346,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 
-		m_gameObjects.emplace_back(startingPosition, 0.0f, eAnimationName::eMovementSpeedPickUp, eGameObjectType::eMovementPickUp);
+		spawnPickUp(startingPosition, eGameObjectType::eMovementPickUp);
 	}
 		break;
 		

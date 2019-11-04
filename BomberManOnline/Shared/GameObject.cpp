@@ -1,20 +1,14 @@
 #include "GameObject.h"
 
-GameObject::GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eGameObjectTag tag, eTimerActive timerActive)
+GameObject::GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eTimerActive timerActive)
 	: m_type(type),
 	m_position(startingPosition),
-	m_lifeTimer(expirationTime, timerActive),
-	m_tag(tag)
+	m_lifeTimer(expirationTime, timerActive)
 {}
 
 eGameObjectType GameObject::getType() const
 {
 	return m_type;
-}
-
-eGameObjectTag GameObject::getTag() const
-{
-	return m_tag;
 }
 
 const Timer & GameObject::getTimer() const

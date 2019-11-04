@@ -23,7 +23,7 @@ struct ServerMessageInitialGameData;
 class Level : private NonCopyable
 {
 public:
-	static std::unique_ptr<Level> create(int localClientID, const ServerMessageInitialGameData& initialGameData);
+	static std::unique_ptr<Level> create(int localClientID, ServerMessageInitialGameData& initialGameData);
 
 	void handleInput(const sf::Event& sfmlEvent);
 	void onReceivedServerMessage(eServerMessageType receivedMessageType, sf::Packet& receivedMessage, sf::RenderWindow& window);
@@ -32,7 +32,8 @@ public:
 	void update(float deltaTime);
 
 private:
-	Level();
+	Level(std::string&& levelName);
+
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;
 	std::vector<TileLayer> m_tileLayers;
@@ -44,4 +45,6 @@ private:
 	std::vector<GameObjectClient> m_gameObjects; 
 
 	void spawnExplosions(sf::Vector2f bombExplodePosition);
+	void spawnBomb(sf::Vector2f position);
+	void spawnPickUp(sf::Vector2f position, eGameObjectType type);
 };

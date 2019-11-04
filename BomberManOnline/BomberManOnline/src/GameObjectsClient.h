@@ -35,7 +35,7 @@ class GameObjectClient : public GameObject
 {
 public:
 	GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName,
-		eGameObjectType type, eGameObjectTag tag = eGameObjectTag::eNone, eTimerActive timerActive = eTimerActive::eFalse);
+		eGameObjectType type, eTimerActive timerActive = eTimerActive::eFalse);
 
 	void render(sf::RenderWindow& window) const;
 	void update(float deltaTime);

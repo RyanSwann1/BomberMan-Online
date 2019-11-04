@@ -39,7 +39,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
-		std::vector<sf::Vector2f> collisionLayer;
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
@@ -50,11 +49,11 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		//Initialize AI Players
 		for (int i = 0; i < MAX_AI_PLAYERS; i++)
 		{
-			int clientID = static_cast<int>(server->m_players.size());
-			std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();
+			assert(!server->m_spawnPositions.empty());
 			sf::Vector2f startingPosition = server->m_spawnPositions.back();
 			server->m_spawnPositions.pop_back();
-			
+
+			int clientID = static_cast<int>(server->m_players.size());
 			server->m_players.emplace_back(std::make_unique<PlayerServerAI>(clientID, startingPosition, *server));
 		}
 
@@ -144,18 +143,7 @@ void Server::addNewClient()
 
 		if (m_players.size() == MAX_CLIENTS)
 		{
-			m_currentState = eServerState::eGame;
-			packetToSend.clear();
-			packetToSend << eServerMessageType::eInitialGameData;
-			ServerMessageInitialGameData initialGameDataMessage;
-			initialGameDataMessage.levelName = m_levelName;
-			for (const auto& player : m_players)
-			{
-				initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());
-			}
-
-			packetToSend << initialGameDataMessage;
-			broadcastMessage(packetToSend);
+			startGame();
 		}
 	}
 }
@@ -167,7 +155,6 @@ void Server::listen()
 		if (player->getControllerType() == ePlayerControllerType::eHuman)
 		{
 			auto& client = *static_cast<PlayerServerHuman*>(player.get());
-
 			if (m_socketSelector.isReady(*client.getTCPSocket()))
 			{
 				sf::Packet receivedPacket;
@@ -209,7 +196,7 @@ void Server::placeBomb(sf::Vector2f position)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
 
-	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eGameObjectTag::eNone, eTimerActive::eTrue);
+	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eTimerActive::eTrue);
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
@@ -334,6 +321,17 @@ void Server::update(float frameTime)
 			++gameObject;
 		}
 	}
+
+	//Game Object Queue
+	if (!m_gameObjectQueue.empty())
+	{
+		for (const auto& i : m_gameObjectQueue)
+		{
+			m_gameObjects.push_back(i);
+		}
+
+		m_gameObjectQueue.clear();
+	}
 }
 
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
@@ -355,7 +353,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
 				broadcastMessage(packetToSend);
 
-				m_gameObjects.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 			}
 		}
 
@@ -384,4 +382,21 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 	}
 		break;
 	}
+}
+
+void Server::startGame()
+{
+
+	m_currentState = eServerState::eGame;
+	packetToSend.clear();
+	packetToSend << eServerMessageType::eInitialGameData;
+	ServerMessageInitialGameData initialGameDataMessage;
+	initialGameDataMessage.levelName = m_levelName;
+	for (const auto& player : m_players)
+	{
+		initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());
+	}
+
+	packetToSend << initialGameDataMessage;
+	broadcastMessage(packetToSend);
 }

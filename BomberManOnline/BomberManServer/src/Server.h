@@ -41,6 +41,7 @@ private:
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
+	std::vector<GameObject> m_gameObjectQueue;
 	std::vector<GameObject> m_gameObjects;
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;
@@ -59,4 +60,5 @@ private:
 	
 	void onBombExplosion(sf::Vector2f explosionPosition);
 	void handlePickUpCollision(Player& player, eGameObjectType gameObjectType);
+	void startGame();
 };
