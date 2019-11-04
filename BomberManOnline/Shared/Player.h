@@ -24,7 +24,6 @@ public:
 	virtual void update(float deltaTime);
 	void stop();
 	void increaseMovementSpeed(float amount);
-	void setNewPosition(sf::Vector2f newPosition);
 
 protected:
 	int m_ID;
@@ -37,4 +36,12 @@ protected:
 	float m_movementFactor;
 	float m_movementSpeed;
 	Timer m_bombPlacementTimer;
+};
+
+class PlayerServer : public Player
+{
+public:
+	PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
+
+	void setNewPosition(sf::Vector2f newPosition);
 };

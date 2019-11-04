@@ -53,7 +53,6 @@ void PlayerServerAI::update(float frameTime)
 			PathFinding::getInstance().pathToClosestBox(m_position, m_pathToTile, m_server);
 			if (!m_pathToTile.empty())
 			{
-				std::cout << "Move To Box\n";
 				m_currentState = eAIState::eMoveToBox;
 				m_moving = true;
 
@@ -76,7 +75,7 @@ void PlayerServerAI::update(float frameTime)
 
 		if (m_position == m_newPosition)
 		{
-			std::cout << "Reached new position\n";
+			
 			m_movementFactor = 0;
 			m_previousPosition = m_position;
 
@@ -93,7 +92,6 @@ void PlayerServerAI::update(float frameTime)
 				{
 					m_moving = false;
 					m_currentState = eAIState::eMakeDecision;
-					std::cout << "Box Not Found\n";
 				}
 
 				m_pathToTile.pop_back();

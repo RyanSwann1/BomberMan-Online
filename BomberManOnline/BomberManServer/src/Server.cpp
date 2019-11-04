@@ -250,7 +250,6 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 		broadcastMessage(packetToSend);
-		std::cout << "Place Bomb\n";
 		m_gameObjects.emplace_back(placementPosition, clientBombPlacementTimer.getExpirationTime(), eGameObjectType::eBomb);
 		clientBombPlacementTimer.resetElaspedTime();
 	}

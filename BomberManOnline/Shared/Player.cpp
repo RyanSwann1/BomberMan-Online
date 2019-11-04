@@ -79,7 +79,24 @@ void Player::increaseMovementSpeed(float amount)
 
 void Player::setNewPosition(sf::Vector2f newPosition)
 {
+
+}
+
+//Player Server
+PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
+	: Player(ID, startingPosition, controllerType)
+{
 	m_newPosition = newPosition;
 	m_previousPosition = m_position;
 	m_moving = true;
+}
+
+void PlayerServer::setNewPosition(sf::Vector2f newPosition)
+{
+}
+
+//Player Client
+PlayerClient::PlayerClient(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
+	: Player(ID, startingPosition, controllerType)
+{
 }

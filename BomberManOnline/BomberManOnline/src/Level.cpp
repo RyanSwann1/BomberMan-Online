@@ -9,6 +9,7 @@
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
+constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
 Level::Level(std::string&& levelName)
 	: m_levelName(std::move(levelName)),
