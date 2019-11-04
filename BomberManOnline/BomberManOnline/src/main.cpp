@@ -17,7 +17,6 @@
 
 //https://www.bogotobogo.com/DesignPatterns/introduction.php
 
-
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(336, 336), "SFML_WINDOW", sf::Style::Default);

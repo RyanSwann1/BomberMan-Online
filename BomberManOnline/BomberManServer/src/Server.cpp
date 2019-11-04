@@ -386,8 +386,9 @@ void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectTy
 
 void Server::startGame()
 {
-
 	m_currentState = eServerState::eGame;
+
+	sf::Packet packetToSend;
 	packetToSend.clear();
 	packetToSend << eServerMessageType::eInitialGameData;
 	ServerMessageInitialGameData initialGameDataMessage;

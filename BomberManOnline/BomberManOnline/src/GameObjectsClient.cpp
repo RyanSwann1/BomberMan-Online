@@ -129,5 +129,6 @@ void GameObjectClient::render(sf::RenderWindow & window) const
 
 void GameObjectClient::update(float deltaTime)
 {
+	GameObject::update(deltaTime);
 	m_sprite.update(deltaTime);
 }
