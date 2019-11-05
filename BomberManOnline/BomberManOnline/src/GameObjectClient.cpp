@@ -1,4 +1,4 @@
-#include "GameObjectsClient.h"
+#include "GameObjectClient.h"
 #include "NetworkHandler.h"
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
