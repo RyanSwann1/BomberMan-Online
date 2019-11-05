@@ -1,5 +1,5 @@
 #include "AnimatedSprite.h"
-#include "GameObjectsClient.h"
+#include "GameObjectClient.h"
 #include "Resources.h"
 #include "Texture.h"
 #include <assert.h>
