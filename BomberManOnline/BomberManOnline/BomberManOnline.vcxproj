@@ -31,12 +31,12 @@
     <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp" />
     <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp" />
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp" />
-    <ClCompile Include="PlayerClient.cpp" />
-    <ClCompile Include="src\GameObjectsClient.cpp" />
+    <ClCompile Include="src\GameObjectClient.cpp" />
     <ClCompile Include="src\Level.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\NetworkHandler.cpp" />
     <ClCompile Include="src\AnimatedSprite.cpp" />
+    <ClCompile Include="src\PlayerClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\SFML\include\SFML\Network\Packet.hpp" />
@@ -57,11 +57,11 @@
     <ClInclude Include="..\Shared\XMLParser\Base64.h" />
     <ClInclude Include="..\Shared\XMLParser\tinyxml.h" />
     <ClInclude Include="..\Shared\XMLParser\XMLParser.h" />
-    <ClInclude Include="PlayerClient.h" />
-    <ClInclude Include="src\GameObjectsClient.h" />
+    <ClInclude Include="src\GameObjectClient.h" />
     <ClInclude Include="src\Level.h" />
     <ClInclude Include="src\AnimatedSprite.h" />
     <ClInclude Include="src\NetworkHandler.h" />
+    <ClInclude Include="src\PlayerClient.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

@@ -63,16 +63,16 @@
     <ClCompile Include="src\AnimatedSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObjectsClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\GameObject.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Player.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerClient.cpp">
+    <ClCompile Include="src\PlayerClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameObjectClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -134,16 +134,16 @@
     <ClInclude Include="src\NetworkHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObjectsClient.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\GameObject.h">
       <Filter>Shared</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Player.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerClient.h">
+    <ClInclude Include="src\PlayerClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GameObjectClient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

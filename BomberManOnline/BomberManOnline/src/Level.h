@@ -3,21 +3,14 @@
 #include "NonCopyable.h"
 #include "TileLayer.h"
 #include "Box.h"
-#include "GameObjectsClient.h"
+#include "GameObjectClient.h"
+#include "PlayerClient.h"
 #include "CollidableTile.h"
 #include "Direction.h"
 #include <vector>
 #include <string>
 #include <memory>
 #include <SFML/Network.hpp>
-
-struct MovementPoint
-{
-	MovementPoint(sf::Vector2f position, eDirection moveDirection);
-
-	sf::Vector2f position;
-	eDirection moveDirection;
-};
 
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable

@@ -5,7 +5,7 @@
 #include "ServerMessages.h"
 #include <assert.h>
 #include "Utilities.h"
-#include "GameObjectsServer.h"
+#include "PlayerServer.h"
 #include "PathFinding.h"
 
 constexpr size_t MAX_CLIENTS = 4;
@@ -67,7 +67,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	}
 }
 
-const std::vector<std::unique_ptr<Player>>& Server::getPlayers() const
+const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 {
 	return m_players;
 }
@@ -141,6 +141,7 @@ void Server::addNewClient()
 		m_players.push_back(std::make_unique<PlayerServerHuman>(std::move(tcpSocket), clientID, startingPosition, m_socketSelector));
 		std::cout << "New client added to server\n";
 
+		//Player Limit Reached
 		if (m_players.size() == MAX_CLIENTS)
 		{
 			startGame();
@@ -367,7 +368,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	}
 }
 
-void Server::handlePickUpCollision(Player & player, eGameObjectType gameObjectType)
+void Server::handlePickUpCollision(PlayerServer & player, eGameObjectType gameObjectType)
 {
 	switch (gameObjectType)
 	{

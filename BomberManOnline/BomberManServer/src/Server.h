@@ -2,7 +2,7 @@
 
 #include "NonCopyable.h"
 #include "CollidableTile.h"
-#include "GameObjectsServer.h"
+#include "PlayerServer.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
@@ -23,7 +23,7 @@ class Server : private NonCopyable
 public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
-	const std::vector<std::unique_ptr<Player>>& getPlayers() const;
+	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
 	const std::vector<GameObject>& getGameObjects() const;
 	sf::Vector2i getTileSize() const;
@@ -37,7 +37,7 @@ private:
 	Server();
 	sf::TcpListener m_tcpListener;
 	sf::SocketSelector m_socketSelector;
-	std::vector<std::unique_ptr<Player>> m_players;
+	std::vector<std::unique_ptr<PlayerServer>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
@@ -59,6 +59,6 @@ private:
 	void update(float frameTime);
 	
 	void onBombExplosion(sf::Vector2f explosionPosition);
-	void handlePickUpCollision(Player& player, eGameObjectType gameObjectType);
+	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);
 	void startGame();
 };

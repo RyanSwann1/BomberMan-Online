@@ -60,14 +60,14 @@
     <ClCompile Include="src\PathFinding.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameObjectsServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\Player.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\GameObject.cpp">
       <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PlayerServer.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +122,6 @@
     <ClInclude Include="..\Shared\Player.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="src\GameObjectsServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -133,6 +130,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\GameObject.h">
       <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PlayerServer.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

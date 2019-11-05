@@ -73,17 +73,19 @@ std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGame
 		return std::unique_ptr<Level>();
 	}
 
-	//Initialize Remote Players
+	//Initialize Players
 	for (const auto& playerDetails : initialGameData.playerDetails)
 	{
+		//Create Local Player
 		if (playerDetails.ID == localClientID)
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition, ePlayerType::eLocal));
 			level->m_localPlayer = level->m_players.back().get();
 		}
+		//Create Remote Player
 		else
 		{
-			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition));
+			level->m_players.emplace_back(std::make_unique<PlayerClient>(playerDetails.ID, playerDetails.spawnPosition, ePlayerType::eRemote));
 		}
 	}
 
@@ -98,25 +100,25 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
-		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(playerPosition.x - tileSize.x, playerPosition.y), 
+		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x - tileSize.x, playerPosition.y), 
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 	
 	case sf::Keyboard::D:
-		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(playerPosition.x + tileSize.x, playerPosition.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x + tileSize.x, playerPosition.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::W:
-		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(playerPosition.x, playerPosition.y - tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y - tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::S:
-		m_localPlayer->setLocalPlayerPosition(sf::Vector2f(playerPosition.x, playerPosition.y + tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y + tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
@@ -304,7 +306,8 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->getID() == clientID; });
 			assert(remotePlayer != m_players.end());
 
-			(*remotePlayer)->setRemotePlayerPosition(newPosition);
+			(*remotePlayer)->setNewPosition(newPosition, m_collisionLayer, Textures::getInstance().getTileSheet().getTileSize(), 
+				m_localPlayerPreviousPositions);
 		}
 	}
 		break;
