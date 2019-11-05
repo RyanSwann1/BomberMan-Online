@@ -37,11 +37,3 @@ protected:
 	float m_movementSpeed;
 	Timer m_bombPlacementTimer;
 };
-
-class PlayerServer : public Player
-{
-public:
-	PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
-
-	void setNewPosition(sf::Vector2f newPosition);
-};
