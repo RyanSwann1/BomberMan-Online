@@ -16,11 +16,13 @@ enum class eAIBehaviour
 enum class eAIState
 {
 	eMakeDecision = 0,
+	eSetTargetAtBox,
 	eMoveToBox,
+	eSetTargetAtNearestPlayer,
 	eMoveToNearestPlayer,
+	eSetTargetAtSafePosition,
 	eMoveToSafePosition,
 	ePlantBomb,
-	eSetPositionAtSafeArea,
 	eWait
 };
 
@@ -46,6 +48,8 @@ private:
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
+
+	void handleAIStates(float frameTime);
 };
 
 class PlayerServerHuman : public PlayerServer

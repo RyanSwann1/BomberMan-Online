@@ -35,8 +35,68 @@ PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& se
 
 void PlayerServerAI::update(float frameTime)
 {
-	Player::update(frameTime);
+	handleAIStates(frameTime);
+	m_bombPlacementTimer.update(frameTime);
 
+	//if (m_moving)
+	//{
+	//	m_movementFactor += frameTime * m_movementSpeed;
+	//	m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
+
+	//	if (m_position == m_newPosition)
+	//	{
+	//		//m_moving = false;
+	//		//m_movementFactor = 0.0f;
+	//	}
+	//}
+
+	const auto& collisionLayer = m_server.getCollisionLayer();
+	const auto& players = m_server.getPlayers();
+	sf::Vector2i tileSize = m_server.getTileSize();
+	sf::Vector2i levelSize = m_server.getLevelSize();
+
+	if (m_moving)
+	{
+		m_movementFactor += frameTime * m_movementSpeed;
+		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
+
+		if (m_position == m_newPosition)
+		{
+			m_movementFactor = 0.0f;
+
+			if (m_pathToTile.empty())
+			{
+				m_moving = false;
+
+				if (m_currentState == eAIState::eMoveToBox)
+				{
+					m_currentState = eAIState::ePlantBomb;
+				}
+				else if (m_currentState == eAIState::eMoveToSafePosition)
+				{
+					m_currentState = eAIState::eWait;
+				}
+			}
+			else
+			{
+				if (m_currentState == eAIState::eMoveToBox)
+				{
+					if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
+					{
+						m_moving = false;
+						m_currentState = eAIState::eMakeDecision;
+					}
+				}
+
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_pathToTile.pop_back();
+			}
+		}
+	}
+}
+
+void PlayerServerAI::handleAIStates(float frameTime)
+{
 	const auto& collisionLayer = m_server.getCollisionLayer();
 	const auto& players = m_server.getPlayers();
 	sf::Vector2i tileSize = m_server.getTileSize();
@@ -59,59 +119,28 @@ void PlayerServerAI::update(float frameTime)
 				if (PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
 					targetFound = true;
-					m_currentState = eAIState::eMoveToNearestPlayer;
+					m_currentState = eAIState::eSetTargetAtNearestPlayer;
 					break;
 				}
 			}
 		}
 		if (!targetFound || m_behavour == eAIBehaviour::ePassive)
 		{
-			PathFinding::getInstance().pathToClosestBox(m_position, m_pathToTile, m_server);
-			if (!m_pathToTile.empty())
-			{
-				m_currentState = eAIState::eMoveToBox;
-				setNewPosition(m_pathToTile.back(), m_server);
-			}
+			m_currentState = eAIState::eSetTargetAtBox;
 		}
 	}
 
 	break;
-	case eAIState::eMoveToBox:
+	case eAIState::eSetTargetAtBox:
 	{
-		m_movementFactor += frameTime * m_movementSpeed;
-		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-
-		if (m_position == m_newPosition)
-		{
-			m_movementFactor = 0.0f;
-			m_previousPosition = m_position;
-
-			if (m_pathToTile.empty())
-			{
-				m_moving = false;
-				m_currentState = eAIState::ePlantBomb;
-			}
-			else
-			{
-				m_moving = true;
-				m_newPosition = m_pathToTile.back();
-				if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
-				{
-					m_moving = false;
-					m_currentState = eAIState::eMakeDecision;
-				}
-
-				m_pathToTile.pop_back();
-			}
-
-			sf::Packet globalPacket;
-			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
-			m_server.broadcastMessage(globalPacket);
-		}
+		PathFinding::getInstance().pathToClosestBox(m_position, m_pathToTile, m_server);
+		assert(!m_pathToTile.empty());
+		setNewPosition(m_pathToTile.back(), m_server);
+		m_currentState = eAIState::eMoveToBox;
 	}
 
 	break;
-	case eAIState::eMoveToNearestPlayer:
+	case eAIState::eSetTargetAtNearestPlayer:
 	{
 		if (m_position == m_newPosition)
 		{
@@ -164,43 +193,12 @@ void PlayerServerAI::update(float frameTime)
 	}
 
 	break;
-	case eAIState::eSetPositionAtSafeArea:
+	case eAIState::eSetTargetAtSafePosition:
 	{
 		PathFinding::getInstance().pathToClosestSafePosition(m_position, m_pathToTile, m_server);
 		m_currentState = eAIState::eMoveToSafePosition;
-		m_moving = true;
-
-		m_newPosition = m_pathToTile.back();
+		setNewPosition(m_pathToTile.back(), m_server);
 		m_pathToTile.pop_back();
-		m_previousPosition = m_position;
-	}
-
-	break;
-	case eAIState::eMoveToSafePosition:
-	{
-		m_movementFactor += frameTime * m_movementSpeed;
-		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-
-		if (m_position == m_newPosition)
-		{
-			m_movementFactor = 0.0f;
-
-			if (m_pathToTile.empty())
-			{
-				m_moving = false;
-				m_currentState = eAIState::eWait;
-			}
-			else
-			{
-				m_moving = true;
-				m_newPosition = m_pathToTile.back();
-				m_pathToTile.pop_back();
-			}
-
-			sf::Packet globalPacket;
-			globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_position.x << m_position.y << m_ID;
-			m_server.broadcastMessage(globalPacket);
-		}
 	}
 
 	break;
@@ -217,7 +215,7 @@ void PlayerServerAI::update(float frameTime)
 			m_server.broadcastMessage(packetToSend);
 			m_server.placeBomb(m_position);
 
-			m_currentState = eAIState::eSetPositionAtSafeArea;
+			m_currentState = eAIState::eSetTargetAtSafePosition;
 		}
 	}
 
