@@ -38,18 +38,6 @@ void PlayerServerAI::update(float frameTime)
 	handleAIStates(frameTime);
 	m_bombPlacementTimer.update(frameTime);
 
-	//if (m_moving)
-	//{
-	//	m_movementFactor += frameTime * m_movementSpeed;
-	//	m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-
-	//	if (m_position == m_newPosition)
-	//	{
-	//		//m_moving = false;
-	//		//m_movementFactor = 0.0f;
-	//	}
-	//}
-
 	const auto& collisionLayer = m_server.getCollisionLayer();
 	const auto& players = m_server.getPlayers();
 	sf::Vector2i tileSize = m_server.getTileSize();
