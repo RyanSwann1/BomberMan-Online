@@ -128,6 +128,11 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 	return false;
 }
 
+bool PathFinding::isPositionReachableWithinRange(sf::Vector2f source, sf::Vector2f target, const Server& server, int range)
+{
+	return false;
+}
+
 void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	sf::Vector2i levelSize = server.getLevelSize();
@@ -194,7 +199,6 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f
 {
 	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
-	const auto& collisionLayer = server.getCollisionLayer();
 
 	pathToTile.clear();
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
@@ -216,7 +220,7 @@ void PathFinding::pathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f
 		getNeighbouringPoints(lastPosition, neighbours, server);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
+			if (server.getCollisionLayer()[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
 			{
 				if (boxSelection.size() < MAX_BOX_SELECTION)
 				{

@@ -28,6 +28,7 @@ public:
 	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
+	bool isPositionReachableWithinRange(sf::Vector2f source, sf::Vector2f target, const Server& server, int range);
 
 	void getPathToTile(sf::Vector2f source, sf::Vector2f destination, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
