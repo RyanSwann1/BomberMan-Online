@@ -12,18 +12,22 @@ PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControl
 	: Player(ID, startingPosition, controllerType)
 {}
 
-void PlayerServer::setNewPosition(sf::Vector2f newPosition)
+void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 {
 	m_newPosition = newPosition;
 	m_previousPosition = m_position;
 	m_moving = true;
+
+	sf::Packet globalPacket;
+	globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
+	server.broadcastMessage(globalPacket);
 }
 
 //Player AI
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
 	: PlayerServer(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
-	m_behavour(eAIBehaviour::eAggressive),
+	m_behavour(eAIBehaviour::ePassive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f)
@@ -66,15 +70,7 @@ void PlayerServerAI::update(float frameTime)
 			if (!m_pathToTile.empty())
 			{
 				m_currentState = eAIState::eMoveToBox;
-				m_moving = true;
-
-				m_newPosition = m_pathToTile.back();
-				m_pathToTile.pop_back();
-				m_previousPosition = m_position;
-
-				sf::Packet globalPacket;
-				globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
-				m_server.broadcastMessage(globalPacket);
+				setNewPosition(m_pathToTile.back(), m_server);
 			}
 		}
 	}
@@ -87,8 +83,7 @@ void PlayerServerAI::update(float frameTime)
 
 		if (m_position == m_newPosition)
 		{
-			
-			m_movementFactor = 0;
+			m_movementFactor = 0.0f;
 			m_previousPosition = m_position;
 
 			if (m_pathToTile.empty())

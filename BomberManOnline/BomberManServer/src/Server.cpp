@@ -231,11 +231,7 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 	//Valid Move
 	else
 	{
-		client.setNewPosition(playerMoveMessage.newPosition);
-
-		sf::Packet globalPacket;
-		globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << playerMoveMessage.newPosition.x << playerMoveMessage.newPosition.y << client.getID();
-		broadcastMessage(globalPacket);
+		client.setNewPosition(playerMoveMessage.newPosition, *this);
 	}
 }
 

@@ -24,15 +24,15 @@ enum class eAIState
 	eWait
 };
 
+class Server;
 class PlayerServer : public Player
 {
 public:
 	PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 
-	void setNewPosition(sf::Vector2f newPosition);
+	void setNewPosition(sf::Vector2f newPosition, Server& server);
 };
 
-class Server;
 class PlayerServerAI : public PlayerServer
 {
 public:
