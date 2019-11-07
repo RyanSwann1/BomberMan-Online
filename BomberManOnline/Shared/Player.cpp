@@ -5,10 +5,9 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	: m_ID(ID),
 	m_previousPosition(),
 	m_position(startingPosition),
-	m_newPosition(),
+	m_newPosition(startingPosition),
 	m_controllerType(controllerType),
 	m_moveDirection(),
-	m_moving(false),
 	m_movementFactor(0.0f),
 	m_movementSpeed(2.5f),
 	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
@@ -21,7 +20,7 @@ Timer & Player::getBombPlacementTimer()
 
 bool Player::isMoving() const
 {
-	return m_moving;
+	return m_position != m_newPosition;
 }
 
 ePlayerControllerType Player::getControllerType() const
@@ -53,14 +52,13 @@ void Player::update(float deltaTime)
 {
 	m_bombPlacementTimer.update(deltaTime);
 
-	if (m_moving)
+	if (isMoving())
 	{
 		m_movementFactor += deltaTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
 
 		if (m_position == m_newPosition)
 		{
-			m_moving = false;
 			m_movementFactor = 0.0f;
 		}
 	}
@@ -68,7 +66,6 @@ void Player::update(float deltaTime)
 
 void Player::stop()
 {
-	m_moving = false;
 	m_movementFactor = 0.0f;
 }
 

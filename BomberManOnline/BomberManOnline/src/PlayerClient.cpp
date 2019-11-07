@@ -17,7 +17,7 @@ void PlayerClient::update(float deltaTime)
 {
 	Player::update(deltaTime);
 
-	if (m_moving)
+	if (isMoving())
 	{
 		m_sprite.setPosition(m_position);
 		m_sprite.update(deltaTime);
@@ -34,11 +34,10 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 {
 	if (m_playerType == ePlayerType::eLocal)
 	{
-		if (!m_moving && !Utilities::isPositionCollidable(collisionLayer, newPosition, tileSize))
+		if (!isMoving() && !Utilities::isPositionCollidable(collisionLayer, newPosition, tileSize))
 		{
 			m_newPosition = newPosition;
 			m_previousPosition = m_position;
-			m_moving = true;
 
 			//Assign new movement direction
 			if (newPosition.x > m_position.x)
@@ -74,7 +73,6 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 		m_movementFactor = 0.0f;
 		m_newPosition = newPosition;
 		m_previousPosition = m_position;
-		m_moving = true;
 
 		//Assign new movement direction
 		if (newPosition.x > m_position.x)
@@ -102,7 +100,7 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 
 void PlayerClient::plantBomb()
 {
-	if (!m_moving && m_bombPlacementTimer.isExpired())
+	if (!isMoving() && m_bombPlacementTimer.isExpired())
 	{
 		m_bombPlacementTimer.resetElaspedTime();
 
@@ -116,6 +114,5 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 {
 	m_position = position;
 	m_previousPosition = position;
-	m_moving = false;
 	m_movementFactor = 0.0f;
 }

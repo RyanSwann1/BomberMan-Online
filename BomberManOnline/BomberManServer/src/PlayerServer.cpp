@@ -16,7 +16,6 @@ void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 {
 	m_newPosition = newPosition;
 	m_previousPosition = m_position;
-	m_moving = true;
 
 	sf::Packet globalPacket;
 	globalPacket << static_cast<int>(eServerMessageType::eNewPlayerPosition) << m_newPosition.x << m_newPosition.y << m_ID;
@@ -43,7 +42,7 @@ void PlayerServerAI::update(float frameTime)
 	sf::Vector2i tileSize = m_server.getTileSize();
 	sf::Vector2i levelSize = m_server.getLevelSize();
 
-	if (m_moving)
+	if (isMoving())
 	{
 		m_movementFactor += frameTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
@@ -54,8 +53,6 @@ void PlayerServerAI::update(float frameTime)
 
 			if (m_pathToTile.empty())
 			{
-				m_moving = false;
-
 				if (m_currentState == eAIState::eMoveToBox)
 				{
 					m_currentState = eAIState::ePlantBomb;
@@ -71,7 +68,6 @@ void PlayerServerAI::update(float frameTime)
 				{
 					if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
 					{
-						m_moving = false;
 						m_currentState = eAIState::eMakeDecision;
 					}
 				}
@@ -79,6 +75,17 @@ void PlayerServerAI::update(float frameTime)
 				setNewPosition(m_pathToTile.back(), m_server);
 				m_pathToTile.pop_back();
 			}
+		}
+	}
+	else if (m_pathToTile.empty())
+	{
+		if (m_currentState == eAIState::eMoveToBox)
+		{
+			m_currentState = eAIState::ePlantBomb;
+		}
+		else if (m_currentState == eAIState::eMoveToSafePosition)
+		{
+			m_currentState = eAIState::eWait;
 		}
 	}
 }
@@ -164,12 +171,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 			if (m_pathToTile.empty())
 			{
-				m_moving = false;
 				m_currentState = eAIState::ePlantBomb;
 			}
 			else
 			{
-				m_moving = true;
 				m_newPosition = m_pathToTile.back();
 				m_pathToTile.pop_back();
 			}
