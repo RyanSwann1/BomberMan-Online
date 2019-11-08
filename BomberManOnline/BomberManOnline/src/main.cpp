@@ -17,6 +17,13 @@
 
 //https://www.bogotobogo.com/DesignPatterns/introduction.php
 
+
+//Important video to watch
+//https://www.youtube.com/watch?v=EU81tjgoKoI
+
+//https://www.reddit.com/r/gamedev/comments/3krwlr/is_it_just_me_or_is_networking_really_hard_gaffer/
+
+
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(336, 336), "SFML_WINDOW", sf::Style::Default);
