@@ -46,46 +46,35 @@ void PlayerServerAI::update(float frameTime)
 	{
 		m_movementFactor += frameTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-
-		if (m_position == m_newPosition)
-		{
-			m_movementFactor = 0.0f;
-
-			if (m_pathToTile.empty())
-			{
-				if (m_currentState == eAIState::eMoveToBox)
-				{
-					m_currentState = eAIState::ePlantBomb;
-				}
-				else if (m_currentState == eAIState::eMoveToSafePosition)
-				{
-					m_currentState = eAIState::eWait;
-				}
-			}
-			else
-			{
-				if (m_currentState == eAIState::eMoveToBox)
-				{
-					if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
-					{
-						m_currentState = eAIState::eMakeDecision;
-					}
-				}
-
-				setNewPosition(m_pathToTile.back(), m_server);
-				m_pathToTile.pop_back();
-			}
-		}
 	}
-	else if (m_pathToTile.empty())
+
+	if (m_position == m_newPosition)
 	{
-		if (m_currentState == eAIState::eMoveToBox)
+		m_movementFactor = 0.0f;
+
+		if (m_pathToTile.empty())
 		{
-			m_currentState = eAIState::ePlantBomb;
+			if (m_currentState == eAIState::eMoveToBox)
+			{
+				m_currentState = eAIState::ePlantBomb;
+			}
+			else if (m_currentState == eAIState::eMoveToSafePosition)
+			{
+				m_currentState = eAIState::eWait;
+			}
 		}
-		else if (m_currentState == eAIState::eMoveToSafePosition)
+		else
 		{
-			m_currentState = eAIState::eWait;
+			if (m_currentState == eAIState::eMoveToBox)
+			{
+				if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
+				{
+					m_currentState = eAIState::eMakeDecision;
+				}
+			}
+
+			setNewPosition(m_pathToTile.back(), m_server);
+			m_pathToTile.pop_back();
 		}
 	}
 }
