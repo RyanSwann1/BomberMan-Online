@@ -2,6 +2,14 @@
 #include <assert.h>
 #include <iostream>
 
+NetworkHandler::NetworkHandler()
+	: m_receivedPackets(),
+	m_tcpSocket(),
+	m_connectedToServer(false),
+	m_listenThread(),
+	m_mutex()
+{}
+
 std::vector<sf::Packet>& NetworkHandler::getNetworkMessages()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
@@ -19,6 +27,7 @@ bool NetworkHandler::connectToServer()
 
 	m_connectedToServer = true;
 	m_listenThread = std::thread(&NetworkHandler::listen, this);
+
 	return true;
 }
 

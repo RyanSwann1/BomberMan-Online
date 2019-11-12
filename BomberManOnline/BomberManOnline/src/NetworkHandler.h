@@ -2,13 +2,14 @@
 
 #include <SFML/Network.hpp>
 #include "ServerMessageType.h"
+#include "NonCopyable.h"
 #include <vector>
 #include <thread>
 #include <atomic>
 #include <mutex>
 #include <memory>
 
-class NetworkHandler
+class NetworkHandler : private NonCopyable
 {
 public:
 	static NetworkHandler& getInstance()
@@ -24,7 +25,7 @@ public:
 	void sendMessageToServer(sf::Packet& packetToSend);
 
 private:
-	NetworkHandler() {}
+	NetworkHandler();
 	std::vector<sf::Packet> m_receivedPackets;
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 	std::atomic<bool> m_connectedToServer;

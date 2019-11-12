@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NonCopyable.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -14,7 +15,7 @@ struct GraphNode
 
 class Server;
 enum class eCollidableTile;
-class PathFinding
+class PathFinding : private NonCopyable
 {
 public:
 	static PathFinding& getInstance()
@@ -38,6 +39,7 @@ public:
 	void getPathToClosestSafePosition(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
 private:
+	PathFinding() {}
 	std::vector<std::vector<GraphNode>> m_graph;
 
 	std::vector<sf::Vector2i> getPathToTile(sf::Vector2f source, sf::Vector2f destination, const Server& server);
