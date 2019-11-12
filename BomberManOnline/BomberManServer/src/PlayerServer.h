@@ -22,6 +22,8 @@ enum class eAIState
 	eMoveToNearestPlayer,
 	eSetTargetAtSafePosition,
 	eMoveToSafePosition,
+	eSetTargetAtPickUp,
+	eMoveToPickUp,
 	ePlantBomb,
 	eWait
 };
