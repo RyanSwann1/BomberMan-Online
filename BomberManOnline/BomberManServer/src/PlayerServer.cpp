@@ -7,6 +7,8 @@
 #include <iostream>
 #include <assert.h>
 
+constexpr int PICK_UP_SEARCH_RANGE = 5;
+
 //Player Server
 PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
 	: Player(ID, startingPosition, controllerType)
@@ -91,16 +93,12 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	case eAIState::eMakeDecision:
 	{
 		bool targetFound = false;
+
 		if (m_behavour == eAIBehaviour::eAggressive)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
-				if (targetPlayer->getID() == m_ID)
-				{
-					continue;
-				}
-
-				if (PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
+				if (targetPlayer->getID() != m_ID && PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
 					targetFound = true;
 					m_currentState = eAIState::eSetTargetAtNearestPlayer;
@@ -110,14 +108,15 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		}
 		if (!targetFound || m_behavour == eAIBehaviour::ePassive)
 		{
-			m_currentState = eAIState::eSetTargetAtBox;
+			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
+			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eSetTargetAtPickUp);
 		}
 	}
 
 	break;
 	case eAIState::eSetTargetAtBox:
 	{
-		PathFinding::getInstance().pathToClosestBox(m_position, m_pathToTile, m_server);
+		PathFinding::getInstance().getPathToClosestBox(m_position, m_pathToTile, m_server);
 		assert(!m_pathToTile.empty());
 		setNewPosition(m_pathToTile.back(), m_server);
 		m_currentState = eAIState::eMoveToBox;
@@ -177,7 +176,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetTargetAtSafePosition:
 	{
-		PathFinding::getInstance().pathToClosestSafePosition(m_position, m_pathToTile, m_server);
+		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
 		m_currentState = eAIState::eMoveToSafePosition;
 		setNewPosition(m_pathToTile.back(), m_server);
 		m_pathToTile.pop_back();
