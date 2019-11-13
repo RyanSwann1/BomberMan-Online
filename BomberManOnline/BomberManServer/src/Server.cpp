@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_CLIENTS = 4;
-constexpr int MAX_AI_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 3;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()

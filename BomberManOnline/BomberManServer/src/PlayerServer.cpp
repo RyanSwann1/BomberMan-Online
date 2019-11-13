@@ -93,7 +93,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	case eAIState::eMakeDecision:
 	{
 		bool targetFound = false;
-
 		if (m_behavour == eAIBehaviour::eAggressive)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())

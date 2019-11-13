@@ -20,7 +20,6 @@ GraphNode::GraphNode(sf::Vector2i cameFrom)
 {}
 
 void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph);
-
 void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, const Server& server);
 
 void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph)
@@ -34,14 +33,12 @@ void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& gra
 	}
 }
 
-void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, const Server& server)
+void getNonCollidableNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, const Server& server)
 {
-	sf::Vector2i levelSize = server.getLevelSize();
-	const auto& collisionLayer = server.getCollisionLayer();
-
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		if (x >= 0 && x < levelSize.x && collisionLayer[position.y][x] != eCollidableTile::eWall)
+		if (x >= 0 && x < server.getLevelSize().x && server.getCollisionLayer()[position.y][x] != eCollidableTile::eWall
+			&& server.getCollisionLayer()[position.y][x] != eCollidableTile::eBox)
 		{
 			neighbours.emplace_back(x, position.y);
 		}
@@ -49,7 +46,27 @@ void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& nei
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		if (y >= 0 && y < levelSize.y && collisionLayer[y][position.x] != eCollidableTile::eWall)
+		if (y >= 0 && y < server.getLevelSize().y && server.getCollisionLayer()[y][position.x] != eCollidableTile::eWall
+			&& server.getCollisionLayer()[position.x][y] != eCollidableTile::eBox)
+		{
+			neighbours.emplace_back(position.x, y);
+		}
+	}
+}
+
+void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& neighbours, const Server& server)
+{
+	for (int x = position.x - 1; x <= position.x + 1; x += 2)
+	{
+		if (x >= 0 && x < server.getLevelSize().x && server.getCollisionLayer()[position.y][x] != eCollidableTile::eWall)
+		{
+			neighbours.emplace_back(x, position.y);
+		}
+	}
+
+	for (int y = position.y - 1; y <= position.y + 1; y += 2)
+	{
+		if (y >= 0 && y < server.getLevelSize().y && server.getCollisionLayer()[y][position.x] != eCollidableTile::eWall)
 		{
 			neighbours.emplace_back(position.x, y);
 		}
@@ -155,14 +172,9 @@ void PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, s
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbouringPoints(lastPosition, neighbours, server);
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server);
 		for (auto& neighbourPosition : neighbours)
 		{
-			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
-			{
-				continue;
-			}
-
 			if (pathToTile.empty())
 			{
 				if (Utilities::distance(neighbourPosition, positionAtDestination) < Utilities::distance(positionAtSource, positionAtDestination))
@@ -268,15 +280,11 @@ void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vecto
 
 void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range)
 {
-	sf::Vector2i levelSize = server.getLevelSize();
-	sf::Vector2i tileSize = server.getTileSize();
-	const auto& collisionLayer = server.getCollisionLayer();
-
 	pathToTile.clear();
-	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
-	resetGraph(levelSize, m_graph);
+	resetGraph(server.getLevelSize(), m_graph);
 
 	std::queue<sf::Vector2i> frontier;
+	sf::Vector2i positionAtSource(source.x / server.getTileSize().x, source.y / server.getTileSize().y);
 	frontier.push(positionAtSource);
 
 	std::vector<sf::Vector2i> neighbours;
@@ -288,11 +296,10 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Ve
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
 
-		getNeighbouringPoints(lastPosition, neighbours, server);
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (server.getCollisionLayer()[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox ||
-				getPathToTile(source, sf::Vector2f(neighbourPosition.x, neighbourPosition.y), server).size() > range)
+			if (getPathToTile(source, sf::Vector2f(neighbourPosition.x, neighbourPosition.y), server).size() > range)
 			{
 				continue;
 			}
@@ -304,7 +311,6 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Ve
 				{
 					return gameObject.getPosition() == position && gameObject.getType() == eGameObjectType::eMovementPickUp;
 				});
-
 			if (cIter != server.getGameObjects().cend())
 			{
 				searchForPickUp = false;
@@ -312,18 +318,18 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Ve
 				return;
 			}
 		}
+
+		neighbours.clear();
 	}
 }
 
 void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
-	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
-	const auto& collisionLayer = server.getCollisionLayer();
 
 	pathToTile.clear();
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
-	resetGraph(levelSize, m_graph);
+	resetGraph(server.getLevelSize(), m_graph);
 
 	std::queue<sf::Vector2i> frontier;
 	frontier.push(positionAtSource);
@@ -336,14 +342,9 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbouringPoints(lastPosition, neighbours, server);
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
-			{
-				continue;
-			}
-
 			if (neighbourPosition.x != positionAtSource.x && neighbourPosition.y != positionAtSource.y)
 			{
 				pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
@@ -386,13 +387,10 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 
 std::vector<sf::Vector2i> PathFinding::getPathToTile(sf::Vector2f source, sf::Vector2f destination, const Server& server)
 {
-	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
-	const auto& collisionLayer = server.getCollisionLayer();
-
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
-	sf::Vector2i positionAtDestination(destination.x / tileSize.x, destination.y / tileSize.y);
-	resetGraph(levelSize, m_graph);
+	sf::Vector2i positionAtDestination(destination.x, destination.y);
+	resetGraph(server.getLevelSize(), m_graph);
 
 	std::queue<sf::Vector2i> frontier;
 	frontier.push(positionAtSource);
@@ -406,14 +404,9 @@ std::vector<sf::Vector2i> PathFinding::getPathToTile(sf::Vector2f source, sf::Ve
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
-		getNeighbouringPoints(lastPosition, neighbours, server);
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server);
 		for (auto& neighbourPosition : neighbours)
 		{
-			if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
-			{
-				continue;
-			}
-
 			if (pathToTile.empty())
 			{
 				if (Utilities::distance(neighbourPosition, positionAtDestination) < Utilities::distance(positionAtSource, positionAtDestination))
