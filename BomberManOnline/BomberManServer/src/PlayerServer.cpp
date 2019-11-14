@@ -110,7 +110,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
 			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eSetTargetAtPickUp);
 
-			m_currentState = eAIState::eSetTargetAtBox;
+			//m_currentState = eAIState::eSetTargetAtBox;
 		}
 	}
 
@@ -178,6 +178,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	case eAIState::eSetTargetAtSafePosition:
 	{
 		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+		assert(!m_pathToTile.empty());
 		m_currentState = eAIState::eMoveToSafePosition;
 		setNewPosition(m_pathToTile.back(), m_server);
 		m_pathToTile.pop_back();
