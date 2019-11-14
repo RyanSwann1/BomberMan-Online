@@ -18,11 +18,11 @@ class Graph
 public:
 	Graph();
 
-	void createGraph(sf::Vector2i levelSize);
+	const std::vector<std::vector<GraphNode>>& getGraph() const;
+	GraphNode getGraphNode(sf::Vector2i position, sf::Vector2i levelSize);
 
-	void resetGraph(sf::Vector2i levelSize, std::vector<std::vector<GraphNode>>& graph);
-	void addToGraph(std::vector<std::vector<GraphNode>>& graph, sf::Vector2i position, sf::Vector2i levelSize);
-	GraphNode getGraphNode(sf::Vector2i position, sf::Vector2i levelSize, const std::vector<std::vector<GraphNode>>& graph);
+	void resetGraph(sf::Vector2i levelSize);
+	void addToGraph(sf::Vector2i position, sf::Vector2i lastPosition, sf::Vector2i levelSize);
 
 private:
 	std::vector<std::vector<GraphNode>> m_graph;
