@@ -8,8 +8,8 @@
 #include "PlayerServer.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_CLIENTS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr size_t MAX_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 1;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -26,9 +26,9 @@ Server::Server()
 	m_currentState(eServerState::eLobby),
 	m_running(false)
 {
-	m_players.reserve(MAX_CLIENTS);
-	m_clientsToRemove.reserve(MAX_CLIENTS);
-	m_spawnPositions.reserve(MAX_CLIENTS);
+	m_players.reserve(MAX_PLAYERS);
+	m_clientsToRemove.reserve(MAX_PLAYERS);
+	m_spawnPositions.reserve(MAX_PLAYERS);
 }
 
 std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned short portNumber)
@@ -142,7 +142,7 @@ void Server::addNewClient()
 		std::cout << "New client added to server\n";
 
 		//Player Limit Reached
-		if (m_players.size() == MAX_CLIENTS)
+		if (m_players.size() == MAX_PLAYERS)
 		{
 			startGame();
 		}
@@ -343,7 +343,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 			broadcastMessage(packetToSend);
 
-			if (Utilities::getRandomNumber(0, 10) > 7)
+			if (Utilities::getRandomNumber(0, 10) >= 0)
 			{
 				packetToSend.clear();
 				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
@@ -382,7 +382,7 @@ void Server::handlePickUpCollision(PlayerServer & player, eGameObjectType gameOb
 
 void Server::startGame()
 {
-	assert(m_players.size() == MAX_CLIENTS);
+	assert(m_players.size() == MAX_PLAYERS);
 
 	m_currentState = eServerState::eGame;
 
