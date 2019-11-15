@@ -64,6 +64,10 @@ void PlayerServerAI::update(float frameTime)
 			{
 				m_currentState = eAIState::eWait;
 			}
+			else if (m_currentState == eAIState::eMoveToPickUp)
+			{
+				m_currentState = eAIState::eMakeDecision;
+			}
 		}
 		else
 		{
@@ -107,10 +111,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		}
 		if (!targetFound || m_behavour == eAIBehaviour::ePassive)
 		{
-			//PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
-			//(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eSetTargetAtPickUp);
-
-			m_currentState = eAIState::eSetTargetAtBox;
+			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
+			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
 		}
 	}
 
