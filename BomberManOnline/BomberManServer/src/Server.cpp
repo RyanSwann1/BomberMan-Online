@@ -8,8 +8,8 @@
 #include "PlayerServer.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 2;
-constexpr int MAX_AI_PLAYERS = 1;
+constexpr size_t MAX_PLAYERS = 4;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -70,6 +70,11 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 {
 	return m_players;
+}
+
+const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() const
+{
+	return m_collisionLayer;
 }
 
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
@@ -222,7 +227,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	//Invalid Move
-	if (Utilities::isPositionCollidable(*this, playerMoveMessage.newPosition))
+	if (Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
@@ -242,7 +247,8 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
 	Timer& clientBombPlacementTimer = client.getBombPlacementTimer();
-	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(*this, placementPosition))
+	//bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
+	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
