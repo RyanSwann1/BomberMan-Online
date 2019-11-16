@@ -17,8 +17,8 @@ void getNonCollidableNeighbouringPoints(sf::Vector2i position, std::vector<sf::V
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		if (x >= 0 && x < server.getLevelSize().x && server.getCollisionLayer()[position.y][x] != eCollidableTile::eWall
-			&& server.getCollisionLayer()[position.y][x] != eCollidableTile::eBox &&
+		if (x >= 0 && x < server.getLevelSize().x && server.getCollidableTile({ x, position.y }) != eCollidableTile::eWall
+			&& server.getCollidableTile({ x, position.y }) != eCollidableTile::eBox &&
 			sf::Vector2i(x, position.y) != ignorePosition)
 		{
 			neighbours.emplace_back(x, position.y);
@@ -27,8 +27,8 @@ void getNonCollidableNeighbouringPoints(sf::Vector2i position, std::vector<sf::V
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		if (y >= 0 && y < server.getLevelSize().y && server.getCollisionLayer()[y][position.x] != eCollidableTile::eWall
-			&& server.getCollisionLayer()[y][position.x] != eCollidableTile::eBox &&
+		if (y >= 0 && y < server.getLevelSize().y && server.getCollidableTile({ position.x, y }) != eCollidableTile::eWall
+			&& server.getCollidableTile({ position.x, y }) != eCollidableTile::eBox && 
 			sf::Vector2i(position.x, y) != ignorePosition)
 		{
 			neighbours.emplace_back(position.x, y);
@@ -40,7 +40,7 @@ void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& nei
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		if (x >= 0 && x < server.getLevelSize().x && server.getCollisionLayer()[position.y][x] != eCollidableTile::eWall)
+		if (x >= 0 && x < server.getLevelSize().x && server.getCollidableTile({ x, position.y }) != eCollidableTile::eWall)
 		{
 			neighbours.emplace_back(x, position.y);
 		}
@@ -48,7 +48,7 @@ void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& nei
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		if (y >= 0 && y < server.getLevelSize().y && server.getCollisionLayer()[y][position.x] != eCollidableTile::eWall)
+		if (y >= 0 && y < server.getLevelSize().y && server.getCollidableTile({ position.x, y }) != eCollidableTile::eWall)
 		{
 			neighbours.emplace_back(position.x, y);
 		}
@@ -142,7 +142,6 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 {
 	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
-	const auto& collisionLayer = server.getCollisionLayer();
 
 	m_graph.resetGraph(levelSize);
 
@@ -165,7 +164,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 			{
 				return true;
 			}
-			else if (collisionLayer[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eNonCollidable &&
+			else if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eNonCollidable &&
 				!m_graph.getGraphNode(neighbourPosition, server.getLevelSize()).visited)
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
@@ -208,7 +207,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vecto
 		getNeighbouringPoints(lastPosition, neighbours, server);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (server.getCollisionLayer()[neighbourPosition.y][neighbourPosition.x] == eCollidableTile::eBox)
+			if(server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox)
 			{
 				if (boxSelection.size() < MAX_BOX_SELECTION)
 				{

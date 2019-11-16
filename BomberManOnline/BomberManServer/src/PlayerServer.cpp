@@ -39,7 +39,6 @@ void PlayerServerAI::update(float frameTime)
 	handleAIStates(frameTime);
 	m_bombPlacementTimer.update(frameTime);
 
-	const auto& collisionLayer = m_server.getCollisionLayer();
 	const auto& players = m_server.getPlayers();
 	sf::Vector2i tileSize = m_server.getTileSize();
 	sf::Vector2i levelSize = m_server.getLevelSize();
@@ -73,7 +72,7 @@ void PlayerServerAI::update(float frameTime)
 		{
 			if (m_currentState == eAIState::eMoveToBox)
 			{
-				if (!Utilities::isPositionNeighbouringBox(collisionLayer, m_pathToTile.front(), tileSize, levelSize))
+				if (!Utilities::isPositionNeighbouringBox(m_server, m_pathToTile.front()))
 				{
 					m_currentState = eAIState::eMakeDecision;
 				}
@@ -87,7 +86,6 @@ void PlayerServerAI::update(float frameTime)
 
 void PlayerServerAI::handleAIStates(float frameTime)
 {
-	const auto& collisionLayer = m_server.getCollisionLayer();
 	const auto& players = m_server.getPlayers();
 	sf::Vector2i tileSize = m_server.getTileSize();
 	sf::Vector2i levelSize = m_server.getLevelSize();

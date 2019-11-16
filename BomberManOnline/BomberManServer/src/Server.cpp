@@ -74,8 +74,11 @@ const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
 {
-	if()
-	return m_collisionLayer[position.y][position.x];
+	assert(position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y);
+	if (position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y)
+	{
+		return m_collisionLayer[position.y][position.x];
+	}
 }
 
 const std::vector<GameObject>& Server::getGameObjects() const
@@ -219,7 +222,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
 	//Invalid Move
-	if (Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
+	if (Utilities::isPositionCollidable(*this, playerMoveMessage.newPosition))
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
@@ -239,7 +242,7 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
 	Timer& clientBombPlacementTimer = client.getBombPlacementTimer();
-	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
+	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(*this, placementPosition))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
