@@ -345,24 +345,24 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 		{
 			if (neighbourPosition.x != positionAtSource.x && neighbourPosition.y != positionAtSource.y)
 			{
-				getPathtoTile(neighbourPosition, lastPosition, server, positionAtSource, pathToTile);
-				//pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
-				//pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
-				//safePositionFound = true;
-				//sf::Vector2i comeFrom = lastPosition;
-				//bool pathCompleted = false;
-				//while (!pathCompleted)
-				//{
-				//	comeFrom = m_graph.getGraphNode(comeFrom, server.getLevelSize()).cameFrom; 
-				//	if (comeFrom != positionAtSource)
-				//	{
-				//		pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
-				//	}
-				//	else
-				//	{
-				//		pathCompleted = true;
-				//	}
-				//}
+				//getPathtoTile(neighbourPosition, lastPosition, server, positionAtSource, pathToTile);
+				pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
+				pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
+				safePositionFound = true;
+				sf::Vector2i comeFrom = lastPosition;
+				bool pathCompleted = false;
+				while (!pathCompleted)
+				{
+					comeFrom = m_graph.getGraphNode(comeFrom, server.getLevelSize()).cameFrom; 
+					if (comeFrom != positionAtSource)
+					{
+						pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
+					}
+					else
+					{
+						pathCompleted = true;
+					}
+				}
 				break;
 			}
 			else
