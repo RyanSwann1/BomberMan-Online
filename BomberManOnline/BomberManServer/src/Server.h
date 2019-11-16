@@ -24,7 +24,7 @@ public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
-	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
+	eCollidableTile getCollidableTile(sf::Vector2i position) const;
 	const std::vector<GameObject>& getGameObjects() const;
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;

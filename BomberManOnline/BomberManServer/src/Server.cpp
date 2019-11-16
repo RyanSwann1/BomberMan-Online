@@ -72,9 +72,10 @@ const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 	return m_players;
 }
 
-const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() const
+eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
 {
-	return m_collisionLayer;
+	if()
+	return m_collisionLayer[position.y][position.x];
 }
 
 const std::vector<GameObject>& Server::getGameObjects() const
