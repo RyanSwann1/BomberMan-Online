@@ -345,7 +345,6 @@ void Server::update(float frameTime)
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
 	assert(explosionPosition.x >= 0 && explosionPosition.x < m_levelSize.x * m_tileSize.x && explosionPosition.y >= 0 && explosionPosition.y < m_levelSize.y * m_tileSize.y);
-	
 	if (explosionPosition.x >= 0 && explosionPosition.x < m_levelSize.x * m_tileSize.x && explosionPosition.y >= 0 && explosionPosition.y < m_levelSize.y * m_tileSize.y)
 	{
 		if (m_collisionLayer[static_cast<int>(explosionPosition.y / m_tileSize.y)][static_cast<int>(explosionPosition.x / m_tileSize.x)] == eCollidableTile::eBox)
@@ -355,7 +354,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 			broadcastMessage(packetToSend);
 
-			if (Utilities::getRandomNumber(0, 10) >= 0)
+			if (Utilities::getRandomNumber(0, 10) >= 7)
 			{
 				packetToSend.clear();
 				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
