@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -249,7 +249,6 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
 	Timer& clientBombPlacementTimer = client.getBombPlacementTimer();
-	//bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
 	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
 	{
 		ServerMessageBombPlacement bombPlacementMessage;

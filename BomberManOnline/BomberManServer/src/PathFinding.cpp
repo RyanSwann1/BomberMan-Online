@@ -279,7 +279,6 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Ve
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 				frontier.push(neighbourPosition);
-				std::cout << neighbourPosition.x << " " << neighbourPosition.y << "\n";
 			}
 
 			if (getPathToTile(neighbourPosition, lastPosition, server, positionAtSource).size() 
