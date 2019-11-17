@@ -40,8 +40,7 @@ void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& nei
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
-		if (x >= 0 && x < server.getLevelSize().x && server.getCollidableTile({ x, position.y }) != eCollidableTile::eWall &&
-			sf::Vector2i(x, position.y) != ignorePosition)
+		if (x >= 0 && x < server.getLevelSize().x && sf::Vector2i(x, position.y) != ignorePosition)
 		{
 			neighbours.emplace_back(x, position.y);
 		}
@@ -49,8 +48,7 @@ void getNeighbouringPoints(sf::Vector2i position, std::vector<sf::Vector2i>& nei
 
 	for (int y = position.y - 1; y <= position.y + 1; y += 2)
 	{
-		if (y >= 0 && y < server.getLevelSize().y && server.getCollidableTile({ position.x, y }) != eCollidableTile::eWall &&
-			sf::Vector2i(position.x, y) != ignorePosition)
+		if (y >= 0 && y < server.getLevelSize().y && sf::Vector2i(position.x, y) != ignorePosition)
 		{
 			neighbours.emplace_back(position.x, y);
 		}
@@ -71,8 +69,7 @@ GraphNode::GraphNode(sf::Vector2i cameFrom)
 //Graph
 Graph::Graph()
 	: m_graph()
-{
-}
+{}
 
 void Graph::addToGraph(sf::Vector2i position, sf::Vector2i lastPosition, sf::Vector2i levelSize)
 {
@@ -223,21 +220,19 @@ void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vecto
 				continue;
 			}
 
-			if(server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox)
+			if (!m_graph.getGraphNode(neighbourPosition, server.getLevelSize()).visited)
 			{
-				if (boxSelection.size() < MAX_BOX_SELECTION)
+				if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox &&
+					boxSelection.size() < MAX_BOX_SELECTION)
 				{
-					m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 					boxSelection.push_back(neighbourPosition);
 				}
-			}
-			else
-			{
-				if (!m_graph.getGraphNode(neighbourPosition, server.getLevelSize()).visited)
+				else
 				{
-					m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 					frontier.push(neighbourPosition);
 				}
+
+				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 			}
 		}
 
@@ -247,23 +242,13 @@ void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vecto
 	if (!boxSelection.empty())
 	{
 		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
-		lastPosition = m_graph.getGraphNode(sf::Vector2i(boxSelection[randNumb].x, boxSelection[randNumb].y), server.getLevelSize()).cameFrom;
-
-		sf::Vector2i comeFrom = lastPosition;
-		pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
+		sf::Vector2i position = m_graph.getGraphNode(boxSelection[randNumb], server.getLevelSize()).cameFrom;
+		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 		
-		bool pathCompleted = false;
-		while (!pathCompleted)
+		while (position != positionAtSource)
 		{
-			comeFrom = m_graph.getGraphNode(sf::Vector2i(comeFrom.x, comeFrom.y), server.getLevelSize()).cameFrom;
-			if (comeFrom != positionAtSource)
-			{
-				pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
-			}
-			else
-			{
-				pathCompleted = true;
-			}
+			position = m_graph.getGraphNode(position, server.getLevelSize()).cameFrom;
+			pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 		}
 	}
 }
@@ -375,19 +360,12 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i neighbourPosit
 	pathToTile.emplace_back(neighbourPosition.x* tileSize.x, neighbourPosition.y* tileSize.y);
 	pathToTile.emplace_back(lastPosition.x* tileSize.x, lastPosition.y* tileSize.y);
 
-	sf::Vector2i comeFrom = lastPosition;
-	bool pathCompleted = false;
-	while (!pathCompleted)
+
+	sf::Vector2i position = lastPosition;
+	while (position != positionAtSource)
 	{
-		comeFrom = m_graph.getGraphNode(comeFrom, server.getLevelSize()).cameFrom;
-		if (comeFrom != positionAtSource)
-		{
-			pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
-		}
-		else
-		{
-			pathCompleted = true;
-		}
+		position = m_graph.getGraphNode(position, server.getLevelSize()).cameFrom;
+		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 	}
 
 	return pathToTile;
@@ -405,18 +383,10 @@ void PathFinding::getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i las
 	pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
 	pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
 
-	sf::Vector2i comeFrom = lastPosition;
-	bool pathCompleted = false;
-	while (!pathCompleted)
+	sf::Vector2i position = lastPosition;
+	while (position != positionAtSource)
 	{
-		comeFrom = m_graph.getGraphNode(comeFrom, server.getLevelSize()).cameFrom;
-		if (comeFrom != positionAtSource)
-		{
-			pathToTile.emplace_back(comeFrom.x * tileSize.x, comeFrom.y * tileSize.y);
-		}
-		else
-		{
-			pathCompleted = true;
-		}
+		position = m_graph.getGraphNode(position, server.getLevelSize()).cameFrom;
+		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 	}
 }

@@ -83,10 +83,6 @@ void PlayerServerAI::update(float frameTime)
 
 void PlayerServerAI::handleAIStates(float frameTime)
 {
-	const auto& players = m_server.getPlayers();
-	sf::Vector2i tileSize = m_server.getTileSize();
-	sf::Vector2i levelSize = m_server.getLevelSize();
-
 	switch (m_currentState)
 	{
 	case eAIState::eMakeDecision:
@@ -123,9 +119,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetTargetAtNearestPlayer:
 	{
+		const auto& players = m_server.getPlayers();
 		if (m_position == m_newPosition)
 		{
-			float distance = levelSize.x * levelSize.y;
+			float distance = m_server.getLevelSize().x * m_server.getLevelSize().y;
 			int closestTargetPlayerID = 0;
 
 			for (const auto& target : players)
@@ -135,7 +132,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				{
 					continue;
 				}
-
+				sf::Vector2i tileSize = m_server.getTileSize();
 				if (Utilities::distance(m_position, target->getPosition(), tileSize) < distance)
 				{
 					closestTargetPlayerID = target->getID();
