@@ -205,8 +205,10 @@ void Server::listen()
 void Server::placeBomb(sf::Vector2f position)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
-
-	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eTimerActive::eTrue);
+	if (position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y)
+	{
+		m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eTimerActive::eTrue);
+	}
 }
 
 void Server::broadcastMessage(sf::Packet & packetToSend)
