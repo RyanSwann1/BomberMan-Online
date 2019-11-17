@@ -401,6 +401,7 @@ void Server::startGame()
 	packetToSend << eServerMessageType::eInitialGameData;
 	ServerMessageInitialGameData initialGameDataMessage;
 	initialGameDataMessage.levelName = m_levelName;
+
 	for (const auto& player : m_players)
 	{
 		initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());

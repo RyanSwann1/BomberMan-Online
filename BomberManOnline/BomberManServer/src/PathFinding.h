@@ -53,6 +53,6 @@ private:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i lastPosition, const Server& server, 
 		sf::Vector2i positionAtSource);
-	void getPathtoTile(sf::Vector2i neighbourPosition, sf::Vector2i lastPosition, const Server& server,
+	void getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i lastPosition, const Server& server,
 		sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 };

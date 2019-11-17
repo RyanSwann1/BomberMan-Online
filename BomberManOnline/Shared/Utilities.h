@@ -13,7 +13,7 @@ namespace Utilities
 
 	sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor);
 
-	bool isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize);
+	bool isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSizedo);
 
 	int getRandomNumber(int min, int max);
 }
