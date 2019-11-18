@@ -60,6 +60,10 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType type)
 	case eGameObjectType::eMovementPickUp :
 		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eMovementSpeedPickUp, type);
 		break;
+
+	case eGameObjectType::eExtraBombPickUp :
+		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eExtraBombPickUp, type);
+		break;
 	}
 }
 
@@ -363,7 +367,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		
 	case eServerMessageType::eMovementPickUpCollision :
 	{
-		int clientID = 0;
+		int clientID = INVALID_CLIENT_ID;
 		float movementSpeedIncrement = 0;
 		receivedMessage >> clientID >> movementSpeedIncrement;
 		for (auto& player : m_players)
@@ -371,6 +375,30 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			if (clientID == player->getID())
 			{
 				player->increaseMovementSpeed(movementSpeedIncrement);
+				break;
+			}
+		}
+	}
+		break;
+		
+	case eServerMessageType::eSpawnExtraBombPickUp :
+	{
+		sf::Vector2f startingPosition;
+		receivedMessage >> startingPosition.x >> startingPosition.y;
+
+		spawnPickUp(startingPosition, eGameObjectType::eExtraBombPickUp);
+	}
+	break;
+
+	case eServerMessageType::eExtraBombPickUpCollision :
+	{
+		int clientID = INVALID_CLIENT_ID;
+		receivedMessage >> clientID;
+		for (auto& player : m_players)
+		{
+			if (clientID == player->getID())
+			{
+				player->increaseBombCount();
 				break;
 			}
 		}

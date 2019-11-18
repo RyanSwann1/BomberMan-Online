@@ -358,6 +358,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			{
 				packetToSend.clear();
 			 	const int randNumb = Utilities::getRandomNumber(0, 1);	
+				std::cout << randNumb << "\n";
 				switch (randNumb)
 				{
 				case 0 :
@@ -369,8 +370,8 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 				}
 				case 1 :
 				{
-					//packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
-					//m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+					packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+					m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
 					break;
 				}

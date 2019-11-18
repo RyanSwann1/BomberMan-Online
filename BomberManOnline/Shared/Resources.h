@@ -20,25 +20,30 @@ enum class eFrameID
 	eExplosionStart = 284,
 	eExplosionEnd =	254,
 	eMovementSpeedPickUp = 254,
-	eExtraBombPickUp = 269
+	eExtraBombPickUp = 220
 };
 
 enum class eAnimationName
 {
+	//Player Idle
 	ePlayerIdleUp = 0,
 	ePlayerIdleDown,
 	ePlayerIdleLeft,
 	ePlayerIdleRight,
+	//Player Move
 	ePlayerMoveUp,
 	ePlayerMoveDown,
 	ePlayerMoveRight,
 	ePlayerMoveLeft,
+	//Bomb
 	eBomb,
+	//Explosion
 	eExplosion,
+	//PickUps
 	eMovementSpeedPickUp,
+	eExtraBombPickUp,
 	eTotal
 };
-
 enum class eAnimationFlipped
 {
 	eFalse = 0,
@@ -114,6 +119,7 @@ private:
 		//Explosion
 		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse),
 		//PickUps
-		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp)
+		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp),
+		AnimationDetails(eDirection::eNone, eFrameID::eExtraBombPickUp, eFrameID::eExtraBombPickUp)
 	};
 };
