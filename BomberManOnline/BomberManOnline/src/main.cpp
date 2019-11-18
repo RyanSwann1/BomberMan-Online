@@ -61,7 +61,11 @@ int main()
 				{
 					ServerMessageInitialGameData initialGameData;
 					receivedMessage >> initialGameData;
-					level = Level::create(localClientID, initialGameData);
+					assert(level);
+					if (!level)
+					{
+						level = Level::create(localClientID, initialGameData);
+					}
 				}
 				break;
 				default:
