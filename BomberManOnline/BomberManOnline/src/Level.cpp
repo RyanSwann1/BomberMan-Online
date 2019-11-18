@@ -95,36 +95,41 @@ std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGame
 void Level::handleInput(const sf::Event & sfmlEvent)
 {
 	assert(m_localPlayer);
-	sf::Vector2f playerPosition(m_localPlayer->getPosition());
+	sf::Vector2f localPlayerPosition(m_localPlayer->getPosition());
 	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x - tileSize.x, playerPosition.y), 
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x - tileSize.x, localPlayerPosition.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	
+
 	case sf::Keyboard::D:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x + tileSize.x, playerPosition.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x + tileSize.x, localPlayerPosition.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::W:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y - tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y - tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::S:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y + tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y + tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::Space:
-		m_localPlayer->plantBomb();
+		if (m_localPlayer->placeBomb())
+		{
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::ePlayerBombPlacementRequest << localPlayerPosition.x << localPlayerPosition.y;
+			NetworkHandler::getInstance().sendMessageToServer(packetToSend);
+		}
 
 		break;
 	}

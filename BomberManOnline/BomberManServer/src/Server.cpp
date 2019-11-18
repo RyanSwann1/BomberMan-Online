@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -162,40 +162,42 @@ void Server::listen()
 {
 	for (const auto& player : m_players)
 	{
-		if (player->getControllerType() == ePlayerControllerType::eHuman)
+		if (player->getControllerType() != ePlayerControllerType::eHuman)
 		{
-			auto& client = *static_cast<PlayerServerHuman*>(player.get());
-			if (m_socketSelector.isReady(*client.getTCPSocket()))
+			continue;
+		}
+
+		auto& client = *static_cast<PlayerServerHuman*>(player.get());
+		if (m_socketSelector.isReady(*client.getTCPSocket()))
+		{
+			sf::Packet receivedPacket;
+			if (client.getTCPSocket()->receive(receivedPacket) == sf::Socket::Done)
 			{
-				sf::Packet receivedPacket;
-				if (client.getTCPSocket()->receive(receivedPacket) == sf::Socket::Done)
+				eServerMessageType serverMessageType;
+				receivedPacket >> serverMessageType;
+				switch (serverMessageType)
 				{
-					eServerMessageType serverMessageType;
-					receivedPacket >> serverMessageType;
-					switch (serverMessageType)
-					{
-					case eServerMessageType::ePlayerMoveToPosition:
-					{
-						ServerMessagePlayerMove playerMoveMessage;
-						receivedPacket >> playerMoveMessage;
-						setNewPlayerPosition(client, playerMoveMessage);
-					}
-					break;
+				case eServerMessageType::ePlayerMoveToPosition:
+				{
+					ServerMessagePlayerMove playerMoveMessage;
+					receivedPacket >> playerMoveMessage;
+					setNewPlayerPosition(client, playerMoveMessage);
+				}
+				break;
 
-					case eServerMessageType::ePlayerBombPlacementRequest:
-					{
-						sf::Vector2f position;
-						receivedPacket >> position.x >> position.y;
-						placeBomb(client, position);
-					}
-					break;
+				case eServerMessageType::ePlayerBombPlacementRequest:
+				{
+					sf::Vector2f position;
+					receivedPacket >> position.x >> position.y;
+					placeBomb(client, position);
+				}
+				break;
 
-					case eServerMessageType::eRequestDisconnection:
-					{
-						m_clientsToRemove.push_back(client.getID());
-					}
-					break;
-					}
+				case eServerMessageType::eRequestDisconnection:
+				{
+					m_clientsToRemove.push_back(client.getID());
+				}
+				break;
 				}
 			}
 		}
@@ -248,18 +250,16 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	Timer& clientBombPlacementTimer = client.getBombPlacementTimer();
-	if (clientBombPlacementTimer.isExpired() && !Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize))
+	if (!Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize) && client.placeBomb())
 	{
 		ServerMessageBombPlacement bombPlacementMessage;
 		bombPlacementMessage.position = placementPosition;
-		bombPlacementMessage.lifeTimeDuration = clientBombPlacementTimer.getExpirationTime();
+		bombPlacementMessage.lifeTimeDuration = BOMB_LIFETIME_DURATION;
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 		broadcastMessage(packetToSend);
-		m_gameObjects.emplace_back(placementPosition, clientBombPlacementTimer.getExpirationTime(), eGameObjectType::eBomb);
-		clientBombPlacementTimer.resetElaspedTime();
+		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb);
 	}
 }
 
