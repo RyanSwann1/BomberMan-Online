@@ -52,12 +52,33 @@ sf::Vector2f Player::getPreviousPosition() const
 	return m_previousPosition;
 }
 
+bool Player::placeBomb()
+{
+	if (!isMoving())
+	{
+		if (m_bombsPlaced == 0)
+		{
+			m_bombPlacementTimer.setActive(true);
+		}
+
+		if (m_bombsPlaced < m_currentBombCount)
+		{
+			++m_bombsPlaced;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void Player::update(float deltaTime)
 {
 	m_bombPlacementTimer.update(deltaTime);
 	if (m_bombPlacementTimer.isExpired())
 	{
 		m_bombsPlaced = 0;
+		m_bombPlacementTimer.resetElaspedTime();
+		m_bombPlacementTimer.setActive(false);
 	}
 
 	if (isMoving())
