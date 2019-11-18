@@ -353,17 +353,35 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
 			broadcastMessage(packetToSend);
 
+			//Spawn PickUp
 			if (Utilities::getRandomNumber(0, 10) >= 7)
 			{
 				packetToSend.clear();
-				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
-				broadcastMessage(packetToSend);
+			 	const int randNumb = Utilities::getRandomNumber(0, 1);	
+				switch (randNumb)
+				{
+				case 0 :
+				{
+					packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition.x << explosionPosition.y;
+					m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eExtraBombPickUp);
+					
+					break;
+				}
+				case 1 :
+				{
+					packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+					m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+					break;
+				}
+				}
+
+				broadcastMessage(packetToSend);
 			}
 		}
 
-		for (const auto& player : m_players)
+		//Damage colliding players
+		for (const std::unique_ptr<PlayerServer>& player : m_players)
 		{
 			sf::Vector2i playerPosition(static_cast<int>(player->getPosition().x / m_tileSize.x), static_cast<int>(player->getPosition().y / m_tileSize.y));
 			if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
@@ -402,7 +420,7 @@ void Server::startGame()
 	ServerMessageInitialGameData initialGameDataMessage;
 	initialGameDataMessage.levelName = m_levelName;
 
-	for (const auto& player : m_players)
+	for (const std::unique_ptr<PlayerServer>& player : m_players)
 	{
 		initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());
 	}
