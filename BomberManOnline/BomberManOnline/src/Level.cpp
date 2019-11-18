@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <utility>
 #include "Utilities.h"
+#include <iostream>
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
@@ -279,9 +280,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		if (!previousPositionFound)
 		{
-			NetworkHandler::getInstance().disconnectFromServer();
-			window.close();
-			return;
+			std::cout << "Close Window\n";
+			//NetworkHandler::getInstance().disconnectFromServer();
+			//window.close();
 		}
 	}
 	break;
@@ -335,8 +336,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	case eServerMessageType::ePlayerDisconnected :
 	{
-		int clientID = 0;
+		int clientID = INVALID_CLIENT_ID;
 		receivedMessage >> clientID;
+		assert(clientID != INVALID_CLIENT_ID);
 		if (m_localPlayer->getID() == clientID)
 		{
 			window.close();

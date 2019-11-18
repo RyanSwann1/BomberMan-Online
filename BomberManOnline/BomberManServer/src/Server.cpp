@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 3;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -354,7 +354,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			broadcastMessage(packetToSend);
 
 			//Spawn PickUp
-			if (Utilities::getRandomNumber(0, 10) >= 7)
+			if (Utilities::getRandomNumber(0, 10) >= 0)
 			{
 				packetToSend.clear();
 			 	const int randNumb = Utilities::getRandomNumber(0, 1);	
@@ -369,8 +369,8 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 				}
 				case 1 :
 				{
-					packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
-					m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+					//packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+					//m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
 					break;
 				}
