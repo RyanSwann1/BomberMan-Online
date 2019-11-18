@@ -1,8 +1,12 @@
 #include "Player.h"
 #include "Utilities.h"
 
+constexpr int MAX_BOMB_COUNT = 5;
+
 Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
-	: m_ID(ID),
+	: m_maxBombCount(MAX_BOMB_COUNT),
+	m_currentBombCount(1),
+	m_ID(ID),
 	m_previousPosition(),
 	m_position(startingPosition),
 	m_newPosition(startingPosition),
@@ -51,6 +55,10 @@ sf::Vector2f Player::getPreviousPosition() const
 void Player::update(float deltaTime)
 {
 	m_bombPlacementTimer.update(deltaTime);
+	if (m_bombPlacementTimer.isExpired())
+	{
+		m_bombsPlaced = 0;
+	}
 
 	if (isMoving())
 	{
@@ -72,4 +80,12 @@ void Player::stop()
 void Player::increaseMovementSpeed(float amount)
 {
 	m_movementSpeed += amount;
+}
+
+void Player::increaseBombCount()
+{
+	if (m_currentBombCount < m_maxBombCount)
+	{
+		++m_currentBombCount;
+	}
 }

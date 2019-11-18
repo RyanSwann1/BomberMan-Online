@@ -25,8 +25,12 @@ public:
 	virtual void update(float deltaTime);
 	void stop();
 	void increaseMovementSpeed(float amount);
+	void increaseBombCount();
 
 protected:
+	const int m_maxBombCount;
+	int m_currentBombCount;
+	int m_bombsPlaced;
 	int m_ID;
 	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_position;
