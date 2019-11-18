@@ -18,5 +18,6 @@ enum class eServerMessageType
 	//PickUps
 	eSpawnMovementPickUp,
 	eSpawnExtraBombPickUp,
-	eMovementPickUpCollision
+	eMovementPickUpCollision,
+	eExtraBombPickUpCollision
 };

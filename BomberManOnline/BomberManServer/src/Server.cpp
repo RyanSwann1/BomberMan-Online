@@ -403,8 +403,19 @@ void Server::handlePickUpCollision(PlayerServer & player, eGameObjectType gameOb
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eMovementPickUpCollision << player.getID() << MOVEMENT_SPEED_INCREMENT;
 		broadcastMessage(packetToSend);
-	}
+
 		break;
+	}
+	case eGameObjectType::eExtraBombPickUp :
+	{
+		player.increaseBombCount();
+
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eExtraBombPickUpCollision << player.getID();
+		broadcastMessage(packetToSend);
+
+		break;
+	}
 	}
 }
 
