@@ -19,7 +19,8 @@ enum class eFrameID
 	eBombEnd = 266,
 	eExplosionStart = 284,
 	eExplosionEnd =	254,
-	eMovementSpeedPickUp = 254
+	eMovementSpeedPickUp = 254,
+	eExtraBombPickUp = 269
 };
 
 enum class eAnimationName
