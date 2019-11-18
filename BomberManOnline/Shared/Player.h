@@ -6,6 +6,7 @@
 #include "Direction.h"
 
 constexpr float MOVEMENT_SPEED_INCREMENT = 0.2f;
+constexpr int INVALID_CLIENT_ID = -1;
 
 class Player
 {

@@ -123,7 +123,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		if (m_position == m_newPosition)
 		{
 			float distance = m_server.getLevelSize().x * m_server.getLevelSize().y;
-			int closestTargetPlayerID = 0;
+			int closestTargetPlayerID = INVALID_CLIENT_ID;
 
 			for (const auto& target : players)
 			{
@@ -139,6 +139,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 					distance = Utilities::distance(m_position, target->getPosition(), tileSize);
 				}
 			}
+
+			assert(closestTargetPlayerID != INVALID_CLIENT_ID);
 
 			auto cIter = std::find_if(players.cbegin(), players.cend(), [closestTargetPlayerID](const auto& target) { return target->getID() == closestTargetPlayerID; });
 			assert(cIter != players.cend());

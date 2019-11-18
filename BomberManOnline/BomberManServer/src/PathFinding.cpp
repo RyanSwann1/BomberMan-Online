@@ -146,11 +146,10 @@ sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Ve
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)
 {
-	sf::Vector2i tileSize = server.getTileSize();
-
 	m_graph.resetGraph(server.getLevelSize());
 
 	std::queue<sf::Vector2i> frontier;
+	sf::Vector2i tileSize = server.getTileSize();
 	frontier.push(sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y)));
 
 	std::vector<sf::Vector2i> neighbours;

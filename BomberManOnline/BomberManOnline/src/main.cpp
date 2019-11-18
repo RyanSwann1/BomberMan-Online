@@ -41,8 +41,8 @@ int main()
 
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
-	float deltaTime = 0;
-	int localClientID = 0;
+	float deltaTime = 0.0f;
+	int localClientID = INVALID_CLIENT_ID;
 	while (window.isOpen())
 	{
 		//Handle Server Messages
@@ -65,7 +65,11 @@ int main()
 				}
 				break;
 				default:
-					level->onReceivedServerMessage(messageType, receivedMessage, window);
+					assert(level);
+					if (level)
+					{
+						level->onReceivedServerMessage(messageType, receivedMessage, window);
+					}
 				break;
 				}
 			}
