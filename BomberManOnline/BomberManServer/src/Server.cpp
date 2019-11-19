@@ -311,7 +311,8 @@ void Server::update(float frameTime)
 			gameObject = m_gameObjects.erase(gameObject);
 			gameObjectDestroyed = true;
 		}
-		else if (gameObject->getType() == eGameObjectType::eMovementPickUp)
+		else if (gameObject->getType() == eGameObjectType::eMovementPickUp ||
+			gameObject->getType() == eGameObjectType::eExtraBombPickUp)
 		{
 			sf::Vector2f pickUpPosition = gameObject->getPosition();
 			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
