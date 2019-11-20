@@ -23,6 +23,7 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName ani
 	case eAnimationName::ePlayerIdleRight :
 	case eAnimationName::ePlayerIdleUp :
 	case eAnimationName::eMovementSpeedPickUp : 
+	case eAnimationName::eExtraBombPickUp :
 		m_frameTimer.setExpiredTime(0.0f);
 		break;
 	case eAnimationName::ePlayerMoveLeft :

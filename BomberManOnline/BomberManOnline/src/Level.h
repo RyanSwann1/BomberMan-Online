@@ -37,7 +37,5 @@ private:
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; 
 
-	void spawnExplosions(sf::Vector2f bombExplodePosition);
-	void spawnBomb(sf::Vector2f position);
-	void spawnPickUp(sf::Vector2f position, eGameObjectType type);
+	void spawnGameObject(sf::Vector2f position, eGameObjectType gameObjectType);
 };
