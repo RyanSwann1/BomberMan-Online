@@ -7,7 +7,7 @@
 class AnimatedSprite
 {
 public:
-	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName startingAnimationName);
+	AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName);
 
 	void setPosition(sf::Vector2f position);
 	void setNewAnimation(eAnimationName newAnimationName);

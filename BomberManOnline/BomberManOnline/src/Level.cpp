@@ -61,9 +61,9 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType type)
 		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eMovementSpeedPickUp, type);
 		break;
 
-	case eGameObjectType::eExtraBombPickUp :
-		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eExtraBombPickUp, type);
-		break;
+	//case eGameObjectType::eExtraBombPickUp :
+	//	m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eExtraBombPickUp, type);
+	//	break;
 	}
 }
 
@@ -209,8 +209,6 @@ void Level::update(float deltaTime)
 					break;
 				}
 			}
-
-			player->stop();
 		}
 	}
 
@@ -387,7 +385,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 
 		spawnPickUp(startingPosition, eGameObjectType::eExtraBombPickUp);
-		std::cout << startingPosition.x << " " << startingPosition.y << "\n";
 	}
 	break;
 

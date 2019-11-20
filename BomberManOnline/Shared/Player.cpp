@@ -17,11 +17,6 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
 {}
 
-Timer & Player::getBombPlacementTimer()
-{
-	return m_bombPlacementTimer;
-}
-
 bool Player::isMoving() const
 {
 	return m_position != m_newPosition;
@@ -91,11 +86,6 @@ void Player::update(float deltaTime)
 			m_movementFactor = 0.0f;
 		}
 	}
-}
-
-void Player::stop()
-{
-	m_movementFactor = 0.0f;
 }
 
 void Player::increaseMovementSpeed(float amount)

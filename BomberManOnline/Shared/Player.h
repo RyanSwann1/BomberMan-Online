@@ -14,7 +14,6 @@ public:
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 	virtual ~Player() {}
 
-	Timer& getBombPlacementTimer();
 	bool isMoving() const;
 	ePlayerControllerType getControllerType() const;
 	int getID() const;
@@ -24,7 +23,6 @@ public:
 
 	bool placeBomb();
 	virtual void update(float deltaTime);
-	void stop();
 	void increaseMovementSpeed(float amount);
 	void increaseBombCount();
 
