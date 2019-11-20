@@ -98,18 +98,6 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 	}
 }
 
-void PlayerClient::plantBomb()
-{
-	if (!isMoving() && m_bombPlacementTimer.isExpired())
-	{
-		m_bombPlacementTimer.resetElaspedTime();
-
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::ePlayerBombPlacementRequest << m_position.x << m_position.y;
-		NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-	}
-}
-
 void PlayerClient::stopAtPosition(sf::Vector2f position)
 {
 	m_position = position;

@@ -6,6 +6,7 @@
 #include <assert.h>
 #include <utility>
 #include "Utilities.h"
+#include <iostream>
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
 constexpr size_t MAX_PLAYERS = 4;
@@ -25,39 +26,44 @@ Level::Level(std::string&& levelName)
 	m_gameObjects.reserve(MAX_GAME_OBJECTS);
 }
 
-void Level::spawnExplosions(sf::Vector2f bombExplodePosition)
+void Level::spawnGameObject(sf::Vector2f position, eGameObjectType gameObjectType)
 {
-	m_gameObjects.emplace_back(bombExplodePosition, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
-	
-	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	for (int x = bombExplodePosition.x - tileSize.x; x <= bombExplodePosition.x + tileSize.x; x += tileSize.x * 2)
+	switch (gameObjectType)
 	{
-		if (m_collisionLayer[static_cast<int>(bombExplodePosition.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
+	case eGameObjectType::eBomb :		
+		m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eTrue);
+
+		break;
+	case eGameObjectType::eExplosion :
+	{
+		m_gameObjects.emplace_back(position, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+
+		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+		for (int x = position.x - tileSize.x; x <= position.x + tileSize.x; x += tileSize.x * 2)
 		{
-			m_gameObjects.emplace_back(sf::Vector2f(x, bombExplodePosition.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			if (m_collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
+			{
+				m_gameObjects.emplace_back(sf::Vector2f(x, position.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			}
+		}
+
+		for (int y = position.y - tileSize.y; y <= position.y + tileSize.y; y += tileSize.y * 2)
+		{
+			if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eWall)
+			{
+				m_gameObjects.emplace_back(sf::Vector2f(position.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			}
 		}
 	}
 
-	for (int y = bombExplodePosition.y - tileSize.y; y <= bombExplodePosition.y + tileSize.y; y += tileSize.y * 2)
-	{
-		if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(bombExplodePosition.x / tileSize.x)] != eCollidableTile::eWall)
-		{
-			m_gameObjects.emplace_back(sf::Vector2f(bombExplodePosition.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
-		}
-	}
-}
-
-void Level::spawnBomb(sf::Vector2f position)
-{
-	m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eTrue);
-}
-
-void Level::spawnPickUp(sf::Vector2f position, eGameObjectType type)
-{
-	switch (type)
-	{
+		break;
 	case eGameObjectType::eMovementPickUp :
-		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eMovementSpeedPickUp, type);
+		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eMovementSpeedPickUp, eGameObjectType::eMovementPickUp);
+		
+		break;
+	case eGameObjectType::eExtraBombPickUp :
+		m_gameObjects.emplace_back(position, 0.0f, eAnimationName::eExtraBombPickUp, eGameObjectType::eExtraBombPickUp);
+		
 		break;
 	}
 }
@@ -95,36 +101,41 @@ std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGame
 void Level::handleInput(const sf::Event & sfmlEvent)
 {
 	assert(m_localPlayer);
-	sf::Vector2f playerPosition(m_localPlayer->getPosition());
+	sf::Vector2f localPlayerPosition(m_localPlayer->getPosition());
 	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x - tileSize.x, playerPosition.y), 
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x - tileSize.x, localPlayerPosition.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
-	
+
 	case sf::Keyboard::D:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x + tileSize.x, playerPosition.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x + tileSize.x, localPlayerPosition.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::W:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y - tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y - tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::S:
-		m_localPlayer->setNewPosition(sf::Vector2f(playerPosition.x, playerPosition.y + tileSize.y),
+		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y + tileSize.y),
 			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::Space:
-		m_localPlayer->plantBomb();
+		if (m_localPlayer->placeBomb())
+		{
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::ePlayerBombPlacementRequest << localPlayerPosition.x << localPlayerPosition.y;
+			NetworkHandler::getInstance().sendMessageToServer(packetToSend);
+		}
 
 		break;
 	}
@@ -199,8 +210,6 @@ void Level::update(float deltaTime)
 					break;
 				}
 			}
-
-			player->stop();
 		}
 	}
 
@@ -209,7 +218,8 @@ void Level::update(float deltaTime)
 	{
 		gameObject->update(deltaTime);
 
-		if (gameObject->getType() == eGameObjectType::eMovementPickUp) 
+		if (gameObject->getType() == eGameObjectType::eMovementPickUp
+			|| gameObject->getType() == eGameObjectType::eExtraBombPickUp) 
 		{
 			sf::Vector2f pickUpPosition(gameObject->getPosition());
 			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
@@ -228,7 +238,7 @@ void Level::update(float deltaTime)
 			{
 				if (gameObject->getType() == eGameObjectType::eBomb)
 				{
-					spawnExplosions(gameObject->getPosition());
+					spawnGameObject(gameObject->getPosition(), eGameObjectType::eExplosion);
 				}
 
 				gameObject = m_gameObjects.erase(gameObject);
@@ -274,9 +284,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		if (!previousPositionFound)
 		{
-			NetworkHandler::getInstance().disconnectFromServer();
-			window.close();
-			return;
+			std::cout << "Close Window\n";
+			//NetworkHandler::getInstance().disconnectFromServer();
+			//window.close();
 		}
 	}
 	break;
@@ -284,7 +294,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	case eServerMessageType::eNewPlayerPosition :
 	{
 		sf::Vector2f newPosition;
-		int clientID = 0;
+		int clientID = INVALID_CLIENT_ID;
 		receivedMessage >> newPosition.x >> newPosition.y >> clientID;
 		if (clientID == m_localPlayer->getID())
 		{
@@ -317,7 +327,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
 
-		spawnBomb(placementPosition);
+		spawnGameObject(placementPosition, eGameObjectType::eBomb);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :
@@ -330,8 +340,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	case eServerMessageType::ePlayerDisconnected :
 	{
-		int clientID = 0;
+		int clientID = INVALID_CLIENT_ID;
 		receivedMessage >> clientID;
+		assert(clientID != INVALID_CLIENT_ID);
 		if (m_localPlayer->getID() == clientID)
 		{
 			window.close();
@@ -350,13 +361,13 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 
-		spawnPickUp(startingPosition, eGameObjectType::eMovementPickUp);
+		spawnGameObject(startingPosition, eGameObjectType::eMovementPickUp);
 	}
 		break;
 		
 	case eServerMessageType::eMovementPickUpCollision :
 	{
-		int clientID = 0;
+		int clientID = INVALID_CLIENT_ID;
 		float movementSpeedIncrement = 0;
 		receivedMessage >> clientID >> movementSpeedIncrement;
 		for (auto& player : m_players)
@@ -364,6 +375,30 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			if (clientID == player->getID())
 			{
 				player->increaseMovementSpeed(movementSpeedIncrement);
+				break;
+			}
+		}
+	}
+		break;
+		
+	case eServerMessageType::eSpawnExtraBombPickUp :
+	{
+		sf::Vector2f startingPosition;
+		receivedMessage >> startingPosition.x >> startingPosition.y;
+
+		spawnGameObject(startingPosition, eGameObjectType::eExtraBombPickUp);
+	}
+	break;
+
+	case eServerMessageType::eExtraBombPickUpCollision :
+	{
+		int clientID = INVALID_CLIENT_ID;
+		receivedMessage >> clientID;
+		for (auto& player : m_players)
+		{
+			if (clientID == player->getID())
+			{
+				player->increaseBombCount();
 				break;
 			}
 		}

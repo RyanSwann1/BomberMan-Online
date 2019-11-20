@@ -38,6 +38,12 @@ void PlayerServerAI::update(float frameTime)
 {
 	handleAIStates(frameTime);
 	m_bombPlacementTimer.update(frameTime);
+	if (m_bombPlacementTimer.isExpired())
+	{
+		m_bombsPlaced = 0;
+		m_bombPlacementTimer.resetElaspedTime();
+		m_bombPlacementTimer.setActive(false);
+	}
 
 	if (isMoving())
 	{
@@ -175,15 +181,16 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
 		assert(!m_pathToTile.empty());
-		m_currentState = eAIState::eMoveToSafePosition;
 		setNewPosition(m_pathToTile.back(), m_server);
 		m_pathToTile.pop_back();
+
+		m_currentState = eAIState::eMoveToSafePosition;
 	}
 
 	break;
 	case eAIState::ePlantBomb:
 	{
-		if (m_bombPlacementTimer.isExpired())
+		if (placeBomb())
 		{
 			ServerMessageBombPlacement bombPlacementMessage;
 			bombPlacementMessage.position = m_position;

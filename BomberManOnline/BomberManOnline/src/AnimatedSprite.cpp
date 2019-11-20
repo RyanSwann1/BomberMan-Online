@@ -7,22 +7,23 @@
 constexpr float TOTAL_BOMB_ANIMATIONS = 3.0f;
 constexpr float TOTAL_EXPLOSION_ANIMATIONS = 3.0f;
 
-AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName startingAnimationName)
-	: m_currentFrameID(Animations::getInstance().getAnimationDetails(startingAnimationName).startFrameID),
+AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName animationName)
+	: m_currentFrameID(Animations::getInstance().getAnimationDetails(animationName).startFrameID),
 	m_animationFinished(false),
 	m_sprite(Textures::getInstance().getTileSheet().getTexture(), Textures::getInstance().getTileSheet().getFrameRect(m_currentFrameID)),
-	m_animationName(startingAnimationName),
+	m_animationName(animationName),
 	m_frameTimer(0.0f, eTimerActive::eTrue)	
 {
 	m_sprite.setPosition(startingPosition);
 
-	switch (startingAnimationName)
+	switch (animationName)
 	{
 	case eAnimationName::ePlayerIdleDown :
 	case eAnimationName::ePlayerIdleLeft :
 	case eAnimationName::ePlayerIdleRight :
 	case eAnimationName::ePlayerIdleUp :
-	case eAnimationName::eMovementSpeedPickUp :
+	case eAnimationName::eMovementSpeedPickUp : 
+	case eAnimationName::eExtraBombPickUp :
 		m_frameTimer.setExpiredTime(0.0f);
 		break;
 	case eAnimationName::ePlayerMoveLeft :
@@ -38,6 +39,11 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName sta
 		m_frameTimer.setExpiredTime(EXPLOSION_LIFETIME_DURATION / TOTAL_EXPLOSION_ANIMATIONS);
 		break;
 	}
+
+	//if (startingAnimationName == eAnimationName::eExtraBombPickUp)
+	//{
+	//	int i = 0;
+	//}
 }
 
 void AnimatedSprite::setPosition(sf::Vector2f position)

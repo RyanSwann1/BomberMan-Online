@@ -19,12 +19,11 @@ class PlayerClient : public Player
 public:
 	PlayerClient(int ID, sf::Vector2f startingPosition, ePlayerType playerType);
 
-	void update(float deltaTime) override;
+	void update(float deltaTime) override final;
 	void render(sf::RenderWindow& window) const;
 
 	void setNewPosition(sf::Vector2f newPosition, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i tileSize,
 		std::vector<MovementPoint>& localPlayerPreviousPositions);
-	void plantBomb();
 	void stopAtPosition(sf::Vector2f position);
 
 private:

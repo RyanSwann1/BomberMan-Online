@@ -19,22 +19,27 @@ enum class eFrameID
 	eBombEnd = 266,
 	eExplosionStart = 284,
 	eExplosionEnd =	254,
-	eMovementSpeedPickUp = 254
+	eMovementSpeedPickUp = 254,
+	eExtraBombPickUp = 220
 };
 
 enum class eAnimationName
 {
+	//Player Idle
 	ePlayerIdleUp = 0,
 	ePlayerIdleDown,
 	ePlayerIdleLeft,
 	ePlayerIdleRight,
+	//Player Move
 	ePlayerMoveUp,
 	ePlayerMoveDown,
 	ePlayerMoveRight,
 	ePlayerMoveLeft,
+	//Game Objects
 	eBomb,
 	eExplosion,
 	eMovementSpeedPickUp,
+	eExtraBombPickUp,
 	eTotal
 };
 
@@ -108,11 +113,10 @@ private:
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveDownStart, eFrameID::ePlayerMoveDownEnd),
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveRightStart, eFrameID::ePlayerMoveRightEnd),
 		AnimationDetails(eDirection::eRight, eFrameID::ePlayerMoveLeftStart, eFrameID::ePlayerMoveLeftEnd, eAnimationRepeatable::eTrue, eAnimationFlipped::eTrue),
-		//Bomb
+		//Game Objects
 		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd, eAnimationRepeatable::eFalse),
-		//Explosion
 		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse),
-		//PickUps
-		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp)
+		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp),
+		AnimationDetails(eDirection::eNone, eFrameID::eExtraBombPickUp, eFrameID::eExtraBombPickUp)
 	};
 };

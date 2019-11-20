@@ -4,5 +4,6 @@ enum class eGameObjectType
 {
 	eBomb = 0,
 	eExplosion,
-	eMovementPickUp
+	eMovementPickUp,
+	eExtraBombPickUp
 };
