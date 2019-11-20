@@ -290,7 +290,8 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Ve
 			{
 				if (gameObject.getPosition() == sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y)
 					&& gameObject.getType() == eGameObjectType::eMovementPickUp ||
-					gameObject.getType() == eGameObjectType::eExtraBombPickUp)
+					gameObject.getType() == eGameObjectType::eExtraBombPickUp ||
+					gameObject.getType() == eGameObjectType::eBiggerExplosionPickUp)
 				{
 					searchForPickUp = false;
 					getPathToTile(neighbourPosition, lastPosition, server, positionAtSource, pathToTile);
