@@ -44,6 +44,7 @@ enum class eAnimationName
 	eExtraBombPickUp,
 	eTotal
 };
+
 enum class eAnimationFlipped
 {
 	eFalse = 0,

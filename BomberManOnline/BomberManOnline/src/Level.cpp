@@ -387,6 +387,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 
 		spawnPickUp(startingPosition, eGameObjectType::eExtraBombPickUp);
+		std::cout << startingPosition.x << " " << startingPosition.y << "\n";
 	}
 	break;
 
