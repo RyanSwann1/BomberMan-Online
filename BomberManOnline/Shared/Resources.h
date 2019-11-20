@@ -20,7 +20,8 @@ enum class eFrameID
 	eExplosionStart = 284,
 	eExplosionEnd =	254,
 	eMovementSpeedPickUp = 254,
-	eExtraBombPickUp = 220
+	eExtraBombPickUp = 220,
+	eBiggerExplosionPickUp = 284
 };
 
 enum class eAnimationName
@@ -40,6 +41,7 @@ enum class eAnimationName
 	eExplosion,
 	eMovementSpeedPickUp,
 	eExtraBombPickUp,
+	eBiggerExplosionPickUp,
 	eTotal
 };
 
@@ -117,6 +119,7 @@ private:
 		AnimationDetails(eDirection::eDown,  eFrameID::eBombStart, eFrameID::eBombEnd, eAnimationRepeatable::eFalse),
 		AnimationDetails(eDirection::eUp, eFrameID::eExplosionStart, eFrameID::eExplosionEnd, eAnimationRepeatable::eFalse),
 		AnimationDetails(eDirection::eNone, eFrameID::eMovementSpeedPickUp, eFrameID::eMovementSpeedPickUp),
-		AnimationDetails(eDirection::eNone, eFrameID::eExtraBombPickUp, eFrameID::eExtraBombPickUp)
+		AnimationDetails(eDirection::eNone, eFrameID::eExtraBombPickUp, eFrameID::eExtraBombPickUp),
+		AnimationDetails(eDirection::eNone, eFrameID::eBiggerExplosionPickUp, eFrameID::eBiggerExplosionPickUp)
 	};
 };
