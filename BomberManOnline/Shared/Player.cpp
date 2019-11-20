@@ -1,11 +1,12 @@
 #include "Player.h"
 #include "Utilities.h"
 
-constexpr int MAX_BOMB_COUNT = 5;
-
 Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
-	: m_maxBombCount(MAX_BOMB_COUNT),
+	: m_maxBombCount(5),
+	m_maxBombExplosionSize(5),
 	m_currentBombCount(1),
+	m_bombsPlaced(0),
+	m_currentBombExplosionSize(1),
 	m_ID(ID),
 	m_previousPosition(),
 	m_position(startingPosition),
@@ -30,6 +31,11 @@ ePlayerControllerType Player::getControllerType() const
 int Player::getID() const
 {
 	return m_ID;
+}
+
+int Player::getCurrentBombExplosionSize() const
+{
+	return m_currentBombExplosionSize;
 }
 
 sf::Vector2f Player::getPosition() const
@@ -98,5 +104,13 @@ void Player::increaseBombCount()
 	if (m_currentBombCount < m_maxBombCount)
 	{
 		++m_currentBombCount;
+	}
+}
+
+void Player::increaseBombExplosionSize()
+{
+	if (m_currentBombExplosionSize < m_maxBombExplosionSize)
+	{
+		++m_currentBombExplosionSize;
 	}
 }

@@ -17,6 +17,7 @@ public:
 	bool isMoving() const;
 	ePlayerControllerType getControllerType() const;
 	int getID() const;
+	int getCurrentBombExplosionSize() const;
 	sf::Vector2f getPosition() const;
 	sf::Vector2f getNewPosition() const;
 	sf::Vector2f getPreviousPosition() const;
@@ -25,11 +26,14 @@ public:
 	virtual void update(float deltaTime);
 	void increaseMovementSpeed(float amount);
 	void increaseBombCount();
+	void increaseBombExplosionSize();
 
 protected:
 	const int m_maxBombCount;
+	const int m_maxBombExplosionSize;
 	int m_currentBombCount;
 	int m_bombsPlaced;
+	int m_currentBombExplosionSize;
 	int m_ID;
 	sf::Vector2f m_previousPosition;
 	sf::Vector2f m_position;
