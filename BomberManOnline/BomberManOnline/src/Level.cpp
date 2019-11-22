@@ -60,7 +60,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		}
 	}
 	
-	for (int y = position.y - (tileSize.y *= explosionSize); y <= position.y + (tileSize.y *= explosionSize); y += tileSize.y)
+	for (int y = position.y - (tileSize.y * explosionSize); y <= position.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
 		if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eWall)
 		{
