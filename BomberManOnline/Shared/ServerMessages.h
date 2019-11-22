@@ -59,16 +59,19 @@ struct ServerMessageBombPlacement
 {
 	ServerMessageBombPlacement()
 		: position(),
-		lifeTimeDuration(0)
+		lifeTimeDuration(0),
+		explosionSize(0)
 	{}
 
-	ServerMessageBombPlacement(sf::Vector2f position, float lifeTimeDuration)
+	ServerMessageBombPlacement(sf::Vector2f position, float lifeTimeDuration, int explosionSize)
 		: position(position),
-		lifeTimeDuration(lifeTimeDuration)
+		lifeTimeDuration(lifeTimeDuration),
+		explosionSize(explosionSize)
 	{}
 
 	sf::Vector2f position;
 	float lifeTimeDuration;
+	int explosionSize;
 };
 
 struct ServerMessagePickUpCollision

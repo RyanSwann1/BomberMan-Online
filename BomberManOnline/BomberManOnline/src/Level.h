@@ -36,6 +36,9 @@ private:
 	std::vector<MovementPoint> m_localPlayerPreviousPositions;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; 
+	std::vector<BombClient> m_bombs;
 
-	void spawnGameObject(sf::Vector2f position, eGameObjectType gameObjectType);
+	void spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType);
+	void spawnBomb(sf::Vector2f position, int explosionRange);
+	void spawnExplosions(sf::Vector2f position, int explosionRange);
 };

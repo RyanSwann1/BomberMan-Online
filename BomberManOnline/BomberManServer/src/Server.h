@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include "CollidableTile.h"
 #include "PlayerServer.h"
+#include "BombServer.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
@@ -30,7 +31,7 @@ public:
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
 
-	void placeBomb(sf::Vector2f position);
+	void placeBomb(sf::Vector2f position, int explosionRange);
 	void broadcastMessage(sf::Packet& packetToSend);
 	void run();
 
@@ -44,6 +45,7 @@ private:
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	std::vector<GameObject> m_gameObjectQueue;
 	std::vector<GameObject> m_gameObjects;
+	std::vector<BombServer> m_bombs;
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;
 	sf::Vector2i m_tileSize;

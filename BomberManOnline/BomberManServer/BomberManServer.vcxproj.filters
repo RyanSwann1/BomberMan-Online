@@ -134,5 +134,8 @@
     <ClInclude Include="src\PlayerServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\BombServer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

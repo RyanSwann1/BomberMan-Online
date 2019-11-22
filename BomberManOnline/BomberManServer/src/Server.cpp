@@ -204,12 +204,12 @@ void Server::listen()
 	}
 }
 
-void Server::placeBomb(sf::Vector2f position)
+void Server::placeBomb(sf::Vector2f position, int explosionRange)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
 	if (position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y)
 	{
-		m_gameObjects.emplace_back(position, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb, eTimerActive::eTrue);
+		m_bombs.emplace_back(position, explosionRange);
 	}
 }
 
@@ -259,7 +259,7 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
 		broadcastMessage(packetToSend);
-		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eGameObjectType::eBomb);
+		placeBomb(placementPosition, client.getCurrentBombExplosionSize());
 	}
 }
 

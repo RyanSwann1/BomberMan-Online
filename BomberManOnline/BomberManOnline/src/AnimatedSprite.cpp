@@ -40,11 +40,6 @@ AnimatedSprite::AnimatedSprite(sf::Vector2f startingPosition, eAnimationName ani
 		m_frameTimer.setExpiredTime(EXPLOSION_LIFETIME_DURATION / TOTAL_EXPLOSION_ANIMATIONS);
 		break;
 	}
-
-	//if (startingAnimationName == eAnimationName::eExtraBombPickUp)
-	//{
-	//	int i = 0;
-	//}
 }
 
 void AnimatedSprite::setPosition(sf::Vector2f position)
