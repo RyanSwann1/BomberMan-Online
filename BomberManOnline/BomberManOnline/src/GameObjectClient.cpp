@@ -26,7 +26,7 @@ void GameObjectClient::update(float deltaTime)
 
 //Bomb Client
 BombClient::BombClient(sf::Vector2f startingPosition, int explosionRange)
-	: GameObjectClient(startingPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBiggerExplosionPickUp, eGameObjectType::eBiggerExplosionPickUp, 
+	: GameObjectClient(startingPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, 
 		eTimerActive::eTrue),
 	m_explosionSize(explosionRange)
 {}

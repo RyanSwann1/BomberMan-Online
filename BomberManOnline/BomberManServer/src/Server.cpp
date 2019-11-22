@@ -252,9 +252,8 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 {
 	if (!Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize) && client.placeBomb())
 	{
-		ServerMessageBombPlacement bombPlacementMessage;
-		bombPlacementMessage.position = placementPosition;
-		bombPlacementMessage.lifeTimeDuration = BOMB_LIFETIME_DURATION;
+		ServerMessageBombPlacement bombPlacementMessage(placementPosition, BOMB_LIFETIME_DURATION, 
+			client.getCurrentBombExplosionSize());
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;

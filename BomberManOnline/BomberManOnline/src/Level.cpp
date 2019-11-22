@@ -42,17 +42,17 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType)
 	}
 }
 
-void Level::spawnBomb(sf::Vector2f position, int explosionRange)
+void Level::spawnBomb(sf::Vector2f position, int explosionSize)
 {
-	m_bombs.emplace_back(position, explosionRange);
+	m_bombs.emplace_back(position, explosionSize);
 }
 
-void Level::spawnExplosions(sf::Vector2f position, int explosionRange)
+void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 {
 	m_gameObjects.emplace_back(position, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	
-	for (int x = position.x - (tileSize.x *= explosionRange); x <= position.x + (tileSize.x *= explosionRange); x += tileSize.x)
+	for (int x = position.x - (tileSize.x * explosionSize); x <= position.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
 		if (m_collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
 		{
@@ -60,7 +60,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionRange)
 		}
 	}
 	
-	for (int y = position.y - (tileSize.y *= explosionRange); y <= position.y + (tileSize.y *= explosionRange); y += tileSize.y)
+	for (int y = position.y - (tileSize.y *= explosionSize); y <= position.y + (tileSize.y *= explosionSize); y += tileSize.y)
 	{
 		if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eWall)
 		{
@@ -256,6 +256,8 @@ void Level::update(float deltaTime)
 	//Bombs
 	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
 	{
+		bomb->update(deltaTime);
+
 		if (bomb->getTimer().isExpired())
 		{
 			spawnExplosions(bomb->getPosition(), bomb->getExplosionSize());
@@ -343,10 +345,10 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	{
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
-		int explosionRange = 0;
-		receivedMessage >> explosionRange;
+		int explosionSize = 0;
+		receivedMessage >> explosionSize;
 
-		spawnBomb(placementPosition, explosionRange);
+		spawnBomb(placementPosition, explosionSize);
 	}
 		break;
 	case eServerMessageType::eDestroyBox :

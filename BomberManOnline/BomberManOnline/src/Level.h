@@ -39,6 +39,6 @@ private:
 	std::vector<BombClient> m_bombs;
 
 	void spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType);
-	void spawnBomb(sf::Vector2f position, int explosionRange);
-	void spawnExplosions(sf::Vector2f position, int explosionRange);
+	void spawnBomb(sf::Vector2f position, int explosionSize);
+	void spawnExplosions(sf::Vector2f position, int explosionSize);
 };
