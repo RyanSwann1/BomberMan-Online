@@ -6,6 +6,7 @@
 #include "Utilities.h"
 #include "Level.h"
 
+//Game Object Client
 GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, 
 	eTimerActive timerActive)
 	: GameObject(startingPosition, expirationTime, type),
@@ -21,4 +22,16 @@ void GameObjectClient::update(float deltaTime)
 {
 	GameObject::update(deltaTime);
 	m_sprite.update(deltaTime);
+}
+
+//Bomb Client
+BombClient::BombClient(sf::Vector2f startingPosition, int explosionRange)
+	: GameObjectClient(startingPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBiggerExplosionPickUp, eGameObjectType::eBiggerExplosionPickUp, 
+		eTimerActive::eTrue),
+	m_explosionSize(explosionRange)
+{}
+
+int BombClient::getExplosionSize() const
+{
+	return m_explosionSize;
 }
