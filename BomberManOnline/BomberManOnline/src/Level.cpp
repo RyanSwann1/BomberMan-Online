@@ -54,17 +54,25 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 	
 	for (int x = position.x - (tileSize.x * explosionSize); x <= position.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
-		if (m_collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
+		assert(x >= 0 && position.y >= 0 && x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
+		if (x >= 0 && position.y >= 0 && x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
 		{
-			m_gameObjects.emplace_back(sf::Vector2f(x, position.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			if (m_collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(x / tileSize.x)] != eCollidableTile::eWall)
+			{
+				m_gameObjects.emplace_back(sf::Vector2f(x, position.y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			}
 		}
 	}
 	
 	for (int y = position.y - (tileSize.y * explosionSize); y <= position.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
-		if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eWall)
+		assert(position.x >= 0 && y >= 0 && position.x < m_levelSize.x * tileSize.x && y < m_levelSize.y * tileSize.y);
+		if (position.x >= 0 && y >= 0 && position.x < m_levelSize.x * tileSize.x && y < m_levelSize.y * tileSize.y)
 		{
-			m_gameObjects.emplace_back(sf::Vector2f(position.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			if (m_collisionLayer[static_cast<int>(y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eWall)
+			{
+				m_gameObjects.emplace_back(sf::Vector2f(position.x, y), EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+			}
 		}
 	}
 }
