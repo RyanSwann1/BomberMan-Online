@@ -82,16 +82,14 @@ sf::Packet & sf::operator<<(Packet & packetToSend, ServerMessagePlayerMove playe
 
 sf::Packet & sf::operator>>(Packet & receivedPacket, ServerMessageBombPlacement & bombPlacementMessage)
 {
-	receivedPacket >> bombPlacementMessage.position.x >> bombPlacementMessage.position.y >> bombPlacementMessage.lifeTimeDuration >> 
-		bombPlacementMessage.explosionSize;
+	receivedPacket >> bombPlacementMessage.position.x >> bombPlacementMessage.position.y >> bombPlacementMessage.explosionSize;
 
 	return receivedPacket;
 }
 
 sf::Packet & sf::operator<<(Packet & packetToSend, ServerMessageBombPlacement bombPlacementMessage)
 {
-	packetToSend << bombPlacementMessage.position.x << bombPlacementMessage.position.y << bombPlacementMessage.lifeTimeDuration <<
-		bombPlacementMessage.explosionSize;
+	packetToSend << bombPlacementMessage.position.x << bombPlacementMessage.position.y << bombPlacementMessage.explosionSize;
 
 	return packetToSend;
 }

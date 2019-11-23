@@ -252,8 +252,7 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 {
 	if (!Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize) && client.placeBomb())
 	{
-		ServerMessageBombPlacement bombPlacementMessage(placementPosition, BOMB_LIFETIME_DURATION, 
-			client.getCurrentBombExplosionSize());
+		ServerMessageBombPlacement bombPlacementMessage(placementPosition, client.getCurrentBombExplosionSize());
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
@@ -299,18 +298,7 @@ void Server::update(float frameTime)
 		gameObject->update(frameTime);
 
 		bool gameObjectDestroyed = false;
-		if (gameObject->getType() == eGameObjectType::eBomb && gameObject->getTimer().isExpired())
-		{
-			onBombExplosion(gameObject->getPosition());
-			onBombExplosion(sf::Vector2f(gameObject->getPosition().x - m_tileSize.x, gameObject->getPosition().y));
-			onBombExplosion(sf::Vector2f(gameObject->getPosition().x + m_tileSize.x, gameObject->getPosition().y));
-			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y - m_tileSize.y));
-			onBombExplosion(sf::Vector2f(gameObject->getPosition().x, gameObject->getPosition().y + m_tileSize.y));
-
-			gameObject = m_gameObjects.erase(gameObject);
-			gameObjectDestroyed = true;
-		}
-		else if (gameObject->getType() == eGameObjectType::eMovementPickUp ||
+		if (gameObject->getType() == eGameObjectType::eMovementPickUp ||
 			gameObject->getType() == eGameObjectType::eExtraBombPickUp ||
 			gameObject->getType() == eGameObjectType::eBiggerExplosionPickUp)
 		{
@@ -323,10 +311,37 @@ void Server::update(float frameTime)
 				gameObjectDestroyed = true;
 			}
 		}
-
-		if (!gameObjectDestroyed)
+		
+		if(!gameObjectDestroyed)
 		{
 			++gameObject;
+		}
+	}
+
+	//Bombs
+	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
+	{
+		bomb->update(frameTime);
+
+		if (bomb->getTimer().isExpired())
+		{
+			int explosionSize = bomb->getExplosionSize();
+			sf::Vector2f position = bomb->getPosition();
+			for (int x = position.x - (m_tileSize.x * explosionSize); x <= position.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
+			{
+				onBombExplosion(sf::Vector2f(x, position.y));
+			}
+
+			for (int y = position.y - (m_tileSize.y * explosionSize); y <= position.y + (m_tileSize.y * explosionSize); y += m_tileSize.y)
+			{
+				onBombExplosion(sf::Vector2f(position.x, y));
+			}
+
+			bomb = m_bombs.erase(bomb);
+		}
+		else
+		{
+			++bomb;
 		}
 	}
 
@@ -359,8 +374,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			if (Utilities::getRandomNumber(0, 10) >= 0)
 			{
 				packetToSend.clear();
-			 	const int randNumb = Utilities::getRandomNumber(0, 2);
-				switch (randNumb)
+				switch (Utilities::getRandomNumber(0, 2))
 				{
 				case 0:
 					packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition.x << explosionPosition.y;
@@ -392,6 +406,8 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 				m_clientsToRemove.push_back(player->getID());
 			}
 		}
+
+
 	}
 }
 

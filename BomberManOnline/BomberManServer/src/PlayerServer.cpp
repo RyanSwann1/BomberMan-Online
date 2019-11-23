@@ -192,9 +192,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (placeBomb())
 		{
-			ServerMessageBombPlacement bombPlacementMessage;
-			bombPlacementMessage.position = m_position;
-			bombPlacementMessage.lifeTimeDuration = m_bombPlacementTimer.getExpirationTime();
+			ServerMessageBombPlacement bombPlacementMessage(m_position, m_currentBombExplosionSize);
 
 			sf::Packet packetToSend;
 			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
