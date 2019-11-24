@@ -505,7 +505,7 @@ void Server::changeCollidableTile(sf::Vector2f position, eCollidableTile collida
 	}
 }
 
-eCollidableTile Server::getCollidableTile(sf::Vector2f position) const
+eCollidableTile Server::getCollidableTile(sf::Vector2f position) 
 {
 	assert(position.x >= 0 && position.x < (m_levelSize.x * m_tileSize.x) && position.y >= 0 && position.y < (m_levelSize.y * m_tileSize.x));
 	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.y && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
