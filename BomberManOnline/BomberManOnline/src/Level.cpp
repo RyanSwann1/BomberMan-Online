@@ -297,7 +297,8 @@ void Level::update(float deltaTime)
 			gameObject->getType() == eGameObjectType::eBiggerExplosionPickUp) 
 		{
 			sf::Vector2f pickUpPosition(gameObject->getPosition());
-			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
+			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) 
+				{ return player->getPosition() == pickUpPosition; });
 			if (player != m_players.cend())
 			{
 				gameObject = m_gameObjects.erase(gameObject);

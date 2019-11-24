@@ -45,28 +45,6 @@ int main()
 	int localClientID = INVALID_CLIENT_ID;
 	while (window.isOpen())
 	{
-		//Input Handling
-		sf::Event sfmlEvent;
-		while (window.pollEvent(sfmlEvent))
-		{
-			if (sfmlEvent.type == sf::Event::Closed)
-			{
-				sf::Packet packetToSend;
-				packetToSend << eServerMessageType::eRequestDisconnection;
-				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
-			}
-			else if (sfmlEvent.type == sf::Event::KeyPressed)
-			{
-				level->handleInput(sfmlEvent);
-			}
-		}
-
-		//Update
-		if (level)
-		{
-			level->update(deltaTime);
-		}
-		
 		//Handle Server Messages
 		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
 		{
@@ -89,7 +67,7 @@ int main()
 						level = Level::create(localClientID, initialGameData);
 					}
 				}
-				break;
+					break;
 				default:
 					assert(level);
 					if (level)
@@ -103,6 +81,28 @@ int main()
 			NetworkHandler::getInstance().getNetworkMessages().clear();
 		}
 
+		//Input Handling
+		sf::Event sfmlEvent;
+		while (window.pollEvent(sfmlEvent))
+		{
+			if (sfmlEvent.type == sf::Event::Closed)
+			{
+				sf::Packet packetToSend;
+				packetToSend << eServerMessageType::eRequestDisconnection;
+				NetworkHandler::getInstance().sendMessageToServer(packetToSend);
+			}
+			else if (sfmlEvent.type == sf::Event::KeyPressed)
+			{
+				level->handleInput(sfmlEvent);
+			}
+		}
+
+		//Update
+		if (level)
+		{
+			level->update(deltaTime);
+		}
+		
 		//Render
 		window.clear(sf::Color::Black);
 		if (level)
