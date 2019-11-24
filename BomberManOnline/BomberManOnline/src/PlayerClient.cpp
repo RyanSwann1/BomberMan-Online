@@ -5,6 +5,12 @@
 #include "NetworkHandler.h"
 #include <SFML/Network.hpp>
 
+//Movemnet Point
+MovementPoint::MovementPoint(sf::Vector2f position, eDirection moveDirection)
+	: position(position),
+	moveDirection(moveDirection)
+{}
+
 //Player Client
 PlayerClient::PlayerClient(int ID, sf::Vector2f startingPosition, ePlayerType playerType)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
@@ -104,3 +110,4 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 	m_previousPosition = position;
 	m_movementFactor = 0.0f;
 }
+

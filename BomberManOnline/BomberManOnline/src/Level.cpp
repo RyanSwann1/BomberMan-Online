@@ -510,8 +510,3 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	}
 }
-
-MovementPoint::MovementPoint(sf::Vector2f position, eDirection moveDirection)
-	: position(position),
-	moveDirection(moveDirection)
-{}
