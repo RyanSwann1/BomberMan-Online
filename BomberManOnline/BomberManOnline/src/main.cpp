@@ -45,42 +45,6 @@ int main()
 	int localClientID = INVALID_CLIENT_ID;
 	while (window.isOpen())
 	{
-		//Handle Server Messages
-		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
-		{
-			for (auto& receivedMessage : NetworkHandler::getInstance().getNetworkMessages())
-			{
-				eServerMessageType messageType;
-				receivedMessage >> messageType;
-				switch (messageType)
-				{
-				case eServerMessageType::eInitializeClientID:
-					receivedMessage >> localClientID;
-				break;
-				case eServerMessageType::eInitialGameData:
-				{
-					ServerMessageInitialGameData initialGameData;
-					receivedMessage >> initialGameData;
-					assert(!level);
-					if (!level)
-					{
-						level = Level::create(localClientID, initialGameData);
-					}
-				}
-				break;
-				default:
-					assert(level);
-					if (level)
-					{
-						level->onReceivedServerMessage(messageType, receivedMessage, window);
-					}
-				break;
-				}
-			}
-
-			NetworkHandler::getInstance().getNetworkMessages().clear();
-		}
-
 		//Input Handling
 		sf::Event sfmlEvent;
 		while (window.pollEvent(sfmlEvent))
@@ -103,6 +67,42 @@ int main()
 			level->update(deltaTime);
 		}
 		
+		//Handle Server Messages
+		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
+		{
+			for (auto& receivedMessage : NetworkHandler::getInstance().getNetworkMessages())
+			{
+				eServerMessageType messageType;
+				receivedMessage >> messageType;
+				switch (messageType)
+				{
+				case eServerMessageType::eInitializeClientID:
+					receivedMessage >> localClientID;
+					break;
+				case eServerMessageType::eInitialGameData:
+				{
+					ServerMessageInitialGameData initialGameData;
+					receivedMessage >> initialGameData;
+					assert(!level);
+					if (!level)
+					{
+						level = Level::create(localClientID, initialGameData);
+					}
+				}
+				break;
+				default:
+					assert(level);
+					if (level)
+					{
+						level->onReceivedServerMessage(messageType, receivedMessage, window);
+					}
+					break;
+				}
+			}
+
+			NetworkHandler::getInstance().getNetworkMessages().clear();
+		}
+
 		//Render
 		window.clear(sf::Color::Black);
 		if (level)
