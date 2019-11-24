@@ -18,14 +18,3 @@ public:
 private:
 	AnimatedSprite m_sprite;
 };
-
-class BombClient : public GameObjectClient
-{
-public:
-	BombClient(sf::Vector2f startingPosition, int explosionRange);
-
-	int getExplosionSize() const;
-
-private:
-	int m_explosionSize;
-};

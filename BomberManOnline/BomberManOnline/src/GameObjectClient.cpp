@@ -9,7 +9,7 @@
 //Game Object Client
 GameObjectClient::GameObjectClient(sf::Vector2f startingPosition, float expirationTime, eAnimationName startingAnimationName, eGameObjectType type, 
 	eTimerActive timerActive)
-	: GameObject(startingPosition, expirationTime, type),
+	: GameObject(startingPosition, expirationTime, type, timerActive),
 	m_sprite(startingPosition, startingAnimationName)
 {}
 
@@ -22,16 +22,4 @@ void GameObjectClient::update(float deltaTime)
 {
 	GameObject::update(deltaTime);
 	m_sprite.update(deltaTime);
-}
-
-//Bomb Client
-BombClient::BombClient(sf::Vector2f startingPosition, int explosionRange)
-	: GameObjectClient(startingPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, 
-		eTimerActive::eTrue),
-	m_explosionSize(explosionRange)
-{}
-
-int BombClient::getExplosionSize() const
-{
-	return m_explosionSize;
 }
