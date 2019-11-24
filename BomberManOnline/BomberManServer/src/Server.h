@@ -64,4 +64,6 @@ private:
 	void onBombExplosion(sf::Vector2f explosionPosition);
 	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);
 	void startGame();
+	void changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile);
+	eCollidableTile getCollidableTile(sf::Vector2f position);
 };
