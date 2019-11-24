@@ -41,4 +41,7 @@ private:
 	void spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType);
 	void spawnBomb(sf::Vector2f position, int explosionSize);
 	void spawnExplosions(sf::Vector2f position, int explosionSize);
+
+	eCollidableTile getCollidableTile(sf::Vector2i position) const;
+	void addExplosionObject(sf::Vector2f position);
 };
