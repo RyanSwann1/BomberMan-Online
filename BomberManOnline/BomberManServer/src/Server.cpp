@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -252,11 +252,10 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 {
 	if (!Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize) && client.placeBomb())
 	{
-		ServerMessageBombPlacement bombPlacementMessage(placementPosition, client.getCurrentBombExplosionSize());
-
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
+		packetToSend << eServerMessageType::ePlaceBomb << placementPosition.x << placementPosition.y;
 		broadcastMessage(packetToSend);
+		
 		placeBomb(placementPosition, client.getCurrentBombExplosionSize());
 	}
 }
@@ -323,12 +322,18 @@ void Server::update(float frameTime)
 	{
 		bomb->update(frameTime);
 
+		//Bomb Explosion
 		if (bomb->getTimer().isExpired())
 		{
-			onBombExplosion(bomb->getPosition());
-
 			int explosionSize = bomb->getExplosionSize();
 			sf::Vector2f position = bomb->getPosition();
+
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::eBombExplosion << position.x << position.y << explosionSize;
+			broadcastMessage(packetToSend);
+
+			onBombExplosion(position);
+
 			for (int x = position.x + m_tileSize.x; x <= position.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
 			{
 				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, position.y));
@@ -349,7 +354,7 @@ void Server::update(float frameTime)
 				}
 			}
 
-			for (int y = position.y + m_tileSize.y; y >= position.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
+			for (int y = position.y - m_tileSize.y; y >= position.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
 			{
 				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(position.x, y));
 				onBombExplosion(sf::Vector2f(position.x, y));
@@ -395,14 +400,10 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	{
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eDestroyBox << explosionPosition.x << explosionPosition.y;
-		broadcastMessage(packetToSend);
-
 		//Spawn PickUp
 		if (Utilities::getRandomNumber(0, 10) >= 0)
 		{
-			packetToSend.clear();
+			sf::Packet packetToSend;
 			switch (Utilities::getRandomNumber(0, 2))
 			{
 			case 0:
