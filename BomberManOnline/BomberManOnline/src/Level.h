@@ -36,12 +36,11 @@ private:
 	std::vector<MovementPoint> m_localPlayerPreviousPositions;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;
 	std::vector<GameObjectClient> m_gameObjects; 
-	std::vector<BombClient> m_bombs;
 
 	void spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType);
-	void spawnBomb(sf::Vector2f position, int explosionSize);
-	void spawnExplosions(sf::Vector2f position, int explosionSize);
+	void onBombExplosion(sf::Vector2f position, int explosionSize);
 
 	eCollidableTile getCollidableTile(sf::Vector2i position) const;
+	void changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile);
 	void addExplosionObject(sf::Vector2f position);
 };

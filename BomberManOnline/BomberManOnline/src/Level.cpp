@@ -42,13 +42,13 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType)
 	}
 }
 
-void Level::spawnBomb(sf::Vector2f position, int explosionSize)
+void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 {
-	m_bombs.emplace_back(position, explosionSize);
-}
+	auto explodedBomb = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [position](const auto& gameObject) 
+		{ return gameObject.getPosition() == position; });
+	assert(explodedBomb != m_gameObjects.end());
+	m_gameObjects.erase(explodedBomb);
 
-void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
-{
 	addExplosionObject(position);
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	
@@ -61,6 +61,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		else if(getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eBox)
 		{
 			addExplosionObject(sf::Vector2f(x, position.y));
+			changeCollidableTile(sf::Vector2i(x, position.y), eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eWall)
@@ -78,6 +79,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eBox)
 		{
 			addExplosionObject(sf::Vector2f(x, position.y));
+			changeCollidableTile(sf::Vector2i(x, position.y), eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eWall)
@@ -86,7 +88,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		}
 	}
 
-	for (int y = position.y + tileSize.y; y >= position.y - (tileSize.y * explosionSize); y -= tileSize.y)
+	for (int y = position.y - tileSize.y; y >= position.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
 		if (getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eNonCollidable)
 		{
@@ -95,6 +97,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eBox)
 		{
 			addExplosionObject(sf::Vector2f(position.x, y));
+			changeCollidableTile(sf::Vector2i(position.x, y), eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eWall)
@@ -112,6 +115,7 @@ void Level::spawnExplosions(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eBox)
 		{
 			addExplosionObject(sf::Vector2f(position.x, y));
+			changeCollidableTile(sf::Vector2i(position.x, y), eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eWall)
@@ -131,9 +135,19 @@ eCollidableTile Level::getCollidableTile(sf::Vector2i position) const
 	}
 }
 
+void Level::changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile)
+{
+	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
+	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
+	{
+		m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x] = collidableTile;
+	}
+}
+
 void Level::addExplosionObject(sf::Vector2f position)
 {
-	m_gameObjects.emplace_back(position, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion);
+	m_gameObjects.emplace_back(position, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion, eTimerActive::eTrue);
 }
 
 std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGameData & initialGameData)
@@ -236,9 +250,9 @@ void Level::render(sf::RenderWindow & window) const
 	{
 		for (int x = 0; x < m_levelSize.x; x++)
 		{
-			if (m_collisionLayer[y][x] == eCollidableTile::eBox)
+			const auto& tileSheet = Textures::getInstance().getTileSheet();
+			if (getCollidableTile(sf::Vector2i(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y)) == eCollidableTile::eBox)
 			{
-				const auto& tileSheet = Textures::getInstance().getTileSheet();
 				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(204));
 				boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
 
@@ -257,12 +271,6 @@ void Level::render(sf::RenderWindow & window) const
 	for (const auto& gameObject : m_gameObjects)
 	{
 		gameObject.render(window);
-	}
-
-	//Bombs
-	for (const auto& bomb : m_bombs)
-	{
-		bomb.render(window);
 	}
 }
 
@@ -318,22 +326,6 @@ void Level::update(float deltaTime)
 			{
 				++gameObject;
 			}
-		}
-	}
-
-	//Bombs
-	for (auto bomb = m_bombs.begin(); bomb != m_bombs.end();)
-	{
-		bomb->update(deltaTime);
-
-		if (bomb->getTimer().isExpired())
-		{
-			spawnExplosions(bomb->getPosition(), bomb->getExplosionSize());
-			bomb = m_bombs.erase(bomb);
-		}
-		else
-		{
-			++bomb;
 		}
 	}
 }
@@ -413,19 +405,18 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	{
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
+
+		m_gameObjects.emplace_back(placementPosition, 0.0f, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eFalse);
+	}
+		break;
+	case eServerMessageType::eBombExplosion :
+	{
+		sf::Vector2f position;
+		receivedMessage >> position.x >> position.y;
 		int explosionSize = 0;
 		receivedMessage >> explosionSize;
 
-		spawnBomb(placementPosition, explosionSize);
-	}
-		break;
-	case eServerMessageType::eDestroyBox :
-	{
-		sf::Vector2f boxPosition;
-		receivedMessage >> boxPosition.x >> boxPosition.y;
-		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-		
-		m_collisionLayer[static_cast<int>(boxPosition.y / tileSize.y)][static_cast<int>(boxPosition.x / tileSize.x)] = eCollidableTile::eNonCollidable;
+		onBombExplosion(position, explosionSize);
 	}
 		break;
 	case eServerMessageType::ePlayerDisconnected :
