@@ -192,11 +192,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (placeBomb())
 		{
-			ServerMessageBombPlacement bombPlacementMessage(m_position, m_currentBombExplosionSize);
-
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::ePlaceBomb << bombPlacementMessage;
+			packetToSend << eServerMessageType::ePlaceBomb << m_position.x << m_position.y;
 			m_server.broadcastMessage(packetToSend);
+
 			m_server.placeBomb(m_position, m_currentBombExplosionSize);
 
 			m_currentState = eAIState::eSetTargetAtSafePosition;

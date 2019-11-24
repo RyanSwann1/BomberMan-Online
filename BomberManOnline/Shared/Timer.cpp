@@ -19,7 +19,14 @@ float Timer::getExpirationTime() const
 
 bool Timer::isExpired() const
 {
-	return m_elaspedTime >= m_expirationTime;
+	if (m_active)
+	{
+		return m_elaspedTime > m_expirationTime;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Timer::setExpiredTime(float expirationTime)
