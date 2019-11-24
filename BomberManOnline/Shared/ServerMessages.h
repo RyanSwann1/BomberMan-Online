@@ -54,29 +54,3 @@ struct ServerMessagePlayerMove
 	sf::Vector2f newPosition;
 	float speed;
 };
-
-struct ServerMessageBombPlacement
-{
-	ServerMessageBombPlacement()
-		: position(),
-		explosionSize(0)
-	{}
-
-	ServerMessageBombPlacement(sf::Vector2f position, int explosionSize)
-		: position(position),
-		explosionSize(explosionSize)
-	{}
-
-	sf::Vector2f position;
-	int explosionSize;
-};
-
-struct ServerMessagePickUpCollision
-{
-	ServerMessagePickUpCollision()
-	{
-
-	}
-
-
-};
