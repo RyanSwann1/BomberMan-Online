@@ -18,7 +18,8 @@ enum class eAIState
 	eMakeDecision = 0,
 	eSetTargetAtBox,
 	eMoveToBox,
-	eSetTargetAtNearestPlayer,
+	eAttackTargetPlayer,
+	eMovingToTargetPlayer,
 	eMoveToNearestPlayer,
 	eSetTargetAtSafePosition,
 	eMoveToSafePosition,
@@ -49,6 +50,7 @@ private:
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
+	const PlayerServer* m_targetPlayer;
 
 	void handleAIStates(float frameTime);
 };

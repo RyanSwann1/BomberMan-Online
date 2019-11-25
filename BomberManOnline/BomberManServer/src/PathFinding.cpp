@@ -347,7 +347,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 	}
 }
 
-std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource)
+std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource)
 {
 	//No path
 	if (lastPosition == positionAtSource)
@@ -358,7 +358,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i neighbourPosit
 	std::vector<sf::Vector2f> pathToTile;
 
 	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(neighbourPosition.x* tileSize.x, neighbourPosition.y* tileSize.y);
+	pathToTile.emplace_back(targetPosition.x* tileSize.x, targetPosition.y* tileSize.y);
 	pathToTile.emplace_back(lastPosition.x* tileSize.x, lastPosition.y* tileSize.y);
 
 
@@ -372,7 +372,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i neighbourPosit
 	return pathToTile;
 }
 
-void PathFinding::getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
 {
 	//No path
 	if (lastPosition == positionAtSource)
@@ -381,7 +381,7 @@ void PathFinding::getPathToTile(sf::Vector2i neighbourPosition, sf::Vector2i las
 	}
 
 	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y);
+	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
 	pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
 
 	sf::Vector2i position = lastPosition;

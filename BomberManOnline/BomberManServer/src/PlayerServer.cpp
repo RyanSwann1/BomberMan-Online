@@ -31,7 +31,8 @@ PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& se
 	m_behavour(eAIBehaviour::ePassive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
-	m_waitTimer(2.5f)
+	m_waitTimer(2.5f),
+	m_targetPlayer(nullptr)
 {}
 
 void PlayerServerAI::update(float frameTime)
@@ -69,6 +70,14 @@ void PlayerServerAI::update(float frameTime)
 			{
 				m_currentState = eAIState::eMakeDecision;
 			}
+			else if (m_currentState == eAIState::eMovingToTargetPlayer)
+			{
+				assert(m_targetPlayer);
+				if (m_targetPlayer)
+				{
+				
+				}
+			}
 		}
 		else
 		{
@@ -93,24 +102,23 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 	case eAIState::eMakeDecision:
 	{
-		bool targetFound = false;
-		if (m_behavour == eAIBehaviour::eAggressive)
+		if (m_behavour == eAIBehaviour::eAggressive && !m_targetPlayer)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
-				if (targetPlayer->getID() != m_ID && PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
+				if (targetPlayer->getID() != m_ID && targetPlayer->getControllerType() == ePlayerControllerType::eHuman &&
+					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
-					targetFound = true;
-					m_currentState = eAIState::eSetTargetAtNearestPlayer;
+					m_targetPlayer = targetPlayer.get();
+					setNewPosition(PathFinding::getInstance().getPositionClosestToTarget(m_position, m_targetPlayer->getPosition(), m_server), m_server);
+					m_currentState = eAIState::eMovingToTargetPlayer;
 					break;
 				}
 			}
 		}
-		if (!targetFound || m_behavour == eAIBehaviour::ePassive)
-		{
-			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
-			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
-		}
+
+		PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
+		(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
 	}
 
 	break;
@@ -123,8 +131,15 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 
 	break;
-	case eAIState::eSetTargetAtNearestPlayer:
+	case eAIState::eAttackTargetPlayer:
 	{
+		assert(m_targetPlayer);
+		if (m_targetPlayer)
+		{
+
+		}
+
+
 		const auto& players = m_server.getPlayers();
 		if (m_position == m_newPosition)
 		{
