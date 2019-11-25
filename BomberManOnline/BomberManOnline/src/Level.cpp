@@ -215,7 +215,8 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 		if (m_localPlayer->placeBomb())
 		{
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::ePlayerBombPlacementRequest << localPlayerPosition.x << localPlayerPosition.y;
+			sf::Vector2f bombPlacementPosition(Utilities::getClosestGridPosition(localPlayerPosition, tileSize));
+			packetToSend << eServerMessageType::ePlayerBombPlacementRequest << bombPlacementPosition.x << bombPlacementPosition.y;
 			NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 		}
 
