@@ -55,21 +55,20 @@ sf::Vector2f Player::getPreviousPosition() const
 
 bool Player::placeBomb()
 {
-	if (!isMoving())
+	if (m_bombsPlaced == 0)
 	{
-		if (m_bombsPlaced == 0)
-		{
-			m_bombPlacementTimer.setActive(true);
-		}
-
-		if (m_bombsPlaced < m_currentBombCount)
-		{
-			++m_bombsPlaced;
-			return true;
-		}
+		m_bombPlacementTimer.setActive(true);
 	}
 
-	return false;
+	if (m_bombsPlaced < m_currentBombCount)
+	{
+		++m_bombsPlaced;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void Player::update(float deltaTime)

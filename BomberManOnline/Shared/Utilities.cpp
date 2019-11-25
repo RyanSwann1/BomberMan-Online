@@ -56,7 +56,10 @@ sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, fl
 
 sf::Vector2f Utilities::getClosestGridPosition(sf::Vector2f position, sf::Vector2i tileSize)
 {
-	return sf::Vector2f((position.x / tileSize.x) * tileSize.x, (position.y / tileSize.y) * tileSize.y);
+	sf::Vector2f centerPosition(position.x + (tileSize.x / 2.0f), position.y + (tileSize.y / 2.0f));
+
+	sf::Vector2f pos((static_cast<int>(centerPosition.x / tileSize.x)) * tileSize.x, static_cast<int>((centerPosition.y / tileSize.y)) * tileSize.y);
+	return pos;
 }
 
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
