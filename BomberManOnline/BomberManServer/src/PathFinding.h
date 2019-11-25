@@ -4,11 +4,16 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-struct GraphNode
+class GraphNode
 {
+public:
 	GraphNode();
 	GraphNode(sf::Vector2i cameFrom);
 
+	sf::Vector2i getCameFrom() const;
+	bool isVisited() const;
+
+private:
 	sf::Vector2i cameFrom;
 	bool visited;
 };
@@ -38,8 +43,8 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server,
-		sf::Vector2i positionAtSource);
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource);
+
 	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
