@@ -32,7 +32,7 @@ PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& se
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
-	m_targetPlayer(nullptr)
+	m_targetPlayerID(INVALID_CLIENT_ID)
 {}
 
 void PlayerServerAI::update(float frameTime)
@@ -56,6 +56,11 @@ void PlayerServerAI::update(float frameTime)
 	{
 		m_movementFactor = 0.0f;
 
+		if (m_currentState == eAIState::eMovingToTargetPlayer)
+		{
+			int i = 0;
+		}
+
 		if (m_pathToTile.empty())
 		{
 			if (m_currentState == eAIState::eMoveToBox)
@@ -72,10 +77,10 @@ void PlayerServerAI::update(float frameTime)
 			}
 			else if (m_currentState == eAIState::eMovingToTargetPlayer)
 			{
-				assert(m_targetPlayer);
-				if (m_targetPlayer)
+				const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+				if (targetPlayer)
 				{
-					if (PathFinding::getInstance().getPathToTile(m_targetPlayer->getPosition(), m_server, m_position).size() > 1)
+					if (PathFinding::getInstance().getPathToTile(targetPlayer->getPosition(), m_server, m_position).size() > 1)
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -83,6 +88,11 @@ void PlayerServerAI::update(float frameTime)
 					{
 						m_currentState = eAIState::ePlantBomb;
 					}
+				}
+				else
+				{
+					m_currentState = eAIState::eMakeDecision;
+					m_targetPlayerID = INVALID_CLIENT_ID;
 				}
 			}
 		}
@@ -109,17 +119,17 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 	case eAIState::eMakeDecision:
 	{
-		if (m_behavour == eAIBehaviour::eAggressive && !m_targetPlayer)
+		if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_CLIENT_ID)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
 				if (targetPlayer->getID() != m_ID && targetPlayer->getControllerType() == ePlayerControllerType::eHuman &&
 					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
-					m_targetPlayer = targetPlayer.get();
-					PathFinding::getInstance().getPositionClosestToTarget(m_position, m_targetPlayer->getPosition(), m_server, m_pathToTile);
+					m_targetPlayerID = targetPlayer->getID();
+					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
 					assert(!m_pathToTile.empty());
-					if (m_pathToTile.empty())
+					if (!m_pathToTile.empty())
 					{
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_currentState = eAIState::eMovingToTargetPlayer;
@@ -149,12 +159,16 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetPositionToTargetPlayer:
 	{
-		assert(m_targetPlayer);
-		if (m_targetPlayer)
+		const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+		if (targetPlayer)
 		{
-			PathFinding::getInstance().getPositionClosestToTarget(m_position, m_targetPlayer->getPosition(), m_server, m_pathToTile);
+			PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_currentState = eAIState::eMovingToTargetPlayer;
+		}
+		else
+		{
+			m_currentState = eAIState::eMakeDecision;
 		}
 	}
 

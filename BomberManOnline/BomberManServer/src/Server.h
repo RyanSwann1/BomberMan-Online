@@ -24,6 +24,7 @@ class Server : private NonCopyable
 public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
+	const PlayerServer* getPlayer(int ID) const;
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
 	eCollidableTile getCollidableTile(sf::Vector2i position) const;

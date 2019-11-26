@@ -9,7 +9,7 @@
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -64,6 +64,20 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		delete server;
 		return std::unique_ptr<Server>();
+	}
+}
+
+const PlayerServer* Server::getPlayer(int ID) const
+{
+	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });
+	assert(cIter != m_players.cend());
+	if (cIter != m_players.cend())
+	{
+		return cIter->get();
+	}
+	else
+	{
+		return nullptr;
 	}
 }
 

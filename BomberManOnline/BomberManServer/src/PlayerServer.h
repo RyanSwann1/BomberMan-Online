@@ -50,7 +50,7 @@ private:
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
-	const PlayerServer* m_targetPlayer;
+	int m_targetPlayerID;
 
 	void handleAIStates(float frameTime);
 };
