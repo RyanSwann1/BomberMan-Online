@@ -47,7 +47,10 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 	auto explodedBomb = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [position](const auto& gameObject) 
 		{ return gameObject.getPosition() == position; });
 	assert(explodedBomb != m_gameObjects.end());
-	m_gameObjects.erase(explodedBomb);
+	if (explodedBomb != m_gameObjects.end())
+	{
+		m_gameObjects.erase(explodedBomb);
+	}
 
 	addExplosionObject(position);
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();

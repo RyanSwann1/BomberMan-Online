@@ -131,8 +131,10 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 }
 
 //Path Finding
-sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server)
+void PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
+	pathToTile.clear();
+
 	std::vector<sf::Vector2i> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
 
@@ -151,7 +153,7 @@ sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Ve
 		}
 	}
 
-	return sf::Vector2f(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y);
+	pathToTile.emplace_back(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y);
 }
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)
@@ -364,6 +366,23 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 	while (position != positionAtSource)
 	{
 		position = m_graph.getGraphNode(position, server.getLevelSize()).getCameFrom();
+		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+	}
+
+	return pathToTile;
+}
+
+std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource)
+{
+	std::vector<sf::Vector2f> pathToTile;
+	sf::Vector2i tileSize = server.getTileSize();
+	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
+
+	sf::Vector2f position = targetPosition;
+	while (position != positionAtSource)
+	{
+		sf::Vector2i cameFrom = m_graph.getGraphNode(sf::Vector2i(position.x, position.y), server.getLevelSize()).getCameFrom();
+		position = sf::Vector2f(cameFrom.x, cameFrom.y);
 		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 	}
 

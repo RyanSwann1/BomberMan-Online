@@ -43,9 +43,9 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource);
 
-	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server);
+	void getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
 	void createGraph(sf::Vector2i levelSize);
@@ -58,5 +58,6 @@ private:
 	PathFinding() {}
 	Graph m_graph;
 
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
 	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 };
