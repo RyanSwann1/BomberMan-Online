@@ -43,7 +43,7 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource);
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
 
 	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
