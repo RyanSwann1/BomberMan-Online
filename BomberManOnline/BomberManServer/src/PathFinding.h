@@ -58,7 +58,8 @@ private:
 	PathFinding() {}
 	Graph m_graph;
 
-
 	void getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server,
 		sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
+
+	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 };
