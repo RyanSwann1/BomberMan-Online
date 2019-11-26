@@ -18,7 +18,7 @@ enum class eAIState
 	eMakeDecision = 0,
 	eSetTargetAtBox,
 	eMoveToBox,
-	eAttackTargetPlayer,
+	eSetPositionToTargetPlayer,
 	eMovingToTargetPlayer,
 	eMoveToNearestPlayer,
 	eSetTargetAtSafePosition,
