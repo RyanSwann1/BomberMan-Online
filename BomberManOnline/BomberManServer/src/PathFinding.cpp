@@ -378,25 +378,25 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 	return pathToTile;
 }
 
-void PathFinding::getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
-{
-	//No path
-	if (lastPosition == positionAtSource)
-	{
-		return;
-	}
-
-	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
-	pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
-
-	sf::Vector2i position = lastPosition;
-	while (position != positionAtSource)
-	{
-		position = m_graph.getGraphNode(position, server.getLevelSize()).getCameFrom();
-		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
-	}
-}
+//void PathFinding::getPathToTile(sf::Vector2i targetPosition, sf::Vector2i lastPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
+//{
+//	//No path
+//	if (lastPosition == positionAtSource)
+//	{
+//		return;
+//	}
+//
+//	sf::Vector2i tileSize = server.getTileSize();
+//	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
+//	pathToTile.emplace_back(lastPosition.x * tileSize.x, lastPosition.y * tileSize.y);
+//
+//	sf::Vector2i position = lastPosition;
+//	while (position != positionAtSource)
+//	{
+//		position = m_graph.getGraphNode(position, server.getLevelSize()).getCameFrom();
+//		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+//	}
+//}
 
 void PathFinding::getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
 {
