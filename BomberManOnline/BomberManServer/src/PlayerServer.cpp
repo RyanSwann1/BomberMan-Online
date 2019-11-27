@@ -117,6 +117,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 	case eAIState::eMakeDecision:
 	{
+		//Target Player has been found
 		if (m_targetPlayerID != INVALID_CLIENT_ID)
 		{
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
@@ -137,6 +138,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				m_currentState = eAIState::eMakeDecision;
 			}
 		}
+		//Search for target Player
 		else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_CLIENT_ID)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
@@ -158,6 +160,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			}
 		}
 
+		//Target Player not found
 		if (m_currentState == eAIState::eMakeDecision)
 		{
 			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
