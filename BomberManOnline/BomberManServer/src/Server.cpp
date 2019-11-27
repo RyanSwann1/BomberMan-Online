@@ -70,7 +70,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 const PlayerServer* Server::getPlayer(int ID) const
 {
 	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });
-	assert(cIter != m_players.cend());
 	if (cIter != m_players.cend())
 	{
 		return cIter->get();
