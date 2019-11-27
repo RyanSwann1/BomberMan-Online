@@ -77,7 +77,7 @@ void PlayerServerAI::update(float frameTime)
 				{
 					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
 					auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
-					if (pathToTile.size() >= Utilities::getRandomNumber(2,3))
+					if (pathToTile.size() >= 3)
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -121,7 +121,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
@@ -143,7 +144,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
 					m_targetPlayerID = targetPlayer->getID();
-					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 					assert(!m_pathToTile.empty());
 					if (!m_pathToTile.empty())
 					{
@@ -180,7 +182,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 		if (targetPlayer)
 		{
-			PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+			sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+			PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 			assert(!m_pathToTile.empty());
 			if (!m_pathToTile.empty())
 			{
