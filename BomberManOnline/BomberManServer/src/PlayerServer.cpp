@@ -56,11 +56,6 @@ void PlayerServerAI::update(float frameTime)
 	{
 		m_movementFactor = 0.0f;
 
-		if (m_currentState == eAIState::eMovingToTargetPlayer)
-		{
-			int i = 0;
-		}
-
 		if (m_pathToTile.empty())
 		{
 			if (m_currentState == eAIState::eMoveToBox)
@@ -80,7 +75,7 @@ void PlayerServerAI::update(float frameTime)
 				const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 				if (targetPlayer)
 				{
-					if (PathFinding::getInstance().getPathToTile(targetPlayer->getPosition(), m_server, m_position).size() > 1)
+					if (PathFinding::getInstance().getPathToTile(m_position, m_server, targetPlayer->getPosition()).size() > 1)
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -127,21 +122,20 @@ void PlayerServerAI::handleAIStates(float frameTime)
 					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
 					m_targetPlayerID = targetPlayer->getID();
-					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
-					assert(!m_pathToTile.empty());
-					if (!m_pathToTile.empty())
-					{
-						setNewPosition(m_pathToTile.back(), m_server);
-						m_currentState = eAIState::eMovingToTargetPlayer;
-					}
+					sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+					setNewPosition(newPosition, m_server);
+					m_currentState = eAIState::eMovingToTargetPlayer;
 
 					break;
 				}
 			}
 		}
 
-		PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
-		(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
+		if (m_currentState == eAIState::eMakeDecision)
+		{
+			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
+			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
+		}
 	}
 
 	break;
