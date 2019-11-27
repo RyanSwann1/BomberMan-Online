@@ -76,7 +76,8 @@ void PlayerServerAI::update(float frameTime)
 				if (targetPlayer)
 				{
 					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-					if (PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition).size() >= 2)
+					auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
+					if (pathToTile.size() >= Utilities::getRandomNumber(2,3))
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -115,7 +116,26 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 	case eAIState::eMakeDecision:
 	{
-		if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_CLIENT_ID)
+		if (m_targetPlayerID != INVALID_CLIENT_ID)
+		{
+			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+			if (targetPlayer)
+			{
+				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+				assert(!m_pathToTile.empty());
+				if (!m_pathToTile.empty())
+				{
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+			}
+			else
+			{
+				m_targetPlayerID = INVALID_CLIENT_ID;
+				m_currentState = eAIState::eMakeDecision;
+			}
+		}
+		else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_CLIENT_ID)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
@@ -170,6 +190,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		}
 		else
 		{
+			m_targetPlayerID = INVALID_CLIENT_ID;
 			m_currentState = eAIState::eMakeDecision;
 		}
 	}
