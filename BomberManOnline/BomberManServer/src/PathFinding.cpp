@@ -425,7 +425,6 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition
 					destinationFound = true;
 					break;
 				}
-
 			}
 		}
 
@@ -433,11 +432,19 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition
 		{
 			sf::Vector2f position(frontier.back().x * tileSize.x, frontier.back().y * tileSize.y);
 			pathToTile.push_back(position);
-			while (position != sourcePosition)
+			bool pathCompleted = false;
+			while (!pathCompleted)
 			{
 				sf::Vector2i previousPosition = m_graph.getPreviousPosition(sf::Vector2i(position.x / tileSize.x, position.y / tileSize.y), server.getLevelSize());
 				position = sf::Vector2f(previousPosition.x * tileSize.x, previousPosition.y * tileSize.y);
-				pathToTile.push_back(position);
+				if (position != sourcePosition)
+				{
+					pathToTile.push_back(position);
+				}
+				else
+				{
+					pathCompleted = true;
+				}
 			}
 		}
 	}
