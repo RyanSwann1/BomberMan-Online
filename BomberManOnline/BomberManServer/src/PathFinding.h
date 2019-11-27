@@ -27,7 +27,6 @@ public:
 	sf::Vector2i getPreviousPosition(sf::Vector2i position, sf::Vector2i levelSize) const;
 	bool isPositionVisited(sf::Vector2i position, sf::Vector2i levelSize) const;
 
-
 	void resetGraph(sf::Vector2i levelSize);
 	void addToGraph(sf::Vector2i position, sf::Vector2i lastPosition, sf::Vector2i levelSize);
 
@@ -45,12 +44,12 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource);
-	sf::Vector2f getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile);
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 
 	void createGraph(sf::Vector2i levelSize);
 
+	void getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile);
 	void getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range);
 	void getPathToClosestSafePosition(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);

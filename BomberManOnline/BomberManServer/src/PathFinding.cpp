@@ -140,7 +140,7 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 }
 
 //Path Finding
-sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
 	pathToTile.clear();
 
@@ -162,11 +162,16 @@ sf::Vector2f PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Ve
 		}
 	}
 
-	return sf::Vector2f(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y);
+	pathToTile.push_back(sf::Vector2f(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y));
 }
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)
 {
+	if (source == target)
+	{
+		return true;
+	}
+
 	m_graph.resetGraph(server.getLevelSize());
 
 	std::queue<sf::Vector2i> frontier;
@@ -381,22 +386,59 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 	return pathToTile;
 }
 
-std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource)
+std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition)
 {
 	std::vector<sf::Vector2f> pathToTile;
 
-	assert(isPositionReachable(positionAtSource, targetPosition, server));
-	if (isPositionReachable(positionAtSource, targetPosition, server))
+	assert(isPositionReachable(sourcePosition, targetPosition, server));
+	if (isPositionReachable(sourcePosition, targetPosition, server))
 	{
-		sf::Vector2i tileSize = server.getTileSize();
-		pathToTile.emplace_back(targetPosition.x, targetPosition.y);
+		m_graph.resetGraph(server.getLevelSize());
 
-		sf::Vector2f position = targetPosition;
-		while (position != positionAtSource)
+		sf::Vector2i tileSize = server.getTileSize();
+		sf::Vector2i positionAtSource(sourcePosition.x / tileSize.x, sourcePosition.y / tileSize.y);
+
+		std::queue<sf::Vector2i> frontier;
+		frontier.push(positionAtSource);
+
+		std::vector<sf::Vector2i> neighbouringPositions;
+		neighbouringPositions.reserve(MAX_NEIGHBOURS);
+
+
+		bool destinationFound = false;
+		while (!frontier.empty() && !destinationFound)
 		{
-			sf::Vector2i cameFrom = m_graph.getGraphNode(sf::Vector2i(position.x / tileSize.x, position.y / tileSize.y), server.getLevelSize()).getCameFrom();
-			position = sf::Vector2f(cameFrom.x * tileSize.x, cameFrom.y * tileSize.y);
-			pathToTile.emplace_back(position.x, position.y);
+			sf::Vector2i lastPosition = frontier.front();
+			frontier.pop();
+
+			getNonCollidableNeighbouringPoints(lastPosition, neighbouringPositions, server, positionAtSource);
+			for (sf::Vector2i neighbourPosition : neighbouringPositions)
+			{
+				if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+				{
+					m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+					frontier.push(neighbourPosition);
+				}
+
+				if (sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y) == targetPosition)
+				{
+					destinationFound = true;
+					break;
+				}
+
+			}
+		}
+
+		if (destinationFound)
+		{
+			sf::Vector2f position(frontier.back().x * tileSize.x, frontier.back().y * tileSize.y);
+			pathToTile.push_back(position);
+			while (position != sourcePosition)
+			{
+				sf::Vector2i previousPosition = m_graph.getPreviousPosition(sf::Vector2i(position.x / tileSize.x, position.y / tileSize.y), server.getLevelSize());
+				position = sf::Vector2f(previousPosition.x * tileSize.x, previousPosition.y * tileSize.y);
+				pathToTile.push_back(position);
+			}
 		}
 	}
 
@@ -411,7 +453,7 @@ void PathFinding::getPathToTile(sf::Vector2i targetPosition, const Server& serve
 	sf::Vector2i position = sf::Vector2i(targetPosition);
 	while (position != positionAtSource)
 	{
-		position = m_graph.getGraphNode(position, server.getLevelSize()).getCameFrom();
+		position = m_graph.getPreviousPosition(position, server.getLevelSize());
 		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 	}
 }

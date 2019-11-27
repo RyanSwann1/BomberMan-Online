@@ -75,7 +75,8 @@ void PlayerServerAI::update(float frameTime)
 				const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 				if (targetPlayer)
 				{
-					if (PathFinding::getInstance().getPathToTile(m_position, m_server, targetPlayer->getPosition()).size() > 1)
+					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+					if (PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition).size() >= 2)
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -122,10 +123,13 @@ void PlayerServerAI::handleAIStates(float frameTime)
 					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
 				{
 					m_targetPlayerID = targetPlayer->getID();
-					sf::Vector2f newPosition = PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
-					setNewPosition(newPosition, m_server);
-					m_currentState = eAIState::eMovingToTargetPlayer;
-
+					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
+					assert(!m_pathToTile.empty());
+					if (!m_pathToTile.empty())
+					{
+						setNewPosition(m_pathToTile.back(), m_server);
+						m_currentState = eAIState::eMovingToTargetPlayer;
+					}
 					break;
 				}
 			}
@@ -157,8 +161,12 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		if (targetPlayer)
 		{
 			PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPlayer->getPosition(), m_server, m_pathToTile);
-			setNewPosition(m_pathToTile.back(), m_server);
-			m_currentState = eAIState::eMovingToTargetPlayer;
+			assert(!m_pathToTile.empty());
+			if (!m_pathToTile.empty())
+			{
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_currentState = eAIState::eMovingToTargetPlayer;
+			}
 		}
 		else
 		{
