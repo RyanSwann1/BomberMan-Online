@@ -143,26 +143,7 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 void PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
 	pathToTile.clear();
-
-	std::vector<sf::Vector2i> neighbours;
-	neighbours.reserve(MAX_NEIGHBOURS);
-
-	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2i positionAtSource = sf::Vector2i(source.x / tileSize.x, source.y / tileSize.y);
-	
-	sf::Vector2i roundedTargetPosition(static_cast<int>(target.x / tileSize.x), static_cast<int>(target.y / tileSize.y));
-	sf::Vector2i closestPosition = sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y));
-
-	getNonCollidableNeighbouringPoints(positionAtSource, neighbours, server, positionAtSource);
-	for (sf::Vector2i neighbour : neighbours)
-	{
-		if (Utilities::distance(neighbour, roundedTargetPosition) < Utilities::distance(closestPosition, roundedTargetPosition))
-		{
-			closestPosition = neighbour;
-		}
-	}
-
-	pathToTile.push_back(sf::Vector2f(closestPosition.x * tileSize.x, closestPosition.y * tileSize.y));
+	pathToTile.push_back(getPathToTile(target, server, source).back());
 }
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)
