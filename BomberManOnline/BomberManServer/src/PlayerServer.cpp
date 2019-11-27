@@ -58,26 +58,25 @@ void PlayerServerAI::update(float frameTime)
 
 		if (m_pathToTile.empty())
 		{
-			if (m_currentState == eAIState::eMoveToBox)
+			switch (m_currentState)
 			{
+			case eAIState::eMoveToBox:
 				m_currentState = eAIState::ePlantBomb;
-			}
-			else if (m_currentState == eAIState::eMoveToSafePosition)
-			{
+				break;
+			case eAIState::eMoveToSafePosition:
 				m_currentState = eAIState::eWait;
-			}
-			else if (m_currentState == eAIState::eMoveToPickUp)
-			{
+				break;
+			case eAIState::eMoveToPickUp:
 				m_currentState = eAIState::eMakeDecision;
-			}
-			else if (m_currentState == eAIState::eMovingToTargetPlayer)
+				break;
+			case eAIState::eMovingToTargetPlayer:
 			{
 				const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 				if (targetPlayer)
 				{
 					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
 					auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
-					if (pathToTile.size() >= 3)
+					if (pathToTile.size() >= 2)
 					{
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
@@ -91,6 +90,8 @@ void PlayerServerAI::update(float frameTime)
 					m_currentState = eAIState::eMakeDecision;
 					m_targetPlayerID = INVALID_CLIENT_ID;
 				}
+			}
+				break;
 			}
 		}
 		else
