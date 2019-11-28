@@ -42,7 +42,7 @@ int main()
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	float deltaTime = 0.0f;
-	int localClientID = INVALID_CLIENT_ID;
+	int localClientID = INVALID_PLAYER_ID;
 	while (window.isOpen())
 	{
 		//Handle Server Messages

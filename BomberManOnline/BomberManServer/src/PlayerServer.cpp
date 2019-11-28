@@ -32,7 +32,7 @@ PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& se
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
-	m_targetPlayerID(INVALID_CLIENT_ID)
+	m_targetPlayerID(INVALID_PLAYER_ID)
 {}
 
 void PlayerServerAI::update(float frameTime)
@@ -88,7 +88,7 @@ void PlayerServerAI::update(float frameTime)
 				else
 				{
 					m_currentState = eAIState::eMakeDecision;
-					m_targetPlayerID = INVALID_CLIENT_ID;
+					m_targetPlayerID = INVALID_PLAYER_ID;
 				}
 			}
 				break;
@@ -118,7 +118,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	case eAIState::eMakeDecision:
 	{
 		//Target Player has been found
-		if (m_targetPlayerID != INVALID_CLIENT_ID)
+		if (m_targetPlayerID != INVALID_PLAYER_ID)
 		{
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
@@ -134,12 +134,12 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			}
 			else
 			{
-				m_targetPlayerID = INVALID_CLIENT_ID;
+				m_targetPlayerID = INVALID_PLAYER_ID;
 				m_currentState = eAIState::eMakeDecision;
 			}
 		}
 		//Search for target Player
-		else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_CLIENT_ID)
+		else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
@@ -197,7 +197,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		}
 		else
 		{
-			m_targetPlayerID = INVALID_CLIENT_ID;
+			m_targetPlayerID = INVALID_PLAYER_ID;
 			m_currentState = eAIState::eMakeDecision;
 		}
 	}

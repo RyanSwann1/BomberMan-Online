@@ -377,7 +377,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	case eServerMessageType::eNewPlayerPosition :
 	{
 		sf::Vector2f newPosition;
-		int clientID = INVALID_CLIENT_ID;
+		int clientID = INVALID_PLAYER_ID;
 		receivedMessage >> newPosition.x >> newPosition.y >> clientID;
 		if (clientID == m_localPlayer->getID())
 		{
@@ -425,9 +425,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		break;
 	case eServerMessageType::ePlayerDisconnected :
 	{
-		int clientID = INVALID_CLIENT_ID;
+		int clientID = INVALID_PLAYER_ID;
 		receivedMessage >> clientID;
-		assert(clientID != INVALID_CLIENT_ID);
+		assert(clientID != INVALID_PLAYER_ID);
 		if (m_localPlayer->getID() == clientID)
 		{
 			window.close();
@@ -451,7 +451,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		
 	case eServerMessageType::eMovementPickUpCollision :
 	{
-		int clientID = INVALID_CLIENT_ID;
+		int clientID = INVALID_PLAYER_ID;
 		float movementSpeedIncrement = 0;
 		receivedMessage >> clientID >> movementSpeedIncrement;
 		for (auto& player : m_players)
@@ -476,7 +476,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 	case eServerMessageType::eExtraBombPickUpCollision :
 	{
-		int clientID = INVALID_CLIENT_ID;
+		int clientID = INVALID_PLAYER_ID;
 		receivedMessage >> clientID;
 		for (auto& player : m_players)
 		{
@@ -500,7 +500,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 	case eServerMessageType::eBiggerExplosionPickUpCollision :
 	{
-		int clientID = INVALID_CLIENT_ID;
+		int clientID = INVALID_PLAYER_ID;
 		receivedMessage >> clientID;
 		for (auto& player : m_players)
 		{
