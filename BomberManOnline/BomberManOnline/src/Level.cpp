@@ -9,7 +9,6 @@
 #include <iostream>
 
 constexpr size_t MAX_GAME_OBJECTS = 50;
-constexpr size_t MAX_PLAYERS = 4;
 constexpr size_t MAX_PREVIOUS_POINTS = 10;
 
 Level::Level(std::string&& levelName)
@@ -22,7 +21,6 @@ Level::Level(std::string&& levelName)
 	m_players(),
 	m_gameObjects()
 {
-	m_players.reserve(MAX_PLAYERS);
 	m_gameObjects.reserve(MAX_GAME_OBJECTS);
 }
 
