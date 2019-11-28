@@ -414,7 +414,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
 		//Spawn PickUp
-		if (Utilities::getRandomNumber(0, 10) >= 11)
+		if (Utilities::getRandomNumber(0, 10) >= 9)
 		{
 			sf::Packet packetToSend;
 			switch (Utilities::getRandomNumber(0, 2))
