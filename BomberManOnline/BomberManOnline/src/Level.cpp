@@ -255,7 +255,7 @@ void Level::render(sf::RenderWindow & window) const
 			const auto& tileSheet = Textures::getInstance().getTileSheet();
 			if (getCollidableTile(sf::Vector2i(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y)) == eCollidableTile::eBox)
 			{
-				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(204));
+				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eBox)));
 				boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
 
 				window.draw(boxSprite);
