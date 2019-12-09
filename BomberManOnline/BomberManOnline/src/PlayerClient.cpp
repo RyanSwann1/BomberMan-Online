@@ -15,8 +15,7 @@ MovementPoint::MovementPoint(sf::Vector2f position, eDirection moveDirection)
 PlayerClient::PlayerClient(int ID, sf::Vector2f startingPosition, ePlayerType playerType)
 	: Player(ID, startingPosition, ePlayerControllerType::eHuman),
 	m_playerType(playerType),
-	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown),
-	m_moveDirection(eDirection::eNone)
+	m_sprite(startingPosition, eAnimationName::ePlayerIdleDown)
 {}
 
 void PlayerClient::update(float deltaTime)
@@ -48,22 +47,22 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 			//Assign new movement direction
 			if (newPosition.x > m_position.x)
 			{
-				m_moveDirection = eDirection::eRight;
+				m_facingDirection = eDirection::eRight;
 				m_sprite.setNewAnimation(eAnimationName::ePlayerMoveRight);
 			}
 			else if (newPosition.x < m_position.x)
 			{
-				m_moveDirection = eDirection::eLeft;
+				m_facingDirection = eDirection::eLeft;
 				m_sprite.setNewAnimation(eAnimationName::ePlayerMoveLeft);
 			}
 			else if (newPosition.y < m_position.y)
 			{
-				m_moveDirection = eDirection::eUp;
+				m_facingDirection = eDirection::eUp;
 				m_sprite.setNewAnimation(eAnimationName::ePlayerMoveUp);
 			}
 			else if (newPosition.y > m_position.y)
 			{
-				m_moveDirection = eDirection::eDown;
+				m_facingDirection = eDirection::eDown;
 				m_sprite.setNewAnimation(eAnimationName::ePlayerMoveDown);
 			}
 
@@ -71,7 +70,7 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 			packetToSend << eServerMessageType::ePlayerMoveToPosition << ServerMessagePlayerMove(m_newPosition, m_movementSpeed);
 			NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 
-			localPlayerPreviousPositions.emplace_back(m_newPosition, m_moveDirection);
+			localPlayerPreviousPositions.emplace_back(m_newPosition, m_facingDirection);
 		}
 	}
 	else if (m_playerType == ePlayerType::eRemote)
@@ -83,22 +82,22 @@ void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<st
 		//Assign new movement direction
 		if (newPosition.x > m_position.x)
 		{
-			m_moveDirection = eDirection::eRight;
+			m_facingDirection = eDirection::eRight;
 			m_sprite.setNewAnimation(eAnimationName::ePlayerMoveRight);
 		}
 		else if (newPosition.x < m_position.x)
 		{
-			m_moveDirection = eDirection::eLeft;
+			m_facingDirection = eDirection::eLeft;
 			m_sprite.setNewAnimation(eAnimationName::ePlayerMoveLeft);
 		}
 		else if (newPosition.y < m_position.y)
 		{
-			m_moveDirection = eDirection::eUp;
+			m_facingDirection = eDirection::eUp;
 			m_sprite.setNewAnimation(eAnimationName::ePlayerMoveUp);
 		}
 		else if (newPosition.y > m_position.y)
 		{
-			m_moveDirection = eDirection::eDown;
+			m_facingDirection = eDirection::eDown;
 			m_sprite.setNewAnimation(eAnimationName::ePlayerMoveDown);
 		}
 	}

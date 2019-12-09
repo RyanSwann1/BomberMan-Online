@@ -12,11 +12,16 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_position(startingPosition),
 	m_newPosition(startingPosition),
 	m_controllerType(controllerType),
-	m_moveDirection(),
+	m_facingDirection(),
 	m_movementFactor(0.0f),
 	m_movementSpeed(2.5f),
 	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
 {}
+
+eDirection Player::getFacingDirection() const
+{
+	return m_facingDirection;
+}
 
 bool Player::isMoving() const
 {

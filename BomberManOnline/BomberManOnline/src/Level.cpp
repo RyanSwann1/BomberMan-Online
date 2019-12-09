@@ -231,7 +231,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 	case sf::Keyboard::F :
 	{
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eRequestKickBomb << m_localPlayer->getPosition().x << m_localPlayer->getPosition().y << eDirection::eDown;
+		packetToSend << eServerMessageType::eRequestKickBomb << m_localPlayer->getPosition() << m_localPlayer->getFacingDirection();
 		NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 	}
 		

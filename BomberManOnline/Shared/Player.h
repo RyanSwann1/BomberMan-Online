@@ -15,6 +15,7 @@ public:
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 	virtual ~Player() {}
 
+	eDirection getFacingDirection() const;
 	bool isMoving() const;
 	ePlayerControllerType getControllerType() const;
 	int getID() const;
@@ -40,7 +41,7 @@ protected:
 	sf::Vector2f m_position;
 	sf::Vector2f m_newPosition;
 	ePlayerControllerType m_controllerType;
-	eDirection m_moveDirection;
+	eDirection m_facingDirection;
 	float m_movementFactor;
 	float m_movementSpeed;
 	Timer m_bombPlacementTimer;

@@ -29,5 +29,4 @@ public:
 private:
 	const ePlayerType m_playerType;
 	AnimatedSprite m_sprite;
-	eDirection m_moveDirection;
 };
