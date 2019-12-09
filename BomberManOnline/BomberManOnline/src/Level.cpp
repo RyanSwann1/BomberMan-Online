@@ -42,14 +42,6 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType)
 
 void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 {
-	auto explodedBomb = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [position](const auto& gameObject) 
-		{ return gameObject.getPosition() == position; });
-	assert(explodedBomb != m_gameObjects.end());
-	if (explodedBomb != m_gameObjects.end())
-	{
-		m_gameObjects.erase(explodedBomb);
-	}
-
 	addExplosionObject(position);
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	
@@ -430,7 +422,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
 
-		m_gameObjects.emplace_back(placementPosition, 0.0f, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eFalse);
+		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eTrue);
 	}
 		break;
 	case eServerMessageType::eBombExplosion :

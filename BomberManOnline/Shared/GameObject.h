@@ -23,6 +23,7 @@ public:
 	eGameObjectType getType() const;
 	const Timer& getTimer() const;
 	sf::Vector2f getPosition() const;
+	sf::Vector2f getNewPosition() const;
 
 	void update(float frameTime);
 	void setNewPosition(sf::Vector2f newPosition);

@@ -31,6 +31,11 @@ sf::Vector2f GameObject::getPosition() const
 	return m_position;
 }
 
+sf::Vector2f GameObject::getNewPosition() const
+{
+	return m_newPosition;
+}
+
 void GameObject::update(float frameTime)
 {
 	m_lifeTimer.update(frameTime);
