@@ -3,12 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include "PlayerControllerType.h"
 #include "Timer.h"
+#include "NonCopyable.h"
 #include "Direction.h"
 
 constexpr float MOVEMENT_SPEED_INCREMENT = 0.2f;
 constexpr int INVALID_PLAYER_ID = -1;
 
-class Player
+class Player : private NonCopyable
 {
 public:
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
