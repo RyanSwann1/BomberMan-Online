@@ -29,6 +29,7 @@ public:
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
 	eCollidableTile getCollidableTile(sf::Vector2i position) const;
 	const std::vector<GameObject>& getGameObjects() const;
+	const std::vector<BombServer>& getBombs() const;
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
 

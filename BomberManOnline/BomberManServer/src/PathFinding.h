@@ -3,6 +3,7 @@
 #include "NonCopyable.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <array>
 
 class GraphNode
 {
@@ -34,6 +35,7 @@ private:
 	std::vector<std::vector<GraphNode>> m_graph;
 };
 
+class BombServer;
 class Server;
 class PathFinding : private NonCopyable
 {
@@ -46,6 +48,7 @@ public:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
+	bool isPositionInRangeOfExplosion(sf::Vector2f position, const Server& server);
 
 	void createGraph(sf::Vector2i levelSize);
 
@@ -60,4 +63,5 @@ private:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
 	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
+	bool isExplosionInRange(sf::Vector2f position, const Server& server, const BombServer& bombS) const;
 };

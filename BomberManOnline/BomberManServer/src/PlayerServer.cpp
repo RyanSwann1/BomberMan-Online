@@ -28,7 +28,7 @@ void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
 	: PlayerServer(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
-	m_behavour(eAIBehaviour::eAggressive),
+	m_behavour(eAIBehaviour::ePassive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
@@ -50,6 +50,13 @@ void PlayerServerAI::update(float frameTime)
 	{
 		m_movementFactor += frameTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
+	}
+
+	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, m_server))
+	{
+		m_currentState = eAIState::eSetTargetAtSafePosition;
+		m_waitTimer.setActive(false);
+		m_waitTimer.resetElaspedTime();
 	}
 
 	if (m_position == m_newPosition)

@@ -104,6 +104,11 @@ const std::vector<GameObject>& Server::getGameObjects() const
 	return m_gameObjects;
 }
 
+const std::vector<BombServer>& Server::getBombs() const
+{
+	return m_bombs;
+}
+
 sf::Vector2i Server::getTileSize() const
 {
 	return m_tileSize;
@@ -243,7 +248,6 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
-	//Invalid Move
 	if (Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
 	{
 		sf::Packet packetToSend;
@@ -254,7 +258,6 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 			std::cout << "Failed to send message to client\n";
 		}
 	}
-	//Valid Move
 	else
 	{
 		client.setNewPosition(playerMoveMessage.newPosition, *this);
@@ -441,7 +444,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	}
 
 	//Damage colliding players
-	for (const std::unique_ptr<PlayerServer>& player : m_players)
+	for (const auto& player : m_players)
 	{
 		sf::Vector2i playerPosition(static_cast<int>(player->getPosition().x / m_tileSize.x), static_cast<int>(player->getPosition().y / m_tileSize.y));
 		if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
@@ -500,7 +503,7 @@ void Server::startGame()
 	ServerMessageInitialGameData initialGameDataMessage;
 	initialGameDataMessage.levelName = m_levelName;
 
-	for (const std::unique_ptr<PlayerServer>& player : m_players)
+	for (const auto& player : m_players)
 	{
 		initialGameDataMessage.playerDetails.emplace_back(player->getID(), player->getPosition());
 	}
