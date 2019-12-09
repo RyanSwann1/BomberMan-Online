@@ -391,7 +391,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	{
 		for (int x = position.x; x >= 0;)
 		{
-			if (server.getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eNonCollidable)
+			if (server.getCollidableTile(sf::Vector2i(x / tileSize.x, position.y / tileSize.y)) == eCollidableTile::eNonCollidable)
 			{
 				x -= tileSize.x;
 			}
@@ -406,7 +406,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	{
 		for (int x = position.x; x < levelSize.x * tileSize.x;)
 		{
-			if (server.getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eNonCollidable)
+			if (server.getCollidableTile(sf::Vector2i(x / tileSize.x, position.y / tileSize.y)) == eCollidableTile::eNonCollidable)
 			{
 				x += tileSize.x;
 			}
@@ -421,7 +421,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	{
 		for (int y = position.y; y >= 0;)
 		{
-			if (server.getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eNonCollidable)
+			if (server.getCollidableTile(sf::Vector2i(position.x / tileSize.x, y / tileSize.y)) == eCollidableTile::eNonCollidable)
 			{
 				y -= tileSize.y;
 			}
@@ -436,7 +436,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	{
 		for (int y = position.y; y < levelSize.y * tileSize.y;)
 		{
-			if (server.getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eNonCollidable)
+			if (server.getCollidableTile(sf::Vector2i(position.x / tileSize.x, y / tileSize.y)) == eCollidableTile::eNonCollidable)
 			{
 				y += tileSize.y;
 			}

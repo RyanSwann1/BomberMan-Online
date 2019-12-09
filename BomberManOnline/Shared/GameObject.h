@@ -24,7 +24,7 @@ public:
 	const Timer& getTimer() const;
 	sf::Vector2f getPosition() const;
 
-	virtual void update(float frameTime);
+	void update(float frameTime);
 	void setNewPosition(sf::Vector2f newPosition);
 
 protected:
