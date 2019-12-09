@@ -64,6 +64,7 @@ private:
 	void update(float frameTime);
 	
 	void onBombExplosion(sf::Vector2f explosionPosition);
+	void onBombKick(sf::Vector2f playerPosition, eDirection kickDirection);
 	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);
 	void startGame();
 	void changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile);

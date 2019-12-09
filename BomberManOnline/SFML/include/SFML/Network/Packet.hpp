@@ -29,9 +29,11 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Network/Export.hpp>
+#include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
 
+enum class eDirection;
 enum class eServerMessageType;
 struct ServerMessageInvalidMove;
 struct ServerMessageInitialGameData;
@@ -334,6 +336,12 @@ public:
     /// \overload
     ////////////////////////////////////////////////////////////
     Packet& operator <<(const String&       data);
+
+	friend Packet& operator>>(Packet& receivedPacket, eDirection& direction);
+	friend Packet& operator<<(Packet& packetToSend, eDirection direction);
+
+	friend Packet& operator>>(Packet& receivedPacket, sf::Vector2f& position);
+	friend Packet& operator<<(Packet& packetToSend, sf::Vector2f position);
 
 	friend Packet& operator>>(Packet& receivedPacket, eServerMessageType& serverMessage);
 	friend Packet& operator<<(Packet& packetToSend, eServerMessageType serverMessage);

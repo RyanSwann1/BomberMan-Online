@@ -151,6 +151,18 @@ void Level::addExplosionObject(sf::Vector2f position)
 	m_gameObjects.emplace_back(position, EXPLOSION_LIFETIME_DURATION, eAnimationName::eExplosion, eGameObjectType::eExplosion, eTimerActive::eTrue);
 }
 
+void Level::kickBombToPosition(sf::Vector2f bombPosition, sf::Vector2f kickToPosition)
+{
+	auto bombToKick = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [bombPosition](const auto& gameObject) 
+		{ return gameObject.getPosition() == bombPosition; });
+
+	assert(bombToKick != m_gameObjects.cend());
+	if (bombToKick != m_gameObjects.end())
+	{
+		bombToKick->setNewPosition(kickToPosition);
+	}
+}
+
 std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGameData & initialGameData)
 {
 	//Load Level
@@ -186,6 +198,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 	assert(m_localPlayer);
 	sf::Vector2f localPlayerPosition(m_localPlayer->getPosition());
 	sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
+
 	switch (sfmlEvent.key.code)
 	{
 	case sf::Keyboard::A:
@@ -221,6 +234,15 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 			NetworkHandler::getInstance().sendMessageToServer(packetToSend);
 		}
 
+		break;
+		
+	case sf::Keyboard::F :
+	{
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eRequestKickBomb << m_localPlayer->getPosition().x << m_localPlayer->getPosition().y << eDirection::eDown;
+		NetworkHandler::getInstance().sendMessageToServer(packetToSend);
+	}
+		
 		break;
 	}
 }
@@ -508,6 +530,17 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 				break;
 			}
 		}
+	}
+		break;
+
+	case eServerMessageType::eBombKicked :
+	{
+		sf::Vector2f bombOnPosition;
+		receivedMessage >> bombOnPosition;
+		sf::Vector2f kickToPosition;
+		receivedMessage >> kickToPosition;
+
+		kickBombToPosition(bombOnPosition, kickToPosition);
 	}
 		break;
 	}

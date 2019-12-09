@@ -2,6 +2,33 @@
 #include "ServerMessages.h"
 #include <string>
 
+sf::Packet& sf::operator>>(Packet& receivedPacket, eDirection& direction)
+{
+	int dir = 0;
+	receivedPacket >> dir;
+	direction = static_cast<eDirection>(dir);
+
+	return receivedPacket;
+}
+
+sf::Packet& sf::operator<<(Packet& packetToSend, eDirection direction)
+{
+	packetToSend << static_cast<int>(direction);
+	return packetToSend;
+}
+
+sf::Packet& sf::operator>>(Packet& receivedPacket, sf::Vector2f& position)
+{
+	receivedPacket >> position.x >> position.y;
+	return receivedPacket;
+}
+
+sf::Packet& sf::operator<<(Packet& packetToSend, sf::Vector2f position)
+{
+	packetToSend << position.x << position.y;
+	return packetToSend;
+}
+
 sf::Packet & sf::operator>>(Packet & receivedPacket, eServerMessageType & serverMessage)
 {
 	int messageType = 0;

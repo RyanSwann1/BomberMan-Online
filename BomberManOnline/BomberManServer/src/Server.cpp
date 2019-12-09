@@ -216,6 +216,17 @@ void Server::listen()
 					m_clientsToRemove.push_back(client.getID());
 				}
 				break;
+				
+				case eServerMessageType::eRequestKickBomb :
+				{
+					sf::Vector2f position;
+					receivedPacket >> position.x >> position.y;
+					eDirection kickDirection;
+					receivedPacket >> kickDirection;
+					
+					onBombKick(position, kickDirection);
+				}
+				break;
 				}
 			}
 		}
@@ -342,48 +353,48 @@ void Server::update(float frameTime)
 		if (bomb->getTimer().isExpired())
 		{
 			int explosionSize = bomb->getExplosionSize();
-			sf::Vector2f position = bomb->getPosition();
+			sf::Vector2f explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
 
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eBombExplosion << position.x << position.y << explosionSize;
+			packetToSend << eServerMessageType::eBombExplosion << explosionPosition.x << explosionPosition.y << explosionSize;
 			broadcastMessage(packetToSend);
 
-			onBombExplosion(position);
+			onBombExplosion(explosionPosition);
 
-			for (int x = position.x + m_tileSize.x; x <= position.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
+			for (int x = explosionPosition.x + m_tileSize.x; x <= explosionPosition.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, position.y));
-				onBombExplosion(sf::Vector2f(x, position.y));
+				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, explosionPosition.y));
+				onBombExplosion(sf::Vector2f(x, explosionPosition.y));
 				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
 				{
 					break;
 				}
 			}
 
-			for (int x = position.x - m_tileSize.x; x >= position.x - (m_tileSize.x * explosionSize); x -= m_tileSize.x)
+			for (int x = explosionPosition.x - m_tileSize.x; x >= explosionPosition.x - (m_tileSize.x * explosionSize); x -= m_tileSize.x)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, position.y));
-				onBombExplosion(sf::Vector2f(x, position.y));
+				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, explosionPosition.y));
+				onBombExplosion(sf::Vector2f(x, explosionPosition.y));
 				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
 				{
 					break;
 				}
 			}
 
-			for (int y = position.y - m_tileSize.y; y >= position.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
+			for (int y = explosionPosition.y - m_tileSize.y; y >= explosionPosition.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(position.x, y));
-				onBombExplosion(sf::Vector2f(position.x, y));
+				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(explosionPosition.x, y));
+				onBombExplosion(sf::Vector2f(explosionPosition.x, y));
 				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
 				{
 					break;
 				}
 			}
 
-			for (int y = position.y + m_tileSize.y; y <= position.y + (m_tileSize.y * explosionSize); y += m_tileSize.y)
+			for (int y = explosionPosition.y + m_tileSize.y; y <= explosionPosition.y + (m_tileSize.y * explosionSize); y += m_tileSize.y)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(position.x, y));
-				onBombExplosion(sf::Vector2f(position.x, y));
+				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(explosionPosition.x, y));
+				onBombExplosion(sf::Vector2f(explosionPosition.x, y));
 				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
 				{
 					break;
@@ -450,6 +461,23 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
 		{
 			m_clientsToRemove.push_back(player->getID());
+		}
+	}
+}
+
+void Server::onBombKick(sf::Vector2f playerPosition, eDirection kickDirection)
+{
+	auto bombToKick = std::find_if(m_bombs.begin(), m_bombs.end(), [playerPosition] (const auto& bomb) { return bomb.getPosition() == playerPosition; });
+	if (bombToKick != m_bombs.end())
+	{
+		sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(playerPosition, kickDirection, *this);
+		if (kickToPosition != playerPosition)
+		{
+			bombToKick->setNewPosition(kickToPosition);
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::eBombKicked << bombToKick->getPosition() << kickToPosition;
+			
+			broadcastMessage(packetToSend);
 		}
 	}
 }

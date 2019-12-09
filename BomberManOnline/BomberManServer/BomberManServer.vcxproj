@@ -135,6 +135,7 @@
     <ClCompile Include="..\Shared\XMLParser\tinyxmlerror.cpp" />
     <ClCompile Include="..\Shared\XMLParser\tinyxmlparser.cpp" />
     <ClCompile Include="..\Shared\XMLParser\XMLParser.cpp" />
+    <ClCompile Include="BombServer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PathFinding.cpp" />
     <ClCompile Include="src\PlayerServer.cpp" />

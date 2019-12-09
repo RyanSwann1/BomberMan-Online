@@ -380,6 +380,76 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 	return pathToTile;
 }
 
+sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const
+{
+	sf::Vector2i levelSize = server.getLevelSize();
+	sf::Vector2i tileSize = server.getTileSize();
+
+	switch (direction)
+	{
+	case eDirection::eLeft :
+	{
+		for (int x = position.x; x >= 0;)
+		{
+			if (server.getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eNonCollidable)
+			{
+				x -= tileSize.x;
+			}
+			else
+			{
+				return sf::Vector2f(x + tileSize.x, position.y);
+			}
+		}
+	}
+	break;
+	case eDirection::eRight :
+	{
+		for (int x = position.x; x < levelSize.x * tileSize.x;)
+		{
+			if (server.getCollidableTile(sf::Vector2i(x, position.y)) == eCollidableTile::eNonCollidable)
+			{
+				x += tileSize.x;
+			}
+			else
+			{
+				return sf::Vector2f(x - tileSize.x, position.y);
+			}
+		}
+	}
+	break;
+	case eDirection::eUp :
+	{
+		for (int y = position.y; y >= 0;)
+		{
+			if (server.getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eNonCollidable)
+			{
+				y -= tileSize.y;
+			}
+			else
+			{
+				return sf::Vector2f(position.x, y + tileSize.y);
+			}
+		}
+	}
+	break;
+	case eDirection::eDown :
+	{
+		for (int y = position.y; y < levelSize.y * tileSize.y;)
+		{
+			if (server.getCollidableTile(sf::Vector2i(position.x, y)) == eCollidableTile::eNonCollidable)
+			{
+				y += tileSize.y;
+			}
+			else
+			{
+				return sf::Vector2f(position.x, y - tileSize.y);
+			}
+		}
+	}
+	break;
+	}
+}
+
 std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition)
 {
 	std::vector<sf::Vector2f> pathToTile;
