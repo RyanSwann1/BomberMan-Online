@@ -103,11 +103,6 @@ const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() con
 	return m_collisionLayer;
 }
 
-bool Server::isBombAtPosition(sf::Vector2f position) const
-{
-	
-}
-
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
 {
 	assert(position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y);
