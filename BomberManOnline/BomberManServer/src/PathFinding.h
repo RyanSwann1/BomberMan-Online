@@ -68,5 +68,6 @@ private:
 	Graph m_graph;
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
+	std::vector<sf::Vector2f> getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource);
 	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 };

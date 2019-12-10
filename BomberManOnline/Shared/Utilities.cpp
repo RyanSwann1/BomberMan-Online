@@ -67,6 +67,11 @@ sf::Vector2i Utilities::convertToGridPosition(sf::Vector2f position, sf::Vector2
 	return sf::Vector2i(position.x / tileSize.x, position.y / tileSize.y);
 }
 
+sf::Vector2f Utilities::convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize)
+{
+	return sf::Vector2f(position.x / tileSize.x, position.y / tileSize.y);
+}
+
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
 {
 	return collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eNonCollidable;
