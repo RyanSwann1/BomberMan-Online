@@ -25,9 +25,9 @@ public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
 	const PlayerServer* getPlayer(int ID) const;
+	const BombServer* getBomb(sf::Vector2f position) const;
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
-	bool isBombAtPosition(sf::Vector2f position) const;
 	eCollidableTile getCollidableTile(sf::Vector2i position) const;
 	const std::vector<GameObject>& getGameObjects() const;
 	const std::vector<BombServer>& getBombs() const;

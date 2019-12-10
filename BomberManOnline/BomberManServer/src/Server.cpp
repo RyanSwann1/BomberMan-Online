@@ -80,6 +80,19 @@ const PlayerServer* Server::getPlayer(int ID) const
 	}
 }
 
+const BombServer* Server::getBomb(sf::Vector2f position) const
+{
+	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
+	if (bomb != m_bombs.cend())
+	{
+		return &(*bomb);
+	}
+	else
+	{
+		return nullptr;
+	}
+}
+
 const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 {
 	return m_players;
@@ -92,8 +105,7 @@ const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() con
 
 bool Server::isBombAtPosition(sf::Vector2f position) const
 {
-	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
-	return bomb != m_bombs.cend();
+	
 }
 
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const

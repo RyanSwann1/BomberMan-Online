@@ -101,7 +101,22 @@ void PlayerServerAI::update(float frameTime)
 					{
 						for (const auto& position : pathToTile)
 						{
-							if (m_server.isBombAtPosition(position))
+							const BombServer* bomb = m_server.getBomb(position);
+							if (bomb)
+							{
+								PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
+								if (!pathToTile.empty())
+								{
+									setNewPosition(m_pathToTile.back(), m_server);
+									m_pathToTile.pop_back();
+									m_currentState = eAIState::eMoveToSafePosition;
+								}
+								else
+								{
+
+								}
+							}
+							else
 							{
 								
 							}
