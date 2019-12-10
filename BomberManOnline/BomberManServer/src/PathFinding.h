@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <array>
+#include <string>
+#include <unordered_map>
 
 class GraphNode
 {
@@ -50,7 +52,7 @@ public:
 	sf::Vector2f getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const;
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
-	bool isPositionInRangeOfExplosion(sf::Vector2f position, const Server& server);
+	bool isPositionInRangeOfAllExplosion(sf::Vector2f position, const Server& server);
 	bool isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server);
 
 	void createGraph(sf::Vector2i levelSize);

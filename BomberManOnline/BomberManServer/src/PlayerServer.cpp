@@ -54,7 +54,7 @@ void PlayerServerAI::update(float frameTime)
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
 	}
 
-	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, m_server))
+	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfAllExplosion(m_position, m_server))
 	{
 		if (m_targetPlayerID != INVALID_PLAYER_ID)
 		{
@@ -99,30 +99,27 @@ void PlayerServerAI::update(float frameTime)
 					auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
 					if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
 					{
-						for (const auto& position : pathToTile)
+						bool bombFound = false;
+						for (const sf::Vector2f& position : pathToTile)
 						{
 							const BombServer* bomb = m_server.getBomb(position);
-							if (bomb)
+							if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
 							{
 								PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
-								if (!pathToTile.empty())
+								if (!m_pathToTile.empty())
 								{
 									setNewPosition(m_pathToTile.back(), m_server);
 									m_pathToTile.pop_back();
 									m_currentState = eAIState::eMoveToSafePosition;
+									bombFound = true;
+									break;
 								}
-								else
-								{
-
-								}
-							}
-							else
-							{
-								
 							}
 						}
-
-						m_currentState = eAIState::eSetPositionToTargetPlayer;
+						if(!bombFound)
+						{
+							m_currentState = eAIState::eSetPositionToTargetPlayer;
+						}
 					}
 					else
 					{
@@ -295,16 +292,16 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 void PlayerServerAI::destroyPlayer_FILLERNAME(const Player& targetPlayer)
 {
-	sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	PathFinding::getInstance().getSafePositionToClosestTarget(m_position, targetPlayerPosition, m_server, m_pathToTile);
-	if (m_pathToTile.empty())
-	{
-		m_currentState = eAIState::eSetTargetAtSafePosition; 
-	}
-	else
-	{
+	//sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
+	//PathFinding::getInstance().getSafePositionToClosestTarget(m_position, targetPlayerPosition, m_server, m_pathToTile);
+	//if (m_pathToTile.empty())
+	//{
+	//	m_currentState = eAIState::eSetTargetAtSafePosition; 
+	//}
+	//else
+	//{
 
-	}
+	//}
 }
 
 //Player Human

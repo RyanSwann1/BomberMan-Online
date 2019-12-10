@@ -191,7 +191,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 	return false;
 }
 
-bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Server& server)
+bool PathFinding::isPositionInRangeOfAllExplosion(sf::Vector2f position, const Server& server)
 {
 	for (const auto& bomb : server.getBombs())
 	{
@@ -268,7 +268,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 	sf::Vector2f explosionPosition;
 	
 	//left
-	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * bomb.getExplosionSize()); x -= tileSize.x)
+	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
 		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -282,10 +282,48 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 	}
 
 	//Right
-	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * bomb.getExplosionSize()); x += tileSize.x)
+	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
+		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+		{
+			break;
+		}
+		else if (explosionPosition == position)
+		{
+			return true;
+		}
 	}
+
+	//Up
+	for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
+	{
+		explosionPosition = sf::Vector2f(bombPosition.x, y);
+		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+		{
+			break;
+		}
+		else if (explosionPosition == position)
+		{
+			return true;
+		}
+	}
+
+	//Down
+	for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
+	{
+		explosionPosition = sf::Vector2f(bombPosition.x, y);
+		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+		{
+			break;
+		}
+		else if (explosionPosition == position)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void PathFinding::createGraph(sf::Vector2i levelSize)
@@ -437,7 +475,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 				frontier.push(neighbourPosition);
 			}
 
-			if (!isPositionInRangeOfExplosion(sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y), server))
+			if (!isPositionInRangeOfAllExplosion(sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y), server))
 			{
 				getPathToTile(neighbourPosition, server, positionAtSource, pathToTile);
 				safePositionFound = true;
@@ -478,7 +516,12 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, const BombSe
 				frontier.push(neighbourPosition);
 			}
 			
-
+			if (!isPositionInRangeOfExplosion(sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y), bomb, server))
+			{
+				getPathToTile(neighbourPosition, server, positionAtSource, pathToTile);
+				safePositionFound = true;
+				break;
+			}
 		}
 
 		neighbours.clear();
@@ -508,7 +551,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	sf::Vector2f furthestPosition;
 	switch (direction)
 	{
-	case eDirection::eLeft :
+	case eDirection::eLeft:
 	{
 		for (int x = position.x; x >= position.x - (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
@@ -525,7 +568,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 		}
 	}
 	break;
-	case eDirection::eRight :
+	case eDirection::eRight:
 	{
 		for (int x = position.x; x < position.x + (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
@@ -542,7 +585,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 		}
 	}
 	break;
-	case eDirection::eUp :
+	case eDirection::eUp:
 	{
 		for (int y = position.y; y >= position.y - (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
@@ -559,7 +602,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 		}
 	}
 	break;
-	case eDirection::eDown :
+	case eDirection::eDown:
 	{
 		for (int y = position.y; y < position.y + (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
