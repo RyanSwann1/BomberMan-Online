@@ -8,8 +8,8 @@
 #include "PlayerServer.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 1;
-constexpr int MAX_AI_PLAYERS = 0;
+constexpr size_t MAX_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 1;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()

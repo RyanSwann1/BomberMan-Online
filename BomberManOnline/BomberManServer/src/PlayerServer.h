@@ -7,6 +7,12 @@
 #include <utility>
 #include <vector>
 
+enum class eAIDifficulty
+{
+	eEasy = 0,
+	eHard
+};
+
 enum class eAIBehaviour
 {
 	ePassive = 0, //Target boxes until non left
@@ -45,8 +51,9 @@ public:
 	void update(float frameTime) override final;
 
 private:
+	const eAIBehaviour m_behavour;
+	const eAIDifficulty m_difficulty;
 	Server& m_server;
-	eAIBehaviour m_behavour;
 	eAIState m_currentState;
 	std::vector<sf::Vector2f> m_pathToTile;
 	Timer m_waitTimer;
