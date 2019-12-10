@@ -53,6 +53,7 @@ private:
 	int m_targetPlayerID;
 
 	void handleAIStates(float frameTime);
+	void destroyPlayer_FILLERNAME(const Player& targetPlayer);
 };
 
 class PlayerServerHuman : public PlayerServer

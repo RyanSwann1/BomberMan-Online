@@ -51,6 +51,7 @@ public:
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f sourcePosition);
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 	bool isPositionInRangeOfExplosion(sf::Vector2f position, const Server& server);
+	bool isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server);
 
 	void createGraph(sf::Vector2i levelSize);
 
@@ -58,6 +59,7 @@ public:
 	void getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range);
 	void getPathToClosestSafePosition(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
+	void getPathToClosestSafePosition(sf::Vector2f source, const BombServer& bomb, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 
 private:
 	PathFinding() {}
@@ -65,5 +67,4 @@ private:
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
 	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
-	bool isExplosionInRange(sf::Vector2f position, const Server& server, const BombServer& bombS) const;
 };

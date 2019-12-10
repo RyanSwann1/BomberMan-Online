@@ -8,8 +8,8 @@
 #include "PlayerServer.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 1;
-constexpr int MAX_AI_PLAYERS = 0;
+constexpr size_t MAX_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 1;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -88,6 +88,12 @@ const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() const
 {
 	return m_collisionLayer;
+}
+
+bool Server::isBombAtPosition(sf::Vector2f position) const
+{
+	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
+	return bomb != m_bombs.cend();
 }
 
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const

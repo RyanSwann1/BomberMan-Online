@@ -29,7 +29,7 @@ void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
 	: PlayerServer(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
-	m_behavour(eAIBehaviour::ePassive),
+	m_behavour(eAIBehaviour::eAggressive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
@@ -56,9 +56,21 @@ void PlayerServerAI::update(float frameTime)
 
 	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, m_server))
 	{
-		m_currentState = eAIState::eSetTargetAtSafePosition;
-		m_waitTimer.setActive(false);
-		m_waitTimer.resetElaspedTime();
+		if (m_targetPlayerID != INVALID_PLAYER_ID)
+		{
+			const Player* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+			assert(targetPlayer);
+			if (targetPlayer)
+			{
+				destroyPlayer_FILLERNAME(*targetPlayer);
+			}
+		}
+		else
+		{
+			m_currentState = eAIState::eSetTargetAtSafePosition;
+			m_waitTimer.setActive(false);
+			m_waitTimer.resetElaspedTime();
+		}
 	}
 
 	if (m_position == m_newPosition)
@@ -87,6 +99,14 @@ void PlayerServerAI::update(float frameTime)
 					auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
 					if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
 					{
+						for (const auto& position : pathToTile)
+						{
+							if (m_server.isBombAtPosition(position))
+							{
+								
+							}
+						}
+
 						m_currentState = eAIState::eSetPositionToTargetPlayer;
 					}
 					else
@@ -255,6 +275,20 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 
 	break;
+	}
+}
+
+void PlayerServerAI::destroyPlayer_FILLERNAME(const Player& targetPlayer)
+{
+	sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
+	PathFinding::getInstance().getSafePositionToClosestTarget(m_position, targetPlayerPosition, m_server, m_pathToTile);
+	if (m_pathToTile.empty())
+	{
+		m_currentState = eAIState::eSetTargetAtSafePosition; 
+	}
+	else
+	{
+
 	}
 }
 

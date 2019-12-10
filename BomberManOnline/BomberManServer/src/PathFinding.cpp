@@ -195,13 +195,97 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Serv
 {
 	for (const auto& bomb : server.getBombs())
 	{
-		if (isExplosionInRange(position, server, bomb))
+		sf::Vector2i tileSize = server.getTileSize();
+		sf::Vector2f bombPosition = bomb.getPosition();
+		int explosionSize = bomb.getExplosionSize();
+		sf::Vector2f explosionPosition;
+
+		//Up
+		for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
+		{
+			explosionPosition = sf::Vector2f(bombPosition.x, y);
+			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+			{
+				break;
+			}
+			else if (explosionPosition == position)
+			{
+				return true;
+			}
+		}
+
+		//Down
+		for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
+		{
+			explosionPosition = sf::Vector2f(bombPosition.x, y);
+			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+			{
+				break;
+			}
+			else if (explosionPosition == position)
+			{
+				return true;
+			}
+		}
+
+		//Left
+		for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
+		{
+			explosionPosition = sf::Vector2f(x, bombPosition.y);
+			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+			{
+				break;
+			}
+			else if (explosionPosition == position)
+			{
+				return true;
+			}
+		}
+
+		//Right
+		for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
+		{
+			explosionPosition = sf::Vector2f(x, bombPosition.y);
+			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+			{
+				break;
+			}
+			else if (explosionPosition == position)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server)
+{
+	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2f bombPosition = bomb.getPosition();
+	int explosionSize = bomb.getExplosionSize();
+	sf::Vector2f explosionPosition;
+	
+	//left
+	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * bomb.getExplosionSize()); x -= tileSize.x)
+	{
+		explosionPosition = sf::Vector2f(x, bombPosition.y);
+		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
+		{
+			break;
+		}
+		else if (explosionPosition == position)
 		{
 			return true;
 		}
 	}
 
-	return false;
+	//Right
+	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * bomb.getExplosionSize()); x += tileSize.x)
+	{
+		explosionPosition = sf::Vector2f(x, bombPosition.y);
+	}
 }
 
 void PathFinding::createGraph(sf::Vector2i levelSize)
@@ -359,6 +443,42 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 				safePositionFound = true;
 				break;
 			}
+		}
+
+		neighbours.clear();
+	}
+}
+
+void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, const BombServer& bomb, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+{
+	pathToTile.clear();
+	m_graph.resetGraph(server.getLevelSize());
+
+	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
+
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(positionAtSource);
+
+	std::vector<sf::Vector2i> neighbours;
+	neighbours.reserve(MAX_NEIGHBOURS);
+
+	bool safePositionFound = false;
+	while (!safePositionFound && !frontier.empty())
+	{
+		sf::Vector2i lastPosition = frontier.front();
+		frontier.pop();
+
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, positionAtSource);
+		for (const sf::Vector2i neighbourPosition : neighbours)
+		{
+			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			{
+				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				frontier.push(neighbourPosition);
+			}
+			
+
 		}
 
 		neighbours.clear();
@@ -538,65 +658,4 @@ void PathFinding::getPathToTile(sf::Vector2i targetPosition, const Server& serve
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
 		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
 	}
-}
-
-bool PathFinding::isExplosionInRange(sf::Vector2f position, const Server& server, const BombServer& bomb) const
-{
-	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2f bombPosition = bomb.getPosition();
-	int explosionSize = bomb.getExplosionSize();
-
-	for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
-	{
-		sf::Vector2f explosionPosition(bombPosition.x, y);
-		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
-		{
-			break;
-		}
-		else if (explosionPosition == position)
-		{
-			return true;
-		}
-	}
-
-	for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
-	{
-		sf::Vector2f explosionPosition(bombPosition.x, y);
-		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
-		{
-			break;
-		}
-		else if (explosionPosition == position)
-		{
-			return true;
-		}
-	}
-
-	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
-	{
-		sf::Vector2f explosionPosition(x, bombPosition.y);
-		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
-		{
-			break;
-		}
-		else if (explosionPosition == position)
-		{
-			return true;
-		}
-	}
-
-	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
-	{
-		sf::Vector2f explosionPosition(x, bombPosition.y);
-		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
-		{
-			break;
-		}
-		else if (explosionPosition == position)
-		{
-			return true;
-		}
-	}
-
-	return false;
 }
