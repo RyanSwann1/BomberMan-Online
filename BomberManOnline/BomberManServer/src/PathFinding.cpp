@@ -552,6 +552,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 
 void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource, std::vector<sf::Vector2f>& pathToTile)
 {
+	pathToTile.clear();
 	m_graph.resetGraph(server.getLevelSize());
 
 	sf::Vector2i tileSize = server.getTileSize();
@@ -572,7 +573,14 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePosition);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (!isPositionInRangeOfAllExplosion(sf::Vector2f(neighbourPosition.x, neighbourPosition.y), server) &&
+			if (Utilities::isPositionNeighbourToPosition(sf::Vector2f(neighbourPosition.x * tileSize.x,
+				neighbourPosition.y * tileSize.y), targetPosition, tileSize) &&
+				!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			{
+				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				frontier.push(neighbourPosition);
+			}
+			else if (!isPositionInRangeOfAllExplosion(sf::Vector2f(neighbourPosition.x, neighbourPosition.y), server) &&
 				!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
@@ -597,6 +605,8 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 
 		neighbours.clear();
 	}
+
+	int i = 0;
 }
 
 sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const

@@ -40,6 +40,30 @@ bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollida
 	return false;
 }
 
+bool Utilities::isPositionNeighbourToPosition(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize)
+{
+	bool neighbourPosition = false;
+
+	if (origin.x - tileSize.x == neighbour.x)
+	{
+		neighbourPosition = true;
+	}
+	if (origin.x + tileSize.x == neighbour.x)
+	{
+		neighbourPosition = true;
+	}
+	if (origin.y - tileSize.y == neighbour.y)
+	{
+		neighbourPosition = true;
+	}
+	if (origin.y + tileSize.y == neighbour.y)
+	{
+		neighbourPosition = true;
+	}
+	
+	return neighbourPosition;
+}
+
 sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor)
 {;
 	if (factor > 1.f)

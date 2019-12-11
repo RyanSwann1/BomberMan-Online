@@ -292,7 +292,7 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 {
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
 	auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
-	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY + 1)
+	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
 	{
 		bool bombFound = false;
 		for (sf::Vector2f position : pathToTile)
@@ -300,12 +300,14 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 			const BombServer* bomb = m_server.getBomb(position);
 			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
 			{
+				bombFound = true;
 				PathFinding::getInstance().getSafePathToTile(bomb->getPosition(), m_server, m_position, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 					std::cout << "Get Safe Path\n";
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
+					break;
 				}
 				else
 				{
@@ -313,10 +315,11 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 					assert(!m_pathToTile.empty());
 					if (!m_pathToTile.empty())
 					{
+						std::cout << "Move to safety\n";
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_pathToTile.pop_back();
 						m_currentState = eAIState::eMoveToSafePosition;
-						bombFound = true;
+
 						break;
 					}
 				}

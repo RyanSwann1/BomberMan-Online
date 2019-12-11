@@ -52,6 +52,7 @@ public:
 	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
 	bool isPositionInRangeOfAllExplosion(sf::Vector2f position, const Server& server);
 	bool isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server);
+	
 
 	void createGraph(sf::Vector2i levelSize);
 
