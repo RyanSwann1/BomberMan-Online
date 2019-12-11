@@ -8,7 +8,7 @@
 #include <assert.h>
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
-constexpr int MIN_DISTANCE_FROM_ENEMY = 2; // Min distance from enemy to place bomb
+constexpr int MIN_DISTANCE_FROM_ENEMY = 3; // Min distance from enemy to place bomb
 
 //Player Server
 PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
@@ -290,6 +290,7 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 				PathFinding::getInstance().getSafePathToTile(bomb->getPosition(), m_server, m_position, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
+					std::cout << "Get Safe Path\n";
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
 				}
