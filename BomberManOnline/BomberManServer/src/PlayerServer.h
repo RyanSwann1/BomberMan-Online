@@ -54,6 +54,7 @@ private:
 
 	void handleAIStates(float frameTime);
 	void destroyPlayer_FILLERNAME(const Player& targetPlayer);
+	void onMovingToTargetPlayerState(const PlayerServer& targetPlayer);
 };
 
 class PlayerServerHuman : public PlayerServer
