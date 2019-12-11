@@ -292,37 +292,37 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 {
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
 	auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, m_server, targetPosition);
-	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
+	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY + 1)
 	{
 		bool bombFound = false;
-		//for (sf::Vector2f position : pathToTile)
-		//{
-		//	const BombServer* bomb = m_server.getBomb(position);
-		//	if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
-		//	{
-		//		PathFinding::getInstance().getSafePathToTile(bomb->getPosition(), m_server, m_position, m_pathToTile);
-		//		if (!m_pathToTile.empty())
-		//		{
-		//			std::cout << "Get Safe Path\n";
-		//			setNewPosition(m_pathToTile.back(), m_server);
-		//			m_currentState = eAIState::eMovingToTargetPlayer;
-		//		}
-		//		else
-		//		{
-		//			PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
-		//			assert(!m_pathToTile.empty());
-		//			if (!m_pathToTile.empty())
-		//			{
-		//				setNewPosition(m_pathToTile.back(), m_server);
-		//				m_pathToTile.pop_back();
-		//				m_currentState = eAIState::eMoveToSafePosition;
-		//				bombFound = true;
-		//				break;
-		//			}
-		//		}
+		for (sf::Vector2f position : pathToTile)
+		{
+			const BombServer* bomb = m_server.getBomb(position);
+			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
+			{
+				PathFinding::getInstance().getSafePathToTile(bomb->getPosition(), m_server, m_position, m_pathToTile);
+				if (!m_pathToTile.empty())
+				{
+					std::cout << "Get Safe Path\n";
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+				else
+				{
+					PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
+					assert(!m_pathToTile.empty());
+					if (!m_pathToTile.empty())
+					{
+						setNewPosition(m_pathToTile.back(), m_server);
+						m_pathToTile.pop_back();
+						m_currentState = eAIState::eMoveToSafePosition;
+						bombFound = true;
+						break;
+					}
+				}
 
-		//	}
-		//}
+			}
+		}
 		if (!bombFound)
 		{
 			m_currentState = eAIState::eSetPositionToTargetPlayer;
