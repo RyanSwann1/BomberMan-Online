@@ -144,7 +144,13 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 void PathFinding::getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
 	pathToTile.clear();
-	pathToTile.push_back(getPathToTile(target, server, source).back());
+
+	std::vector<sf::Vector2f> newPathToTile(getPathToTile(target, server, source));
+	assert(!newPathToTile.empty());
+	if (!newPathToTile.empty())
+	{
+		pathToTile.push_back(newPathToTile.back());
+	}
 }
 
 bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)

@@ -1,5 +1,7 @@
 #include <iostream>
 #include "Server.h"
+#include <unordered_map>
+#include <vector>
 
 //https://gamedev.stackexchange.com/questions/119342/authoritative-server-movement-and-collision
 
