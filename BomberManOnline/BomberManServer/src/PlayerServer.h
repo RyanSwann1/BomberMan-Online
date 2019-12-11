@@ -9,7 +9,7 @@
 
 enum class eAIBehaviour
 {
-	ePassive = 0, //Target boxes until non left
+	ePassive = 0, //Target boxes until non left, then Player
 	eAggressive //Target Player when in sight
 };
 

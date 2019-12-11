@@ -57,6 +57,7 @@ public:
 
 	void createGraph(sf::Vector2i levelSize);
 
+	void getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 	void getPositionClosestToTarget(sf::Vector2f source, sf::Vector2f target, const Server& server, std::vector<sf::Vector2f>& pathToTile);
 	void getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPathToClosestPickUp(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range);
@@ -68,6 +69,6 @@ private:
 	Graph m_graph;
 
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
-	std::vector<sf::Vector2f> getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource);
+	
 	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
 };

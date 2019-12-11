@@ -544,7 +544,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition
 	return pathToTile;
 }
 
-std::vector<sf::Vector2f> PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource)
+void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& server, sf::Vector2f positionAtSource, std::vector<sf::Vector2f>& pathToTile)
 {
 	m_graph.resetGraph(server.getLevelSize());
 
@@ -575,20 +575,22 @@ std::vector<sf::Vector2f> PathFinding::getSafePathToTile(sf::Vector2f targetPosi
 
 			if (targetPosition == Utilities::convertToWorldPosition(neighbourPosition, tileSize))
 			{
-				pathCompleted = true;
 				sf::Vector2f position = Utilities::convertToWorldPosition(neighbourPosition, tileSize);
-				std::vector<sf::Vector2f> pathToTile;
 				pathToTile.emplace_back(position);
 				while (position != targetPosition)
 				{
 					auto pos = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), server.getLevelSize());
-					
+					position = sf::Vector2f(pos.x * tileSize.x, pos.y * tileSize.y);
+					pathToTile.push_back(position);
 				}
+
+				pathCompleted = true;
+				break;
 			}
 		}
-	}
 
-	return std::vector<sf::Vector2f>();
+		neighbours.clear();
+	}
 }
 
 sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const
