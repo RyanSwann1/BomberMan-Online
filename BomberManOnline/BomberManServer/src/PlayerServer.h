@@ -7,6 +7,12 @@
 #include <utility>
 #include <vector>
 
+enum class eInteligence
+{
+	eSmart,
+	Dumb
+};
+
 enum class eAIBehaviour
 {
 	ePassive = 0, //Target boxes until non left, then Player
@@ -20,6 +26,7 @@ enum class eAIState
 	eMoveToBox,
 	eSetPositionToTargetPlayer,
 	eMovingToTargetPlayer,
+	eMoveToNearestPlayer,
 	eSetTargetAtSafePosition,
 	eMoveToSafePosition,
 	eMoveToPickUp,
