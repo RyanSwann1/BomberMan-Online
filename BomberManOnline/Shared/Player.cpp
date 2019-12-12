@@ -91,7 +91,7 @@ void Player::update(float deltaTime)
 		m_movementFactor += deltaTime * m_movementSpeed;
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
 
-		if (m_position == m_newPosition)
+		if (!isMoving())
 		{
 			m_movementFactor = 0.0f;
 		}
