@@ -153,33 +153,35 @@ void PathFinding::getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Ve
 	}
 }
 
-bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server)
+bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
-	if (source == target)
-	{
-		return true;
-	}
+	assert(sourcePosition != targetPosition);
+	//if (sourcePosition == targetPosition)
+	//{
+	//	return true;
+	//}
 
 	m_graph.resetGraph(server.getLevelSize());
 
-	std::queue<sf::Vector2i> frontier;
 	sf::Vector2i tileSize = server.getTileSize();
-	frontier.push(sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y)));
+	sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
+
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(sourcePositionOnGrid);
 
 	std::vector<sf::Vector2i> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
 
-	sf::Vector2i lastPosition = sf::Vector2i(static_cast<int>(source.x / tileSize.x), static_cast<int>(source.y / tileSize.y));
 	while (!frontier.empty())
 	{
-		lastPosition = frontier.front();
+		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
 
-		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sf::Vector2i(source.x / tileSize.x, source.y / tileSize.y));
+		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
 			//Target Reachable
-			if (neighbourPosition == sf::Vector2i(static_cast<int>(target.x / tileSize.x), static_cast<int>(target.y / tileSize.y)))
+			if (neighbourPosition == Utilities::convertToGridPosition(targetPosition, tileSize))
 			{
 				return true;
 			}
@@ -197,7 +199,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 	return false;
 }
 
-bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const Server& server)
+bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, const Server& server)
 {
 	for (const auto& bomb : server.getBombs())
 	{
@@ -214,7 +216,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const 
 			{
 				break;
 			}
-			else if (explosionPosition == position)
+			else if (explosionPosition == sourcePosition)
 			{
 				return true;
 			}
@@ -228,7 +230,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const 
 			{
 				break;
 			}
-			else if (explosionPosition == position)
+			else if (explosionPosition == sourcePosition)
 			{
 				return true;
 			}
@@ -242,7 +244,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const 
 			{
 				break;
 			}
-			else if (explosionPosition == position)
+			else if (explosionPosition == sourcePosition)
 			{
 				return true;
 			}
@@ -256,7 +258,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const 
 			{
 				break;
 			}
-			else if (explosionPosition == position)
+			else if (explosionPosition == sourcePosition)
 			{
 				return true;
 			}
@@ -266,7 +268,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const 
 	return false;
 }
 
-bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server)
+bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server)
 {
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2f bombPosition = bomb.getPosition();
@@ -281,7 +283,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 		{
 			break;
 		}
-		else if (explosionPosition == position)
+		else if (explosionPosition == sourcePosition)
 		{
 			return true;
 		}
@@ -295,7 +297,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 		{
 			break;
 		}
-		else if (explosionPosition == position)
+		else if (explosionPosition == sourcePosition)
 		{
 			return true;
 		}
@@ -309,7 +311,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 		{
 			break;
 		}
-		else if (explosionPosition == position)
+		else if (explosionPosition == sourcePosition)
 		{
 			return true;
 		}
@@ -323,7 +325,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f position, const Bomb
 		{
 			break;
 		}
-		else if (explosionPosition == position)
+		else if (explosionPosition == sourcePosition)
 		{
 			return true;
 		}
@@ -430,7 +432,7 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 				frontier.push(neighbourPosition);
 			}
 
-			if (getPathToTile(neighbourPosition, server, sourcePositionOnGrid).size() > range)
+			if (getPathToTile(sourcePositionOnGrid, neighbourPosition, server).size() > range)
 			{
 				continue;
 			}
@@ -443,7 +445,7 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 					gameObject.getType() == eGameObjectType::eBiggerExplosionPickUp))
 				{
 					searchForPickUp = false;
-					getPathToTile(neighbourPosition, server, sourcePositionOnGrid, pathToTile);
+					getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
 					break;
 				}
 			}
@@ -484,7 +486,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
 			{
-				getPathToTile(neighbourPosition, server, sourcePositionOnGrid, pathToTile);
+				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
 				safePositionFound = true;
 				break;
 			}
@@ -525,7 +527,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 			
 			if (!isPositionInRangeOfExplosion(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
 			{
-				getPathToTile(neighbourPosition, server, sourcePositionOnGrid, pathToTile);
+				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
 				safePositionFound = true;
 				break;
 			}
@@ -535,17 +537,17 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 	}
 }
 
-std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource)
+std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i positionAtSource, sf::Vector2i targetPosition, const Server& server)
 {
-	std::vector<sf::Vector2f> pathToTile;
 	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
+	std::vector<sf::Vector2f> pathToTile;
+	pathToTile.emplace_back(Utilities::convertToWorldPosition(targetPosition, tileSize));
 
 	sf::Vector2i position = targetPosition;
 	while (position != positionAtSource)
 	{
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
-		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
 	}
 
 	return pathToTile;
@@ -752,15 +754,15 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 	return pathToTile;
 }
 
-void PathFinding::getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(targetPosition.x * tileSize.x, targetPosition.y * tileSize.y);
+	pathToTile.emplace_back(Utilities::convertToWorldPosition(targetPosition, tileSize));
 
 	sf::Vector2i position = sf::Vector2i(targetPosition);
-	while (position != positionAtSource)
+	while (position != sourcePosition)
 	{
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
-		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
 	}
 }

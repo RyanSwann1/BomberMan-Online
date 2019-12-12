@@ -49,9 +49,9 @@ public:
 		return instance;
 	}
 
-	bool isPositionReachable(sf::Vector2f source, sf::Vector2f target, const Server& server);
-	bool isPositionInRangeOfAllExplosions(sf::Vector2f position, const Server& server);
-	bool isPositionInRangeOfExplosion(sf::Vector2f position, const BombServer& bomb, const Server& server);
+	bool isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server);
+	bool isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, const Server& server);
+	bool isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server);
 	
 	void createGraph(sf::Vector2i levelSize);
 
@@ -68,7 +68,6 @@ private:
 	PathFinding() {}
 	Graph m_graph;
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource);
-	
-	void getPathToTile(sf::Vector2i targetPosition, const Server& server, sf::Vector2i positionAtSource, std::vector<sf::Vector2f>& pathToTile);
+	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, const Server& server);
+	void getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 };
