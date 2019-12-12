@@ -54,7 +54,7 @@ void PlayerServerAI::update(float frameTime)
 		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
 	}
 
-	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfAllExplosion(m_position, m_server))
+	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfAllExplosions(m_position, m_server))
 	{
 		if (m_targetPlayerID != INVALID_PLAYER_ID)
 		{
@@ -111,27 +111,27 @@ void PlayerServerAI::update(float frameTime)
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_pathToTile.pop_back();
 
-		if (m_currentState == eAIState::eMoveToBox)
-		{
-			if (!m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_server.getCollisionLayer(), m_pathToTile.front(),
-				m_server.getLevelSize(), m_server.getTileSize()))
+			if (m_currentState == eAIState::eMoveToBox)
 			{
-				m_currentState = eAIState::eMakeDecision;
-			}
-			else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
-			{
-				for (const auto& player : m_server.getPlayers())
+				if (!m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_server.getCollisionLayer(), m_pathToTile.front(),
+					m_server.getLevelSize(), m_server.getTileSize()))
 				{
-					if (player->getID() != m_ID && player->getControllerType() == ePlayerControllerType::eHuman &&
-						PathFinding::getInstance().isPositionReachable(m_position, player->getPosition(), m_server))
+					m_currentState = eAIState::eMakeDecision;
+				}
+				else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
+				{
+					for (const auto& player : m_server.getPlayers())
 					{
-						m_targetPlayerID = player->getID();
-						m_currentState = eAIState::eSetPositionToTargetPlayer;
-						break;
+						if (player->getID() != m_ID && player->getControllerType() == ePlayerControllerType::eHuman &&
+							PathFinding::getInstance().isPositionReachable(m_position, player->getPosition(), m_server))
+						{
+							m_targetPlayerID = player->getID();
+							m_currentState = eAIState::eSetPositionToTargetPlayer;
+							break;
+						}
 					}
 				}
 			}
-		}
 		}
 	}
 }

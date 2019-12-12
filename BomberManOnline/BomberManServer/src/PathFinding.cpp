@@ -197,7 +197,7 @@ bool PathFinding::isPositionReachable(sf::Vector2f source, sf::Vector2f target, 
 	return false;
 }
 
-bool PathFinding::isPositionInRangeOfAllExplosion(sf::Vector2f position, const Server& server)
+bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f position, const Server& server)
 {
 	for (const auto& bomb : server.getBombs())
 	{
@@ -481,7 +481,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, std::vector<
 				frontier.push(neighbourPosition);
 			}
 
-			if (!isPositionInRangeOfAllExplosion(sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y), server))
+			if (!isPositionInRangeOfAllExplosions(sf::Vector2f(neighbourPosition.x * tileSize.x, neighbourPosition.y * tileSize.y), server))
 			{
 				getPathToTile(neighbourPosition, server, positionAtSource, pathToTile);
 				safePositionFound = true;
@@ -499,6 +499,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f source, const BombSe
 	m_graph.resetGraph(server.getLevelSize());
 
 	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i positionOnGrid(Utilities::convertToGridPosition(source, tileSize));
 	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
 
 	std::queue<sf::Vector2i> frontier;
@@ -556,6 +557,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 	m_graph.resetGraph(server.getLevelSize());
 
 	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i sourcePositionOnGrid()
 	sf::Vector2i sourcePosition(positionAtSource.x / tileSize.x, positionAtSource.y / tileSize.y);
 
 	std::queue<sf::Vector2i> frontier;
@@ -565,7 +567,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 	neighbours.reserve(MAX_NEIGHBOURS);
 
 	bool pathCompleted = false;
-	while (!pathCompleted && frontier.empty())
+	while (!pathCompleted && !frontier.empty())
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
@@ -573,14 +575,13 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePosition);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (Utilities::isPositionNeighbourToPosition(sf::Vector2f(neighbourPosition.x * tileSize.x,
-				neighbourPosition.y * tileSize.y), targetPosition, tileSize) &&
+			if (Utilities::isPositionNeighbourToPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize), targetPosition, tileSize) &&
 				!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 				frontier.push(neighbourPosition);
 			}
-			else if (!isPositionInRangeOfAllExplosion(sf::Vector2f(neighbourPosition.x, neighbourPosition.y), server) &&
+			else if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server) &&
 				!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
@@ -605,8 +606,6 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 
 		neighbours.clear();
 	}
-
-	int i = 0;
 }
 
 sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const
