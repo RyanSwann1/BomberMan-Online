@@ -557,7 +557,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 	m_graph.resetGraph(server.getLevelSize());
 
 	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2i sourcePositionOnGrid()
+	//sf::Vector2i sourcePositionOnGrid()
 	sf::Vector2i sourcePosition(positionAtSource.x / tileSize.x, positionAtSource.y / tileSize.y);
 
 	std::queue<sf::Vector2i> frontier;
