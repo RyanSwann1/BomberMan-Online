@@ -55,7 +55,7 @@ public:
 	
 	void createGraph(sf::Vector2i levelSize);
 
-	sf::Vector2f getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const;
+	sf::Vector2f getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server) const;
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server); 
 	void getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile);

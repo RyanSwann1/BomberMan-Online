@@ -609,7 +609,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 	}
 }
 
-sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position, eDirection direction, const Server& server) const
+sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server) const
 {
 	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
@@ -618,16 +618,16 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	{
 	case eDirection::eLeft:
 	{
-		for (int x = position.x; x >= position.x - (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int x = sourcePosition.x; x >= sourcePosition.x - (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
-			furthestPosition = sf::Vector2f(x, position.y);
+			furthestPosition = sf::Vector2f(x, sourcePosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
 			{
 				x -= tileSize.x;
 			}
 			else
 			{
-				furthestPosition = sf::Vector2f(x + tileSize.x, position.y);
+				furthestPosition = sf::Vector2f(x + tileSize.x, sourcePosition.y);
 				break;
 			}
 		}
@@ -635,16 +635,16 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	break;
 	case eDirection::eRight:
 	{
-		for (int x = position.x; x < position.x + (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int x = sourcePosition.x; x < sourcePosition.x + (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
-			furthestPosition = sf::Vector2f(x, position.y);
+			furthestPosition = sf::Vector2f(x, sourcePosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
 			{
 				x += tileSize.x;
 			}
 			else
 			{
-				furthestPosition = sf::Vector2f(x - tileSize.x, position.y);
+				furthestPosition = sf::Vector2f(x - tileSize.x, sourcePosition.y);
 				break;
 			}
 		}
@@ -652,16 +652,16 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	break;
 	case eDirection::eUp:
 	{
-		for (int y = position.y; y >= position.y - (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int y = sourcePosition.y; y >= sourcePosition.y - (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
-			furthestPosition = sf::Vector2f(position.x, y);
+			furthestPosition = sf::Vector2f(sourcePosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
 			{
 				y -= tileSize.y;
 			}
 			else
 			{
-				furthestPosition = sf::Vector2f(position.x, y + tileSize.y);
+				furthestPosition = sf::Vector2f(sourcePosition.x, y + tileSize.y);
 				break;
 			}
 		}
@@ -669,16 +669,16 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f position
 	break;
 	case eDirection::eDown:
 	{
-		for (int y = position.y; y < position.y + (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int y = sourcePosition.y; y < sourcePosition.y + (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
 		{
-			furthestPosition = sf::Vector2f(position.x, y);
+			furthestPosition = sf::Vector2f(sourcePosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
 			{
 				y += tileSize.y;
 			}
 			else
 			{
-				furthestPosition = sf::Vector2f(position.x, y - tileSize.y);
+				furthestPosition = sf::Vector2f(sourcePosition.x, y - tileSize.y);
 				break;
 			}
 		}
