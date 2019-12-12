@@ -338,29 +338,29 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 	m_graph.resetGraph(levelSize);
 }
 
-void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	pathToTile.clear();
 	m_graph.resetGraph(server.getLevelSize());
 
-	std::queue<sf::Vector2i> frontier;
 	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2i positionAtSource(source.x / tileSize.x, source.y / tileSize.y);
-	frontier.push(positionAtSource);
+	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
+
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(sourcePositionOnGrid);
 
 	std::vector<sf::Vector2i> neighbours;
 	neighbours.reserve(MAX_NEIGHBOURS);
 
 	std::vector<sf::Vector2i> boxSelection;
 	boxSelection.reserve(MAX_BOX_SELECTION);
-	sf::Vector2i lastPosition;
 
 	while (!frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
 	{
-		lastPosition = frontier.front();
+		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();
 
-		getNeighbouringPoints(lastPosition, neighbours, server, positionAtSource);
+		getNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
 			if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eWall)
@@ -391,12 +391,12 @@ void PathFinding::getPathToClosestBox(sf::Vector2f source, std::vector<sf::Vecto
 	{
 		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
 		sf::Vector2i position = m_graph.getPreviousPosition(boxSelection[randNumb], server.getLevelSize());
-		pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
 		
-		while (position != positionAtSource)
+		while (position != sourcePositionOnGrid)
 		{
 			position = m_graph.getPreviousPosition(position, server.getLevelSize());
-			pathToTile.emplace_back(position.x * tileSize.x, position.y * tileSize.y);
+			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
 		}
 	}
 }
@@ -557,7 +557,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f targetPosition, const Server& s
 	m_graph.resetGraph(server.getLevelSize());
 
 	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2i sourcePositionOnGrid()
+	//sf::Vector2i sourcePositionOnGrid()
 	sf::Vector2i sourcePosition(positionAtSource.x / tileSize.x, positionAtSource.y / tileSize.y);
 
 	std::queue<sf::Vector2i> frontier;
