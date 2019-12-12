@@ -7,11 +7,6 @@
 #include <utility>
 #include <vector>
 
-enum class eInteligence
-{
-	eSmart,
-	Dumb
-};
 
 enum class eAIBehaviour
 {
@@ -59,7 +54,6 @@ private:
 	int m_targetPlayerID;
 
 	void handleAIStates(float frameTime);
-	void destroyPlayer_FILLERNAME(const Player& targetPlayer);
 	void onMovingToTargetPlayerState(const PlayerServer& targetPlayer);
 };
 

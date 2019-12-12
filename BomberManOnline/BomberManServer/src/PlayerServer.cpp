@@ -38,100 +38,15 @@ PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& se
 
 void PlayerServerAI::update(float frameTime)
 {
+	Player::update(frameTime);
 	handleAIStates(frameTime);
-	m_bombPlacementTimer.update(frameTime);
 
-	if (m_bombPlacementTimer.isExpired())
+	if (!isMoving())
 	{
-		m_bombsPlaced = 0;
-		m_bombPlacementTimer.resetElaspedTime();
-		m_bombPlacementTimer.setActive(false);
-	}
-
-	if (isMoving())
-	{
-		m_movementFactor += frameTime * m_movementSpeed;
-		m_position = Utilities::Interpolate(m_previousPosition, m_newPosition, m_movementFactor);
-	}
-
-	if (m_currentState == eAIState::eWait && PathFinding::getInstance().isPositionInRangeOfAllExplosions(m_position, m_server))
-	{
-		if (m_targetPlayerID != INVALID_PLAYER_ID)
-		{
-			const Player* targetPlayer = m_server.getPlayer(m_targetPlayerID);
-			assert(targetPlayer);
-			if (targetPlayer)
-			{
-				destroyPlayer_FILLERNAME(*targetPlayer);
-			}
-		}
-		else
-		{
-			m_currentState = eAIState::eSetTargetAtSafePosition;
-			m_waitTimer.setActive(false);
-			m_waitTimer.resetElaspedTime();
-		}
-	}
-
-	if (m_position == m_newPosition)
-	{
-		m_movementFactor = 0.0f;
-
-		if (m_pathToTile.empty())
-		{
-			switch (m_currentState)
-			{
-			case eAIState::eMoveToBox:
-				m_currentState = eAIState::ePlantBomb;
-				break;
-			case eAIState::eMoveToSafePosition:
-				m_currentState = eAIState::eWait;
-				break;
-			case eAIState::eMoveToPickUp:
-				m_currentState = eAIState::eMakeDecision;
-				break;
-			case eAIState::eMovingToTargetPlayer:
-			{
-				const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
-				if (targetPlayer)
-				{
-					onMovingToTargetPlayerState(*targetPlayer);
-				}
-				else
-				{
-					m_currentState = eAIState::eMakeDecision;
-					m_targetPlayerID = INVALID_PLAYER_ID;
-				}
-			}
-				break;
-			}
-		}
-		else
+		if(!m_pathToTile.empty())
 		{
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_pathToTile.pop_back();
-
-			if (m_currentState == eAIState::eMoveToBox)
-			{
-				if (!m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_server.getCollisionLayer(), m_pathToTile.front(),
-					m_server.getLevelSize(), m_server.getTileSize()))
-				{
-					m_currentState = eAIState::eMakeDecision;
-				}
-				else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
-				{
-					for (const auto& player : m_server.getPlayers())
-					{
-						if (player->getID() != m_ID && player->getControllerType() == ePlayerControllerType::eHuman &&
-							PathFinding::getInstance().isPositionReachable(m_position, player->getPosition(), m_server))
-						{
-							m_targetPlayerID = player->getID();
-							m_currentState = eAIState::eSetPositionToTargetPlayer;
-							break;
-						}
-					}
-				}
-			}
 		}
 	}
 }
@@ -206,24 +121,55 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 
 	break;
-	case eAIState::eSetPositionToTargetPlayer:
-	{
-		const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
-		if (targetPlayer)
+	case eAIState::eMoveToBox :
+		if (!isMoving() && m_pathToTile.empty())
 		{
-			sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-			PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-			assert(!m_pathToTile.empty());
-			if (!m_pathToTile.empty())
+			m_currentState = eAIState::ePlantBomb;
+		}
+		else if (!isMoving() && !m_pathToTile.empty())
+		{
+			if (!m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_server.getCollisionLayer(), m_pathToTile.front(),
+				m_server.getLevelSize(), m_server.getTileSize()))
 			{
-				setNewPosition(m_pathToTile.back(), m_server);
-				m_currentState = eAIState::eMovingToTargetPlayer;
+				m_currentState = eAIState::eMakeDecision;
+			}
+			else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
+			{
+				for (const auto& player : m_server.getPlayers())
+				{
+					if (player->getID() != m_ID && player->getControllerType() == ePlayerControllerType::eHuman &&
+						PathFinding::getInstance().isPositionReachable(m_position, player->getPosition(), m_server))
+					{
+						m_targetPlayerID = player->getID();
+						m_currentState = eAIState::eSetPositionToTargetPlayer;
+						break;
+					}
+				}
 			}
 		}
-		else
+
+	break;
+	case eAIState::eSetPositionToTargetPlayer:
+	{
+		if (!isMoving())
 		{
-			m_targetPlayerID = INVALID_PLAYER_ID;
-			m_currentState = eAIState::eMakeDecision;
+			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+			if (targetPlayer)
+			{
+				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
+				assert(!m_pathToTile.empty());
+				if (!m_pathToTile.empty())
+				{
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+			}
+			else
+			{
+				m_targetPlayerID = INVALID_PLAYER_ID;
+				m_currentState = eAIState::eMakeDecision;
+			}
 		}
 	}
 
@@ -245,6 +191,38 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 
 	break;
+	case eAIState::eMovingToTargetPlayer :
+	{
+		if (!isMoving() && m_pathToTile.empty())
+		{
+			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+			if (targetPlayer)
+			{
+				onMovingToTargetPlayerState(*targetPlayer);
+			}
+			else
+			{
+				m_currentState = eAIState::eMakeDecision;
+				m_targetPlayerID = INVALID_PLAYER_ID;
+			}
+		}
+	}
+
+	break;
+	case eAIState::eMoveToSafePosition :
+		if (!isMoving() && m_pathToTile.empty())
+		{
+			m_currentState = eAIState::eWait;
+		}
+
+	break;
+	case eAIState::eMoveToPickUp :
+		if (!isMoving() && m_pathToTile.empty())
+		{
+			m_currentState = eAIState::eMakeDecision;
+		}
+
+	break;
 	case eAIState::ePlantBomb:
 	{
 		if (placeBomb())
@@ -261,31 +239,26 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eWait:
 	{
-		m_waitTimer.setActive(true);
-		m_waitTimer.update(frameTime);
-		if (m_waitTimer.isExpired())
+		if (PathFinding::getInstance().isPositionInRangeOfAllExplosions(m_position, m_server))
 		{
-			m_currentState = eAIState::eMakeDecision;
+			m_currentState = eAIState::eSetTargetAtSafePosition;
+			m_waitTimer.setActive(false);
 			m_waitTimer.resetElaspedTime();
+		}
+		else
+		{
+			m_waitTimer.setActive(true);
+			m_waitTimer.update(frameTime);
+			if (m_waitTimer.isExpired())
+			{
+				m_currentState = eAIState::eMakeDecision;
+				m_waitTimer.resetElaspedTime();
+			}
 		}
 	}
 
 	break;
 	}
-}
-
-void PlayerServerAI::destroyPlayer_FILLERNAME(const Player& targetPlayer)
-{
-	//sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	//PathFinding::getInstance().getSafePositionToClosestTarget(m_position, targetPlayerPosition, m_server, m_pathToTile);
-	//if (m_pathToTile.empty())
-	//{
-	//	m_currentState = eAIState::eSetTargetAtSafePosition; 
-	//}
-	//else
-	//{
-
-	//}
 }
 
 void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
