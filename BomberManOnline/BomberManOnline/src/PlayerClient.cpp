@@ -31,14 +31,14 @@ void PlayerClient::update(float deltaTime)
 
 void PlayerClient::render(sf::RenderWindow& window) const
 {
-	m_sprite.render(window);
-
 #ifdef RENDER_PATHING
 	for (const auto& i : m_path)
 	{
 		window.draw(i);
 	}
 #endif // RENDER_PATHING
+
+	m_sprite.render(window);
 }
 
 void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i tileSize, 
@@ -124,7 +124,8 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 
 	for (sf::Vector2f i : path)
 	{
-		sf::RectangleShape shape(i);
+		sf::RectangleShape shape;
+		shape.setPosition(i);
 		shape.setFillColor(sf::Color::Red);
 		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 		shape.setSize(sf::Vector2f(tileSize.x, tileSize.y));

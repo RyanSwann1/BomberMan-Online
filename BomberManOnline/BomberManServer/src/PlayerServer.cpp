@@ -204,6 +204,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
 		if (!m_pathToTile.empty())
 		{
+#ifdef RENDER_PATHING
+			handleRenderPathing();
+#endif // RENDER_PATHING
+
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_pathToTile.pop_back();
 
@@ -332,7 +336,7 @@ void PlayerServerAI::handleRenderPathing()
 {
 	sf::Packet packetToSend;
 	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
-	std::cout << m_ID << "\n";
+	std::cout << m_pathToTile.size() << "\n";
 	m_server.broadcastMessage(packetToSend);
 }
 #endif // RENDER_PATHING

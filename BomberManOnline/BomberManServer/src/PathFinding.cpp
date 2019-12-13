@@ -155,11 +155,11 @@ void PathFinding::getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Ve
 
 bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
-	assert(sourcePosition != targetPosition);
-	//if (sourcePosition == targetPosition)
-	//{
-	//	return true;
-	//}
+	//assert(sourcePosition != targetPosition);
+	if (sourcePosition == targetPosition)
+	{
+		return true;
+	}
 
 	m_graph.resetGraph(server.getLevelSize());
 

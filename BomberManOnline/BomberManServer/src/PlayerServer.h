@@ -7,6 +7,11 @@
 #include <utility>
 #include <vector>
 
+enum class eAIIntelligence
+{
+	eDumb,
+	eSmart
+};
 
 enum class eAIBehaviour
 {

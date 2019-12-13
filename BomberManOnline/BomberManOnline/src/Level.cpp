@@ -158,7 +158,12 @@ void Level::kickBombToPosition(sf::Vector2f bombPosition, sf::Vector2f kickToPos
 PlayerClient* Level::getPlayer(int ID)
 {
 	auto iter = std::find_if(m_players.begin(), m_players.end(), [ID](const auto& player) { return player->getID() == ID; });
-	return iter->get();
+	if (iter != m_players.cend())
+	{
+		return iter->get();
+	}
+	
+	return nullptr;
 }
 
 std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGameData & initialGameData)
@@ -477,8 +482,9 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		assert(player);
 		if (player)
 			player->increaseMovementSpeed(movementSpeedIncrement);
-		break;
+	
 	}
+	break;
 	case eServerMessageType::eSpawnExtraBombPickUp:
 	{
 		sf::Vector2f startingPosition;
@@ -537,8 +543,8 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		std::vector<sf::Vector2f> path;
 		receivedMessage >> path;
 		int playerID = INVALID_PLAYER_ID;
-		std::cout << playerID << "\n";
 		receivedMessage >> playerID;
+		std::cout << playerID << "\n";
 
 		PlayerClient* player = getPlayer(playerID);
 		assert(player);
@@ -549,4 +555,3 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 #endif // RENDER_PATHING
 	}
 }
-

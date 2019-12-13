@@ -4,7 +4,9 @@
 
 sf::Packet& sf::operator>>(Packet& receivedPacket, std::vector<sf::Vector2f>& path)
 {
-	for (sf::Vector2f i : path)
+	int pathSize = 0;
+	receivedPacket >> pathSize;
+	for (int i = 0; i < pathSize; ++i)
 	{
 		sf::Vector2f position;
 		receivedPacket >> position;
@@ -16,6 +18,8 @@ sf::Packet& sf::operator>>(Packet& receivedPacket, std::vector<sf::Vector2f>& pa
 
 sf::Packet& sf::operator<<(Packet& packetToSend, const std::vector<sf::Vector2f>& path)
 {
+	packetToSend << static_cast<int>(path.size());
+
 	for (sf::Vector2f i : path)
 	{
 		packetToSend << i;

@@ -45,7 +45,38 @@ int main()
 	while (window.isOpen())
 	{
 		//Handle Server Messages
-		if (!NetworkHandler::getInstance().getNetworkMessages().empty())
+		if (NetworkHandler::getInstance().isReceivedPackets())
+		{
+			sf::Packet receivedMessage = NetworkHandler::getInstance().getLatestPacket();
+
+			eServerMessageType messageType;
+			receivedMessage >> messageType;
+			switch (messageType)
+			{
+			case eServerMessageType::eInitializeClientID:
+				receivedMessage >> localClientID;
+				break;
+			case eServerMessageType::eInitialGameData:
+			{
+				ServerMessageInitialGameData initialGameData;
+				receivedMessage >> initialGameData;
+				assert(!level);
+				if (!level)
+				{
+					level = Level::create(localClientID, initialGameData);
+				}
+			}
+			break;
+			default:
+				assert(level);
+				if (level)
+				{
+					level->onReceivedServerMessage(messageType, receivedMessage, window);
+				}
+				break;
+			}
+		}
+		/*if (!NetworkHandler::getInstance().getNetworkMessages().empty())
 		{
 			for (auto& receivedMessage : NetworkHandler::getInstance().getNetworkMessages())
 			{
@@ -78,7 +109,7 @@ int main()
 			}
 
 			NetworkHandler::getInstance().getNetworkMessages().clear();
-		}
+		}*/
 
 		//Input Handling
 		sf::Event sfmlEvent;
