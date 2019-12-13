@@ -68,6 +68,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
+#ifdef RENDER_PATHING
+					handleRenderPathing();
+#endif // RENDER_PATHING
+
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
 				}
@@ -92,6 +96,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 					assert(!m_pathToTile.empty());
 					if (!m_pathToTile.empty())
 					{
+#ifdef RENDER_PATHING
+						handleRenderPathing();
+#endif // RENDER_PATHING
+
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_currentState = eAIState::eMovingToTargetPlayer;
 					}
@@ -104,7 +112,19 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		if (m_currentState == eAIState::eMakeDecision)
 		{
 			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
-			(m_pathToTile.empty() ? m_currentState = eAIState::eSetTargetAtBox : m_currentState = eAIState::eMoveToPickUp);
+			if (m_pathToTile.empty())
+			{
+#ifdef RENDER_PATHING
+				handleRenderPathing();
+#endif // RENDER_PATHING
+
+				m_currentState = eAIState::eSetTargetAtBox;
+			}
+			else
+			{
+				m_currentState = eAIState::eMoveToPickUp;
+			}
+			//(m_pathToTile.empty() ?  : );
 		}
 	}
 
@@ -115,6 +135,9 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		assert(!m_pathToTile.empty());
 		if (!m_pathToTile.empty())
 		{
+#ifdef RENDER_PATHING
+			handleRenderPathing();
+#endif // RENDER_PATHING
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_currentState = eAIState::eMoveToBox;
 		}
@@ -161,6 +184,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
+#ifdef RENDER_PATHING
+					handleRenderPathing();
+#endif // RENDER_PATHING
+
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
 				}
@@ -279,6 +306,9 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
+#ifdef RENDER_PATHING
+					handleRenderPathing();
+#endif // RENDER_PATHING
 					std::cout << "Move to safety\n";
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_pathToTile.pop_back();
@@ -298,6 +328,16 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 		m_currentState = eAIState::ePlantBomb;
 	}
 }
+
+#ifdef RENDER_PATHING
+void PlayerServerAI::handleRenderPathing()
+{
+	sf::Packet packetToSend;
+	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
+
+	m_server.broadcastMessage(packetToSend);
+}
+#endif // RENDER_PATHING
 
 //Player Human
 PlayerServerHuman::PlayerServerHuman(std::unique_ptr<sf::TcpSocket> tcpSocket, int ID, sf::Vector2f startingPosition, sf::SocketSelector& socketSelector)

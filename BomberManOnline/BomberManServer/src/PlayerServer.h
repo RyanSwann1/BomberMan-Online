@@ -55,6 +55,11 @@ private:
 
 	void handleAIStates(float frameTime);
 	void onMovingToTargetPlayerState(const PlayerServer& targetPlayer);
+
+#ifdef RENDER_PATHING
+	void handleRenderPathing();
+#endif // RENDER_PATHING
+
 };
 
 class PlayerServerHuman : public PlayerServer
