@@ -114,14 +114,15 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
 			if (m_pathToTile.empty())
 			{
-#ifdef RENDER_PATHING
-				handleRenderPathing();
-#endif // RENDER_PATHING
+
 
 				m_currentState = eAIState::eSetTargetAtBox;
 			}
 			else
 			{
+#ifdef RENDER_PATHING
+				handleRenderPathing();
+#endif // RENDER_PATHING
 				m_currentState = eAIState::eMoveToPickUp;
 			}
 			//(m_pathToTile.empty() ?  : );
@@ -334,7 +335,7 @@ void PlayerServerAI::handleRenderPathing()
 {
 	sf::Packet packetToSend;
 	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
-
+	std::cout << m_ID << "\n";
 	m_server.broadcastMessage(packetToSend);
 }
 #endif // RENDER_PATHING
