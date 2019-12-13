@@ -26,7 +26,15 @@ public:
 		std::vector<MovementPoint>& localPlayerPreviousPositions);
 	void stopAtPosition(sf::Vector2f position);
 
+#ifdef RENDER_PATHING
+	void setPathToRender(const std::vector<sf::Vector2f>& path);
+#endif // RENDER_PATHING
+
 private:
 	const ePlayerType m_playerType;
 	AnimatedSprite m_sprite;
+
+#ifdef RENDER_PATHING
+	std::vector<sf::RectangleShape> m_path;
+#endif // RENDER_PATHING
 };
