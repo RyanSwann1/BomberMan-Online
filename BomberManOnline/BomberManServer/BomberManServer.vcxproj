@@ -79,7 +79,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)..\SFML\include;$(ProjectDir)..\Shared;$(ProjectDir)src</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TIXML_USE_STL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>RENDER_PATHING;TIXML_USE_STL;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(ProjectDir)lib</AdditionalLibraryDirectories>
