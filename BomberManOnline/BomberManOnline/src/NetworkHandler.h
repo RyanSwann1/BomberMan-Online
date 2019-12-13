@@ -7,6 +7,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <queue>
 #include <memory>
 
 class NetworkHandler : private NonCopyable
@@ -18,7 +19,8 @@ public:
 		return instance;
 	}
 
-	std::vector<sf::Packet>& getNetworkMessages();
+	bool isReceivedPackets() const;
+	sf::Packet getLatestPacket();// ::vector<sf::Packet>& getNetworkMessages();
 
 	bool connectToServer();
 	void disconnectFromServer();
@@ -26,7 +28,8 @@ public:
 
 private:
 	NetworkHandler();
-	std::vector<sf::Packet> m_receivedPackets;
+	std::queue<sf::Packet> m_receivedPackets;
+	//std::vector<sf::Packet> m_receivedPackets;
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 	std::atomic<bool> m_connectedToServer;
 	std::thread m_listenThread;

@@ -8,12 +8,33 @@ NetworkHandler::NetworkHandler()
 	m_connectedToServer(false),
 	m_listenThread(),
 	m_mutex()
-{}
-
-std::vector<sf::Packet>& NetworkHandler::getNetworkMessages()
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	return m_receivedPackets;
+}
+//
+//std::vector<sf::Packet>& NetworkHandler::getNetworkMessages()
+//{
+//	std::lock_guard<std::mutex> lock(m_mutex);
+//
+//
+//	return m_receivedPackets;
+//}
+
+bool NetworkHandler::isReceivedPackets() const
+{
+	return  !m_receivedPackets.empty();
+}
+
+sf::Packet NetworkHandler::getLatestPacket()
+{
+	sf::Packet packetReceived;
+	assert(!m_receivedPackets.empty());
+	if (!m_receivedPackets.empty())
+	{
+		packetReceived = m_receivedPackets.front();
+		m_receivedPackets.pop();
+	}
+
+	return packetReceived;
 }
 
 bool NetworkHandler::connectToServer()
@@ -37,7 +58,6 @@ void NetworkHandler::disconnectFromServer()
 	{
 		std::lock_guard<std::mutex> lock(m_mutex);
 		m_connectedToServer = false;
-
 
 		sf::Packet disconnectPacket;
 		disconnectPacket << eServerMessageType::eRequestDisconnection;
@@ -64,7 +84,12 @@ void NetworkHandler::listen()
 		if (m_tcpSocket->receive(receivedPacket) == sf::Socket::Done)
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
-			m_receivedPackets.push_back(receivedPacket);
+			m_receivedPackets.push(receivedPacket);
+			//m_receivedPackets.push_back(receivedPacket);
+		}
+		else
+		{
+			std::cout << "Received bad packet\n";
 		}
 	}
 }
