@@ -117,9 +117,10 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 	m_movementFactor = 0.0f;
 }
 
+#ifdef RENDER_PATHING
 void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 {
-#ifdef RENDER_PATHING
+
 	m_path.clear();
 
 	for (sf::Vector2f i : path)
@@ -132,5 +133,8 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 
 		m_path.push_back(shape);
 	}
-#endif // DEBUG
+
+	m_path.front().setFillColor(sf::Color::Green);
+
 }
+#endif // DEBUG

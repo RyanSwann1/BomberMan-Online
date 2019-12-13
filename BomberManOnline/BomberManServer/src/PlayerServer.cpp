@@ -336,7 +336,6 @@ void PlayerServerAI::handleRenderPathing()
 {
 	sf::Packet packetToSend;
 	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
-	std::cout << m_pathToTile.size() << "\n";
 	m_server.broadcastMessage(packetToSend);
 }
 #endif // RENDER_PATHING

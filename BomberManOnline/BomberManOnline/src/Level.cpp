@@ -391,8 +391,8 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		if (!previousPositionFound)
 		{
 			std::cout << "Disconnected for cheating.\n";
-			/*NetworkHandler::getInstance().disconnectFromServer();
-			window.close();*/
+			NetworkHandler::getInstance().disconnectFromServer();
+			window.close();
 		}
 	}
 	break;

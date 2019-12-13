@@ -76,40 +76,6 @@ int main()
 				break;
 			}
 		}
-		/*if (!NetworkHandler::getInstance().getNetworkMessages().empty())
-		{
-			for (auto& receivedMessage : NetworkHandler::getInstance().getNetworkMessages())
-			{
-				eServerMessageType messageType;
-				receivedMessage >> messageType;
-				switch (messageType)
-				{
-				case eServerMessageType::eInitializeClientID:
-					receivedMessage >> localClientID;
-					break;
-				case eServerMessageType::eInitialGameData:
-				{
-					ServerMessageInitialGameData initialGameData;
-					receivedMessage >> initialGameData;
-					assert(!level);
-					if (!level)
-					{
-						level = Level::create(localClientID, initialGameData);
-					}
-				}
-					break;
-				default:
-					assert(level);
-					if (level)
-					{
-						level->onReceivedServerMessage(messageType, receivedMessage, window);
-					}
-					break;
-				}
-			}
-
-			NetworkHandler::getInstance().getNetworkMessages().clear();
-		}*/
 
 		//Input Handling
 		sf::Event sfmlEvent;
