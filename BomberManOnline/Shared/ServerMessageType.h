@@ -16,11 +16,13 @@ enum class eServerMessageType
 	eRequestDisconnection,
 	eRequestKickBomb,
 	eBombKicked,
+	ePathToRender,
 	//PickUps
 	eSpawnMovementPickUp,
 	eSpawnExtraBombPickUp,
 	eSpawnBiggerExplosionPickUp,
 	eMovementPickUpCollision,
 	eExtraBombPickUpCollision,
-	eBiggerExplosionPickUpCollision
+	eBiggerExplosionPickUpCollision,
+
 };
