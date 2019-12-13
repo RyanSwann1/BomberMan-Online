@@ -17,6 +17,7 @@ bool NetworkHandler::isReceivedPackets() const
 
 sf::Packet NetworkHandler::getLatestPacket()
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
 	sf::Packet packetReceived;
 	assert(!m_receivedPackets.empty());
 	if (!m_receivedPackets.empty())
