@@ -44,4 +44,5 @@ private:
 	void changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile);
 	void addExplosionObject(sf::Vector2f position);
 	void kickBombToPosition(sf::Vector2f bombPosition, sf::Vector2f kickToPosition);
+	PlayerClient* getPlayer(int ID);
 };

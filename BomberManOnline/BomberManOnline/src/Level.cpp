@@ -155,6 +155,12 @@ void Level::kickBombToPosition(sf::Vector2f bombPosition, sf::Vector2f kickToPos
 	}
 }
 
+PlayerClient* Level::getPlayer(int ID)
+{
+	auto iter = std::find_if(m_players.begin(), m_players.end(), [ID](const auto& player) { return player->getID() == ID; });
+	return iter->get();
+}
+
 std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGameData & initialGameData)
 {
 	//Load Level
@@ -350,7 +356,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 {
 	switch (receivedMessageType)
 	{
-	case eServerMessageType::eInvalidMoveRequest :
+	case eServerMessageType::eInvalidMoveRequest:
 	{
 		ServerMessageInvalidMove invalidMoveMessage;
 		receivedMessage >> invalidMoveMessage;
@@ -380,18 +386,18 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		if (!previousPositionFound)
 		{
 			std::cout << "Disconnected for cheating.\n";
-			NetworkHandler::getInstance().disconnectFromServer();
-			window.close();
+			/*NetworkHandler::getInstance().disconnectFromServer();
+			window.close();*/
 		}
 	}
 	break;
-		
-	case eServerMessageType::eNewPlayerPosition :
+
+	case eServerMessageType::eNewPlayerPosition:
 	{
 		sf::Vector2f newPosition;
-		int clientID = INVALID_PLAYER_ID;
-		receivedMessage >> newPosition.x >> newPosition.y >> clientID;
-		if (clientID == m_localPlayer->getID())
+		int playerID = INVALID_PLAYER_ID;
+		receivedMessage >> newPosition.x >> newPosition.y >> playerID;
+		if (playerID == m_localPlayer->getID())
 		{
 			for (auto iter = m_localPlayerPreviousPositions.begin(); iter != m_localPlayerPreviousPositions.end();)
 			{
@@ -408,24 +414,24 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		}
 		else
 		{
-			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->getID() == clientID; });
+			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [playerID](const auto& player) { return player->getID() == playerID; });
 			assert(remotePlayer != m_players.end());
 
-			(*remotePlayer)->setNewPosition(newPosition, m_collisionLayer, Textures::getInstance().getTileSheet().getTileSize(), 
+			(*remotePlayer)->setNewPosition(newPosition, m_collisionLayer, Textures::getInstance().getTileSheet().getTileSize(),
 				m_localPlayerPreviousPositions);
 		}
 	}
-		break;
+	break;
 
-	case eServerMessageType::ePlaceBomb :
+	case eServerMessageType::ePlaceBomb:
 	{
 		sf::Vector2f placementPosition;
 		receivedMessage >> placementPosition.x >> placementPosition.y;
 
 		m_gameObjects.emplace_back(placementPosition, BOMB_LIFETIME_DURATION, eAnimationName::eBomb, eGameObjectType::eBomb, eTimerActive::eTrue);
 	}
-		break;
-	case eServerMessageType::eBombExplosion :
+	break;
+	case eServerMessageType::eBombExplosion:
 	{
 		sf::Vector2f position;
 		receivedMessage >> position.x >> position.y;
@@ -434,50 +440,46 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		onBombExplosion(position, explosionSize);
 	}
-		break;
-	case eServerMessageType::ePlayerDisconnected :
+	break;
+	case eServerMessageType::ePlayerDisconnected:
 	{
-		int clientID = INVALID_PLAYER_ID;
-		receivedMessage >> clientID;
-		assert(clientID != INVALID_PLAYER_ID);
-		if (m_localPlayer->getID() == clientID)
+		int playerID = INVALID_PLAYER_ID;
+		receivedMessage >> playerID;
+		assert(playerID != INVALID_PLAYER_ID);
+		if (m_localPlayer->getID() == playerID)
 		{
 			window.close();
 		}
 		else
 		{
-			auto iter = std::find_if(m_players.begin(), m_players.end(), [clientID](const auto& player) { return player->getID() == clientID; });
+			auto iter = std::find_if(m_players.begin(), m_players.end(), [playerID](const auto& player) { return player->getID() == playerID; });
 			assert(iter != m_players.end());
-			
+
 			m_players.erase(iter);
 		}
 	}
-		break;
-	case eServerMessageType::eSpawnMovementPickUp :
+	break;
+	case eServerMessageType::eSpawnMovementPickUp:
 	{
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 		spawnPickUp(startingPosition, eGameObjectType::eMovementPickUp);
 	}
-		break;
-		
-	case eServerMessageType::eMovementPickUpCollision :
+	break;
+
+	case eServerMessageType::eMovementPickUpCollision:
 	{
-		int clientID = INVALID_PLAYER_ID;
+		int playerID = INVALID_PLAYER_ID;
 		float movementSpeedIncrement = 0;
-		receivedMessage >> clientID >> movementSpeedIncrement;
-		for (auto& player : m_players)
-		{
-			if (clientID == player->getID())
-			{
-				player->increaseMovementSpeed(movementSpeedIncrement);
-				break;
-			}
-		}
-	}
+		receivedMessage >> playerID >> movementSpeedIncrement;
+
+		PlayerClient* player = getPlayer(playerID);
+		assert(player);
+		if (player)
+			player->increaseMovementSpeed(movementSpeedIncrement);
 		break;
-		
-	case eServerMessageType::eSpawnExtraBombPickUp :
+	}
+	case eServerMessageType::eSpawnExtraBombPickUp:
 	{
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
@@ -486,46 +488,40 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 	}
 	break;
 
-	case eServerMessageType::eExtraBombPickUpCollision :
+	case eServerMessageType::eExtraBombPickUpCollision:
 	{
-		int clientID = INVALID_PLAYER_ID;
-		receivedMessage >> clientID;
-		for (auto& player : m_players)
-		{
-			if (clientID == player->getID())
-			{
-				player->increaseBombCount();
-				break;
-			}
-		}
-	}
-		break;
+		int playerID = INVALID_PLAYER_ID;
+		receivedMessage >> playerID;
 
-	case eServerMessageType::eSpawnBiggerExplosionPickUp :
+		PlayerClient* player = getPlayer(playerID);
+		assert(player);
+		if (player)
+			player->increaseBombCount();
+	}
+	break;
+
+	case eServerMessageType::eSpawnBiggerExplosionPickUp:
 	{
 		sf::Vector2f startingPosition;
 		receivedMessage >> startingPosition.x >> startingPosition.y;
 
 		spawnPickUp(startingPosition, eGameObjectType::eBiggerExplosionPickUp);
 	}
-		break;
+	break;
 
-	case eServerMessageType::eBiggerExplosionPickUpCollision :
+	case eServerMessageType::eBiggerExplosionPickUpCollision:
 	{
-		int clientID = INVALID_PLAYER_ID;
-		receivedMessage >> clientID;
-		for (auto& player : m_players)
-		{
-			if (player->getID() == clientID)
-			{
-				player->increaseBombExplosionSize();
-				break;
-			}
-		}
-	}
-		break;
+		int playerID = INVALID_PLAYER_ID;
+		receivedMessage >> playerID;
 
-	case eServerMessageType::eBombKicked :
+		PlayerClient* player = getPlayer(playerID);
+		assert(player);
+		if (player)
+			player->increaseBombExplosionSize();
+	}
+	break;
+
+	case eServerMessageType::eBombKicked:
 	{
 		sf::Vector2f bombOnPosition;
 		receivedMessage >> bombOnPosition;
@@ -534,6 +530,23 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 		kickBombToPosition(bombOnPosition, kickToPosition);
 	}
-		break;
+	break;
+#ifdef RENDER_PATHING
+	case eServerMessageType::ePathToRender:
+	{
+		std::vector<sf::Vector2f> path;
+		receivedMessage >> path;
+		int playerID = INVALID_PLAYER_ID;
+		std::cout << playerID << "\n";
+		receivedMessage >> playerID;
+
+		PlayerClient* player = getPlayer(playerID);
+		assert(player);
+		if (player)
+			player->setPathToRender(path);
+	}
+	break;
+#endif // RENDER_PATHING
 	}
 }
+
