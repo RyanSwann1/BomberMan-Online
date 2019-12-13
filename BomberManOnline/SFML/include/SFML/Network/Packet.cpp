@@ -2,6 +2,28 @@
 #include "ServerMessages.h"
 #include <string>
 
+sf::Packet& sf::operator>>(Packet& receivedPacket, std::vector<sf::Vector2f>& path)
+{
+	for (sf::Vector2f i : path)
+	{
+		sf::Vector2f position;
+		receivedPacket >> position;
+		path.push_back(position);
+	}
+
+	return receivedPacket;
+}
+
+sf::Packet& sf::operator<<(Packet& packetToSend, const std::vector<sf::Vector2f>& path)
+{
+	for (sf::Vector2f i : path)
+	{
+		packetToSend << i;
+	}
+
+	return packetToSend;
+}
+
 sf::Packet& sf::operator>>(Packet& receivedPacket, eDirection& direction)
 {
 	int dir = 0;

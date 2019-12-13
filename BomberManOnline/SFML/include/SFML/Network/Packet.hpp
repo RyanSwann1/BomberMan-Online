@@ -337,6 +337,9 @@ public:
     ////////////////////////////////////////////////////////////
     Packet& operator <<(const String&       data);
 
+	friend Packet& operator>>(Packet& receivedPacket, std::vector<sf::Vector2f>& path);
+	friend Packet& operator<<(Packet& packetToSend, const std::vector<sf::Vector2f>& path);
+
 	friend Packet& operator>>(Packet& receivedPacket, eDirection& direction);
 	friend Packet& operator<<(Packet& packetToSend, eDirection direction);
 
