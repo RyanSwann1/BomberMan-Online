@@ -114,8 +114,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			PathFinding::getInstance().getPathToClosestPickUp(m_position, m_pathToTile, m_server, PICK_UP_SEARCH_RANGE);
 			if (m_pathToTile.empty())
 			{
-
-
 				m_currentState = eAIState::eSetTargetAtBox;
 			}
 			else
@@ -125,7 +123,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 #endif // RENDER_PATHING
 				m_currentState = eAIState::eMoveToPickUp;
 			}
-			//(m_pathToTile.empty() ?  : );
 		}
 	}
 

@@ -8,20 +8,11 @@ NetworkHandler::NetworkHandler()
 	m_connectedToServer(false),
 	m_listenThread(),
 	m_mutex()
-{
-}
-//
-//std::vector<sf::Packet>& NetworkHandler::getNetworkMessages()
-//{
-//	std::lock_guard<std::mutex> lock(m_mutex);
-//
-//
-//	return m_receivedPackets;
-//}
+{}
 
 bool NetworkHandler::isReceivedPackets() const
 {
-	return  !m_receivedPackets.empty();
+	return !m_receivedPackets.empty();
 }
 
 sf::Packet NetworkHandler::getLatestPacket()
@@ -85,7 +76,6 @@ void NetworkHandler::listen()
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 			m_receivedPackets.push(receivedPacket);
-			//m_receivedPackets.push_back(receivedPacket);
 		}
 		else
 		{

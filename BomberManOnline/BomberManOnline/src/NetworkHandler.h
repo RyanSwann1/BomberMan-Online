@@ -20,7 +20,7 @@ public:
 	}
 
 	bool isReceivedPackets() const;
-	sf::Packet getLatestPacket();// ::vector<sf::Packet>& getNetworkMessages();
+	sf::Packet getLatestPacket();
 
 	bool connectToServer();
 	void disconnectFromServer();
@@ -29,7 +29,6 @@ public:
 private:
 	NetworkHandler();
 	std::queue<sf::Packet> m_receivedPackets;
-	//std::vector<sf::Packet> m_receivedPackets;
 	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
 	std::atomic<bool> m_connectedToServer;
 	std::thread m_listenThread;
