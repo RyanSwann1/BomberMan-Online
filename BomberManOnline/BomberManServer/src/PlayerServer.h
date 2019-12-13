@@ -7,12 +7,6 @@
 #include <utility>
 #include <vector>
 
-enum class eAIIntelligence
-{
-	eDumb,
-	eSmart
-};
-
 enum class eAIBehaviour
 {
 	ePassive = 0, //Target boxes until non left, then Player
@@ -64,7 +58,6 @@ private:
 #ifdef RENDER_PATHING
 	void handleRenderPathing();
 #endif // RENDER_PATHING
-
 };
 
 class PlayerServerHuman : public PlayerServer

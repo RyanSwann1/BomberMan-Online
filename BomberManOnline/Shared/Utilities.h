@@ -6,8 +6,8 @@
 enum class eCollidableTile;
 namespace Utilities
 {
-	float distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
-	float distance(sf::Vector2i source, sf::Vector2i destination);
+	int distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
+	int distance(sf::Vector2i source, sf::Vector2i target);
 
 	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);

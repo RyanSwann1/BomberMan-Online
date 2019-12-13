@@ -227,7 +227,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				onMovingToTargetPlayerState(*targetPlayer);
+				m_currentState = eAIState::eSetPositionToTargetPlayer;
+				//onMovingToTargetPlayerState(*targetPlayer);
 			}
 			else
 			{
@@ -294,7 +295,7 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 {
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
 	auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server);
-	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY + 1)
+	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
 	{
 		bool bombFound = false;
 		for (sf::Vector2f position : pathToTile)
@@ -303,20 +304,38 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
 			{
 				bombFound = true;
-
-				PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
+				sf::Vector2i tileSize = m_server.getTileSize();
+				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, 
+					Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize), m_server, pathToTile);
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
 					handleRenderPathing();
 #endif // RENDER_PATHING
-					std::cout << "Move to safety\n";
+					std::cout << "Redirect path to safe path\n";
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_pathToTile.pop_back();
-					m_currentState = eAIState::eMoveToSafePosition;
+					m_currentState = eAIState::eSetPositionToTargetPlayer;
 
 					break;
+				}
+				else
+				{
+					PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
+					assert(!m_pathToTile.empty());
+					if (!m_pathToTile.empty())
+					{
+#ifdef RENDER_PATHING
+						handleRenderPathing();
+#endif // RENDER_PATHING
+						std::cout << "Move to safety\n";
+						setNewPosition(m_pathToTile.back(), m_server);
+						m_pathToTile.pop_back();
+						m_currentState = eAIState::eMoveToSafePosition;
+
+						break;
+					}
 				}
 			}
 		}
