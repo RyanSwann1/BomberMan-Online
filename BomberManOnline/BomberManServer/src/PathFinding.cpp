@@ -398,7 +398,10 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 		while (position != sourcePositionOnGrid)
 		{
 			position = m_graph.getPreviousPosition(position, server.getLevelSize());
-			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+			if (position != sourcePositionOnGrid)
+			{
+				pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+			}
 		}
 	}
 }
@@ -547,7 +550,10 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i positionAtSour
 	while (position != positionAtSource)
 	{
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
-		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+		if (position != positionAtSource)
+		{
+			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+		}
 	}
 
 	return pathToTile;
@@ -763,6 +769,9 @@ void PathFinding::getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i target
 	while (position != sourcePosition)
 	{
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
-		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+		if (position != sourcePosition)
+		{
+			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+		}
 	}
 }
