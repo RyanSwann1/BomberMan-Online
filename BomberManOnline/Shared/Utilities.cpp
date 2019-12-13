@@ -40,7 +40,7 @@ bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollida
 	return false;
 }
 
-bool Utilities::isPositionNeighbourToPosition(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize)
+bool Utilities::isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize)
 {
 	bool neighbourPosition = false;
 
