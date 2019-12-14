@@ -212,9 +212,8 @@ void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf
 	else
 	{
 		pathToTile.clear();
-		sf::Vector2i tileSize = server.getTileSize();
-
-		getSafePathToTile(sourcePosition, targetPosition, pathToTile, server);
+		std::vector<sf::Vector2f> newPathToTile;
+		getSafePathToTile(sourcePosition, targetPosition, newPathToTile, server);
 		if (!pathToTile.empty())
 		{
 			pathToTile.push_back(pathToTile.back());
@@ -682,14 +681,27 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 		
 	if (pathCompleted)
 	{
-		std::vector<sf::Vector2f> newPathToTile;
-		getSafePathToTile(sourcePosition, targetPosition, newPathToTile, server);
-		assert(!newPathToTile.empty());
-		if (!newPathToTile.empty())
+		sf::Vector2f position = Utilities::convertToWorldPosition(lastPosition, tileSize);
+		pathToTile.push_back(position);
+		while (position != sourcePosition)
 		{
-			pathToTile.push_back(pathToTile.back());
-			pathToTile.push_back(newPathToTile.back());
+			sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
+			position = Utilities::convertToWorldPosition(previousPosition, tileSize);
+			if (position != sourcePosition)
+			{
+				pathToTile.push_back(position);
+			}
 		}
+
+		//pathToTile.clear();
+		//pathToTile.push_back(Utilities::convertToWorldPosition(lastPosition, tileSize));
+
+		////std::vector<sf::Vector2f> newPathToTile;
+		////getSafePathToTile(sourcePosition, targetPosition, newPathToTile, server);
+		////if (!newPathToTile.empty())
+		////{
+		////	pathToTile.push_back(newPathToTile.back());
+		////}
 
 		//sf::Vector2f position = Utilities::convertToWorldPosition(lastPosition, tileSize);
 		//pathToTile.push_back(position);

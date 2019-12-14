@@ -69,8 +69,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			if (targetPlayer)
 			{
 				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				assert(!m_pathToTile.empty());
+				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
@@ -79,6 +78,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+				else
+				{
+					m_currentState = eAIState::eSetTargetAtSafePosition;
 				}
 			}
 			else
@@ -97,8 +100,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				{
 					m_targetPlayerID = targetPlayer->getID();
 					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-					PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-					assert(!m_pathToTile.empty());
+					PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 					if (!m_pathToTile.empty())
 					{
 #ifdef RENDER_PATHING
@@ -107,6 +109,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_currentState = eAIState::eMovingToTargetPlayer;
+					}
+					else
+					{
+						m_currentState = eAIState::eSetTargetAtSafePosition;
 					}
 					break;
 				}
@@ -183,8 +189,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			if (targetPlayer)
 			{
 				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				assert(!m_pathToTile.empty());
+				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
@@ -193,6 +198,10 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+				else
+				{
+					m_currentState = eAIState::eSetTargetAtSafePosition;
 				}
 			}
 			else
