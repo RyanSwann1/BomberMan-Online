@@ -65,60 +65,24 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		//Target Player has been found
 		if (m_targetPlayerID != INVALID_PLAYER_ID)
 		{
-			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
-			if (targetPlayer)
-			{
-				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				if (!m_pathToTile.empty())
-				{
-#ifdef RENDER_PATHING
-					handleRenderPathing();
-#endif // RENDER_PATHING
-
-					setNewPosition(m_pathToTile.back(), m_server);
-					m_currentState = eAIState::eMovingToTargetPlayer;
-				}
-				else
-				{
-					m_currentState = eAIState::eSetTargetAtSafePosition;
-				}
-			}
-			else
-			{
-				m_targetPlayerID = INVALID_PLAYER_ID;
-				m_currentState = eAIState::eMakeDecision;
-			}
+			m_currentState = eAIState::eSetPositionToTargetPlayer;
 		}
 		//Search for target Player
 		else if (m_behavour == eAIBehaviour::eAggressive && m_targetPlayerID == INVALID_PLAYER_ID)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
+				sf::Vector2i tileSize = m_server.getTileSize();
+				sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), tileSize);
 				if (targetPlayer->getID() != m_ID && targetPlayer->getControllerType() == ePlayerControllerType::eHuman &&
-					PathFinding::getInstance().isPositionReachable(m_position, targetPlayer->getPosition(), m_server))
+					PathFinding::getInstance().isPositionReachable(m_position, targetPlayerPosition, m_server))
 				{
 					m_targetPlayerID = targetPlayer->getID();
-					sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-					PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-					if (!m_pathToTile.empty())
-					{
-#ifdef RENDER_PATHING
-						handleRenderPathing();
-#endif // RENDER_PATHING
-
-						setNewPosition(m_pathToTile.back(), m_server);
-						m_currentState = eAIState::eMovingToTargetPlayer;
-					}
-					else
-					{
-						m_currentState = eAIState::eSetTargetAtSafePosition;
-					}
+					m_currentState = eAIState::eSetPositionToTargetPlayer;
 					break;
 				}
 			}
 		}
-
 		//Target Player not found
 		if (m_currentState == eAIState::eMakeDecision)
 		{
@@ -188,21 +152,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
-				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				if (!m_pathToTile.empty())
-				{
-#ifdef RENDER_PATHING
-					handleRenderPathing();
-#endif // RENDER_PATHING
-
-					setNewPosition(m_pathToTile.back(), m_server);
-					m_currentState = eAIState::eMovingToTargetPlayer;
-				}
-				else
-				{
-					m_currentState = eAIState::eSetTargetAtSafePosition;
-				}
+				onSetPositionToTargetPlayerState(*targetPlayer);
 			}
 			else
 			{
@@ -241,7 +191,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				onMovingToTargetPlayerState(*targetPlayer);
+				m_currentState = eAIState::eSetPositionToTargetPlayer;
 			}
 			else
 			{
@@ -304,62 +254,126 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 }
 
-void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
+//void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
+//{
+//	sf::Vector2i tileSize = m_server.getTileSize();
+//	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize);
+//
+//	if (Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
+//	{
+//		m_currentState = eAIState::ePlantBomb;
+//	}
+//	else
+//	{
+//		bool bombFound = false;
+//		for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
+//		{
+//			const BombServer* bomb = m_server.getBomb(position);
+//			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
+//			{
+//				bombFound = true;
+//
+//				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
+//				if (!m_pathToTile.empty())
+//				{
+//#ifdef RENDER_PATHING
+//					handleRenderPathing();
+//#endif // RENDER_PATHING
+//					std::cout << "Redirect path to safe path\n";
+//					setNewPosition(m_pathToTile.back(), m_server);
+//					m_pathToTile.pop_back();
+//					m_currentState = eAIState::eSetPositionToTargetPlayer;
+//
+//					break;
+//				}
+//				else
+//				{
+//					PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
+//					assert(!m_pathToTile.empty());
+//					if (!m_pathToTile.empty())
+//					{
+//#ifdef RENDER_PATHING
+//						handleRenderPathing();
+//#endif // RENDER_PATHING
+//						std::cout << "Move to safety\n";
+//						setNewPosition(m_pathToTile.back(), m_server);
+//						m_pathToTile.pop_back();
+//						m_currentState = eAIState::eMoveToSafePosition;
+//
+//						break;
+//					}
+//				}
+//			}
+//		}
+//
+//		if (!bombFound)
+//		{
+//			m_currentState = eAIState::eSetPositionToTargetPlayer;
+//		}
+//	}
+//}
+
+void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& targetPlayer)
 {
 	sf::Vector2i tileSize = m_server.getTileSize();
-	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize);
-
+	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
 	if (Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
 	{
 		m_currentState = eAIState::ePlantBomb;
 	}
 	else
 	{
-		bool bombFound = false;
-		for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
+		PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_pathToTile, m_server);
+		assert(!m_pathToTile.empty());
+		if (!m_pathToTile.empty())
 		{
-			const BombServer* bomb = m_server.getBomb(position);
-			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
+			bool bombFound = false;
+			for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
 			{
-				bombFound = true;
-				sf::Vector2i tileSize = m_server.getTileSize();
-
-				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				if (!m_pathToTile.empty())
+				const BombServer* bomb = m_server.getBomb(position);
+				if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
 				{
-#ifdef RENDER_PATHING
-					handleRenderPathing();
-#endif // RENDER_PATHING
-					std::cout << "Redirect path to safe path\n";
-					setNewPosition(m_pathToTile.back(), m_server);
-					m_pathToTile.pop_back();
-					m_currentState = eAIState::eSetPositionToTargetPlayer;
+					bombFound = true;
 
-					break;
-				}
-				else
-				{
-					PathFinding::getInstance().getPathToClosestSafePosition(m_position, *bomb, m_pathToTile, m_server);
-					assert(!m_pathToTile.empty());
+					PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 					if (!m_pathToTile.empty())
 					{
 #ifdef RENDER_PATHING
 						handleRenderPathing();
 #endif // RENDER_PATHING
-						std::cout << "Move to safety\n";
+						//std::cout << "Redirect path to safe path\n";
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_pathToTile.pop_back();
-						m_currentState = eAIState::eMoveToSafePosition;
-
-						break;
+						m_currentState = eAIState::eMovingToTargetPlayer;
 					}
+					else
+					{
+						PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+						if (!m_pathToTile.empty())
+						{
+#ifdef RENDER_PATHING
+							handleRenderPathing();
+#endif // RENDER_PATHING
+							setNewPosition(m_pathToTile.back(), m_server);
+							m_pathToTile.pop_back();
+							m_currentState = eAIState::eMoveToSafePosition;
+						}
+					}
+
+					break;
 				}
 			}
-		}
+			if (!bombFound)
+			{
+				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 
-		if (!bombFound)
-		{
-			m_currentState = eAIState::eSetPositionToTargetPlayer;
+#ifdef RENDER_PATHING
+				handleRenderPathing();
+#endif // RENDER_PATHING
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_pathToTile.pop_back();
+				m_currentState = eAIState::eMovingToTargetPlayer;
+			}
 		}
 	}
 }

@@ -657,18 +657,20 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				continue;
 			}
 
-			if (Utilities::isPositionAdjacent(Utilities::convertToWorldPosition(neighbourPosition, tileSize), targetPosition, tileSize) &&
-				!m_graph.isPositionVisited(neighbourPosition, levelSize))
-			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-				frontier.push(neighbourPosition);
-			}
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server) &&
 				!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				frontier.push(neighbourPosition);
 			}
+
+			//if (Utilities::isPositionAdjacent(Utilities::convertToWorldPosition(neighbourPosition, tileSize), targetPosition, tileSize) &&
+			//	!m_graph.isPositionVisited(neighbourPosition, levelSize))
+			//{
+			//	m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
+			//	frontier.push(neighbourPosition);
+			//}
+
 
 			if (neighbourPosition == targetPositionOnGrid)
 			{
