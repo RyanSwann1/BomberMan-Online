@@ -292,8 +292,14 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
 {
-	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() > MIN_DISTANCE_FROM_ENEMY)
+	sf::Vector2i tileSize = m_server.getTileSize();
+	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize);
+
+	if (Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
+	{
+		m_currentState = eAIState::ePlantBomb;
+	}
+	else
 	{
 		bool bombFound = false;
 		for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
@@ -303,7 +309,7 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 			{
 				bombFound = true;
 				sf::Vector2i tileSize = m_server.getTileSize();
-				
+
 				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
@@ -336,14 +342,11 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 				}
 			}
 		}
+
 		if (!bombFound)
 		{
 			m_currentState = eAIState::eSetPositionToTargetPlayer;
 		}
-	}
-	else
-	{
-		m_currentState = eAIState::ePlantBomb;
 	}
 }
 

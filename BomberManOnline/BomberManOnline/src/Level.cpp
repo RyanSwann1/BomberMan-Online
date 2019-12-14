@@ -544,7 +544,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		receivedMessage >> path;
 		int playerID = INVALID_PLAYER_ID;
 		receivedMessage >> playerID;
-		std::cout << playerID << "\n";
 
 		PlayerClient* player = getPlayer(playerID);
 		assert(player);

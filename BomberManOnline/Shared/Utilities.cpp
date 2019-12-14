@@ -44,19 +44,19 @@ bool Utilities::isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, 
 {
 	bool neighbourPosition = false;
 
-	if (origin.x - tileSize.x == neighbour.x)
+	if (origin.x - tileSize.x == neighbour.x && origin.y == neighbour.y)
 	{
 		neighbourPosition = true;
 	}
-	if (origin.x + tileSize.x == neighbour.x)
+	if (origin.x + tileSize.x == neighbour.x && origin.y == neighbour.y)
 	{
 		neighbourPosition = true;
 	}
-	if (origin.y - tileSize.y == neighbour.y)
+	if (origin.y - tileSize.y == neighbour.y && origin.x == neighbour.x)
 	{
 		neighbourPosition = true;
 	}
-	if (origin.y + tileSize.y == neighbour.y)
+	if (origin.y + tileSize.y == neighbour.y && origin.x == neighbour.x)
 	{
 		neighbourPosition = true;
 	}
