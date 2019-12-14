@@ -227,8 +227,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				m_currentState = eAIState::eSetPositionToTargetPlayer;
-				//onMovingToTargetPlayerState(*targetPlayer);
+				onMovingToTargetPlayerState(*targetPlayer);
 			}
 			else
 			{
@@ -294,20 +293,19 @@ void PlayerServerAI::handleAIStates(float frameTime)
 void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
 {
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	auto pathToTile = PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server);
-	if (pathToTile.size() >= MIN_DISTANCE_FROM_ENEMY)
+	if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() >= MIN_DISTANCE_FROM_ENEMY)
 	{
 		bool bombFound = false;
-		for (sf::Vector2f position : pathToTile)
+		for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
 		{
 			const BombServer* bomb = m_server.getBomb(position);
 			if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
 			{
 				bombFound = true;
 				sf::Vector2i tileSize = m_server.getTileSize();
+				
 				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, 
-					Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize), m_server, pathToTile);
-				assert(!m_pathToTile.empty());
+					Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize), m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING

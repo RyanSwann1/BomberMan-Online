@@ -169,6 +169,7 @@ void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf
 
 bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
+	//BUG TO CATCH:
 	assert(sourcePosition != targetPosition);
 	//if (sourcePosition == targetPosition)
 	//{
@@ -613,7 +614,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				frontier.push(neighbourPosition);
 			}
 
-			if (neighbourPosition == targetPositionOnGrid || frontier.empty())
+			if (neighbourPosition == targetPositionOnGrid)
 			{
 				pathCompleted = true;
 				break;
@@ -632,10 +633,11 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 		
 	if (pathCompleted)
 	{
-		std::vector<sf::Vector2f> path = getPathToTile(sourcePositionOnGrid, lastPosition, server);
-		if (path.front() == targetPosition)
+	 	std::vector<sf::Vector2f> path = getPathToTile(sourcePosition, targetPosition, server);
+		assert(!path.empty());
+		if (!path.empty())
 		{
-			pathToTile = path;
+			pathToTile.push_back(path.front());
 		}
 	}
 }
