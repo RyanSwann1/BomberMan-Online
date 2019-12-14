@@ -169,12 +169,10 @@ void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf
 
 bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
-	//BUG TO CATCH:
-	assert(sourcePosition != targetPosition);
-	//if (sourcePosition == targetPosition)
-	//{
-	//	return true;
-	//}
+	if (sourcePosition == targetPosition)
+	{
+		return true;
+	}
 
 	m_graph.resetGraph(server.getLevelSize());
 
@@ -619,14 +617,6 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				pathCompleted = true;
 				break;
 			}
-	/*			sf::Vector2f position = Utilities::convertToWorldPosition(neighbourPosition, tileSize);
-				pathToTile.emplace_back(position);
-				while (position != targetPosition)
-				{
-					auto pos = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
-					position = sf::Vector2f(pos.x * tileSize.x, pos.y * tileSize.y);
-					pathToTile.push_back(position);
-				}*/
 		}
 		neighbours.clear();
 	}
@@ -778,20 +768,6 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 					pathToTile.push_back(position);
 				}
 			}
-			//bool pathCompleted = false;
-			//while (!pathCompleted)
-			//{
-			//	sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
-			//	position = sf::Vector2f(Utilities::convertToWorldPosition(previousPosition, tileSize));
-			//	if (position != sourcePosition)
-			//	{
-			//		pathToTile.push_back(position);
-			//	}
-			//	else
-			//	{
-			//		pathCompleted = true;
-			//	}
-			//}
 		}
 	}
 
