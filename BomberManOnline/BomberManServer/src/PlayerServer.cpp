@@ -304,8 +304,7 @@ void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlaye
 				bombFound = true;
 				sf::Vector2i tileSize = m_server.getTileSize();
 				
-				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, 
-					Utilities::getClosestGridPosition(targetPlayer.getPosition(), tileSize), m_server, m_pathToTile);
+				PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
