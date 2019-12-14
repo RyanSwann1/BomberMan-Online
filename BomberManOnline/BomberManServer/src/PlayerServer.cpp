@@ -57,6 +57,11 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 	case eAIState::eMakeDecision:
 	{
+		if (isMoving())
+		{
+			break;
+		}
+
 		//Target Player has been found
 		if (m_targetPlayerID != INVALID_PLAYER_ID)
 		{

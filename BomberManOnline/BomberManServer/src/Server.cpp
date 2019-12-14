@@ -67,6 +67,19 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	}
 }
 
+bool Server::isBombAtPosition(sf::Vector2f position) const
+{
+	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
+	if (bomb != m_bombs.cend())
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 const PlayerServer* Server::getPlayer(int ID) const
 {
 	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });

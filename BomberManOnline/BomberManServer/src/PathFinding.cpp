@@ -7,6 +7,7 @@
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include <assert.h>
 
 constexpr size_t MAX_NEIGHBOURS = 4;
 constexpr size_t MAX_BOX_SELECTION = 5;
@@ -643,7 +644,6 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 	neighbours.reserve(MAX_NEIGHBOURS);
 
 	sf::Vector2i lastPosition;
-
 	bool pathCompleted = false;
 	while (!pathCompleted && !frontier.empty())
 	{
@@ -653,13 +653,18 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
+			if (server.isBombAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
+			{
+				continue;
+			}
+
 			if (Utilities::isPositionAdjacent(Utilities::convertToWorldPosition(neighbourPosition, tileSize), targetPosition, tileSize) &&
 				!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				frontier.push(neighbourPosition);
 			}
-			else if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server) &&
+			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server) &&
 				!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
@@ -677,11 +682,16 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 		
 	if (pathCompleted)
 	{
-	 	std::vector<sf::Vector2f> path = getPathToTile(sourcePosition, targetPosition, server);
-		assert(!path.empty());
-		if (!path.empty())
+		sf::Vector2f position = Utilities::convertToWorldPosition(lastPosition, tileSize);
+		pathToTile.push_back(position);
+		while (position != sourcePosition)
 		{
-			pathToTile.push_back(path.front());
+			sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
+			position = Utilities::convertToWorldPosition(previousPosition, tileSize);
+			if (position != sourcePosition)
+			{
+				pathToTile.push_back(position);
+			}
 		}
 	}
 }
