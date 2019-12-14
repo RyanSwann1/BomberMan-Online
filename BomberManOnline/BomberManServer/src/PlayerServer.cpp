@@ -8,7 +8,7 @@
 #include <assert.h>
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
-constexpr int MIN_DISTANCE_FROM_ENEMY = 2; // Min distance from enemy to place bomb
+constexpr int MIN_DISTANCE_FROM_ENEMY = 1; // Min distance from enemy to place bomb
 
 //Player Server
 PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
@@ -293,7 +293,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 void PlayerServerAI::onMovingToTargetPlayerState(const PlayerServer& targetPlayer)
 {
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() >= MIN_DISTANCE_FROM_ENEMY)
+	if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() > MIN_DISTANCE_FROM_ENEMY)
 	{
 		bool bombFound = false;
 		for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))

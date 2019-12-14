@@ -144,26 +144,80 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 //Path Finding
 void PathFinding::getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
-	pathToTile.clear();
-	
-	std::vector<sf::Vector2f> newPathToTile;
-	getPathToTile(sourcePosition, targetPosition, newPathToTile, server);
-	assert(!newPathToTile.empty());
-	if (!newPathToTile.empty())
+	if (sourcePosition == targetPosition)
 	{
-		pathToTile.push_back(newPathToTile.back());
+		sf::Vector2i tileSize = server.getTileSize();
+		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
+		std::vector<sf::Vector2i> neighbours;
+		neighbours.reserve(MAX_NEIGHBOURS);
+		bool safePositionFound = false;
+
+		getNonCollidableNeighbouringPoints(sourcePositionOnGrid, neighbours, server, sourcePositionOnGrid);
+		for (sf::Vector2i neighbourPosition : neighbours)
+		{
+			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			{
+				safePositionFound = true;
+				pathToTile.push_back(Utilities::convertToWorldPosition(neighbourPosition, tileSize));
+				break;
+			}
+		}
+
+		if (!safePositionFound)
+		{
+			pathToTile.push_back(Utilities::convertToWorldPosition(neighbours.front(), tileSize));
+		}
+	}
+	else
+	{
+		pathToTile.clear();
+
+		std::vector<sf::Vector2f> newPathToTile;
+		getPathToTile(sourcePosition, targetPosition, newPathToTile, server);
+		assert(!newPathToTile.empty());
+		if (!newPathToTile.empty())
+		{
+			pathToTile.push_back(newPathToTile.back());
+		}
 	}
 }
 
 void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
-	pathToTile.clear();
-	sf::Vector2i tileSize = server.getTileSize();
-
-	getSafePathToTile(sourcePosition, targetPosition, pathToTile, server);
-	if (!pathToTile.empty())
+	if (sourcePosition == targetPosition)
 	{
-		pathToTile.push_back(pathToTile.back());
+		sf::Vector2i tileSize = server.getTileSize();
+		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
+		std::vector<sf::Vector2i> neighbours;
+		neighbours.reserve(MAX_NEIGHBOURS);
+		bool safePositionFound = false;
+
+		getNonCollidableNeighbouringPoints(sourcePositionOnGrid, neighbours, server, sourcePositionOnGrid);
+		for (sf::Vector2i neighbourPosition : neighbours)
+		{
+			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			{
+				safePositionFound = true;
+				pathToTile.push_back(Utilities::convertToWorldPosition(neighbourPosition, tileSize));
+				break;
+			}
+		}
+
+		if (!safePositionFound)
+		{
+			pathToTile.push_back(Utilities::convertToWorldPosition(neighbours.front(), tileSize));
+		}
+	}
+	else
+	{
+		pathToTile.clear();
+		sf::Vector2i tileSize = server.getTileSize();
+
+		getSafePathToTile(sourcePosition, targetPosition, pathToTile, server);
+		if (!pathToTile.empty())
+		{
+			pathToTile.push_back(pathToTile.back());
+		}
 	}
 }
 
