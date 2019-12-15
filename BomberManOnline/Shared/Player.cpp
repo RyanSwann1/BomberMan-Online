@@ -18,6 +18,11 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
 {}
 
+bool Player::isBombCountReached() const
+{
+	return m_currentBombCount < m_maxBombCount;
+}
+
 eDirection Player::getFacingDirection() const
 {
 	return m_facingDirection;
