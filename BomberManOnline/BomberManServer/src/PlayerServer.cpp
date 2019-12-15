@@ -51,6 +51,7 @@ void PlayerServerAI::update(float frameTime)
 	}
 }
 
+
 void PlayerServerAI::handleAIStates(float frameTime)
 {
 	switch (m_currentState)
@@ -165,9 +166,14 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetTargetAtSafePosition:
 	{
-		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+		if (m_targetPlayerID == INVALID_PLAYER_ID && isBombPlaced())
+		{
+			PathFinding::getInstance().getSafePathToClosestBox(m_position, m_pathToTile, m_server);
+		}
 		if (!m_pathToTile.empty())
 		{
+			std::cout << "MOVING TO ANOTHER BOX\n";
+
 #ifdef RENDER_PATHING
 			handleRenderPathing();
 #endif // RENDER_PATHING
@@ -175,11 +181,26 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			setNewPosition(m_pathToTile.back(), m_server);
 			m_pathToTile.pop_back();
 
-			m_currentState = eAIState::eMoveToSafePosition;
+			m_currentState = eAIState::eMoveToBox;
 		}
 		else
 		{
-			m_currentState = eAIState::eMakeDecision;
+			PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+			if (!m_pathToTile.empty())
+			{
+#ifdef RENDER_PATHING
+				handleRenderPathing();
+#endif // RENDER_PATHING
+
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_pathToTile.pop_back();
+
+				m_currentState = eAIState::eMoveToSafePosition;
+			}
+			else
+			{
+				m_currentState = eAIState::eMakeDecision;
+			}
 		}
 	}
 

@@ -410,7 +410,8 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	pathToTile.clear();
-	m_graph.resetGraph(server.getLevelSize());
+	sf::Vector2i levelSize = server.getLevelSize();
+	m_graph.resetGraph(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
@@ -437,7 +438,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 				continue;
 			}
 
-			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox &&
 					boxSelection.size() < MAX_BOX_SELECTION)
@@ -449,7 +450,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 					frontier.push(neighbourPosition);
 				}
 
-				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 			}
 		}
 
@@ -459,12 +460,86 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 	if (!boxSelection.empty())
 	{
 		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
-		sf::Vector2i position = m_graph.getPreviousPosition(boxSelection[randNumb], server.getLevelSize());
+		sf::Vector2i position = m_graph.getPreviousPosition(boxSelection[randNumb], levelSize);
 		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
 		
 		while (position != sourcePositionOnGrid)
 		{
-			position = m_graph.getPreviousPosition(position, server.getLevelSize());
+			position = m_graph.getPreviousPosition(position, levelSize);
+			if (position != sourcePositionOnGrid)
+			{
+				pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+			}
+		}
+	}
+}
+
+void PathFinding::getSafePathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+{
+	pathToTile.clear();
+	sf::Vector2i levelSize = server.getLevelSize();
+	m_graph.resetGraph(levelSize);
+
+	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
+
+	std::queue<sf::Vector2i> frontier;
+	frontier.push(sourcePositionOnGrid);
+
+	std::vector<sf::Vector2i> neighbours;
+	neighbours.reserve(MAX_NEIGHBOURS);
+
+	std::vector<sf::Vector2i> boxSelection;
+	boxSelection.reserve(MAX_BOX_SELECTION);
+
+	while (!frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
+	{
+		sf::Vector2i lastPosition = frontier.front();
+		frontier.pop();
+
+		getNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
+		for (sf::Vector2i neighbourPosition : neighbours)
+		{
+			if (server.isBombAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
+			{
+				continue;
+			}
+			
+
+			if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eWall ||
+				isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			{
+				continue;
+			}
+
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
+			{
+				if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox &&
+					boxSelection.size() < MAX_BOX_SELECTION)
+				{
+					boxSelection.push_back(neighbourPosition);
+				}
+				else
+				{
+					frontier.push(neighbourPosition);
+				}
+
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
+			}
+		}
+
+		neighbours.clear();
+	}
+
+	if (!boxSelection.empty())
+	{
+		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
+		sf::Vector2i position = m_graph.getPreviousPosition(boxSelection[randNumb], levelSize);
+		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+
+		while (position != sourcePositionOnGrid)
+		{
+			position = m_graph.getPreviousPosition(position, levelSize);
 			if (position != sourcePositionOnGrid)
 			{
 				pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));

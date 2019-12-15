@@ -454,10 +454,11 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
 		//Spawn PickUp
-		if (Utilities::getRandomNumber(0, 10) >= 9)
+		if (Utilities::getRandomNumber(0, 10) >= 5)
 		{
+			int numb = 0;
 			sf::Packet packetToSend;
-			switch (Utilities::getRandomNumber(0, 2))
+			switch (numb)
 			{
 			case 0:
 				packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition.x << explosionPosition.y;

@@ -15,7 +15,7 @@ public:
 	Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType);
 	virtual ~Player() {}
 
-	bool isBombCountReached() const;
+	bool isBombPlaced() const;
 	eDirection getFacingDirection() const;
 	bool isMoving() const;
 	ePlayerControllerType getControllerType() const;

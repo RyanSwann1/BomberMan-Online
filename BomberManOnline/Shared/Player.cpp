@@ -1,8 +1,11 @@
 #include "Player.h"
 #include "Utilities.h"
+//
+//constexpr int MAX_HUMAN_PLAYER_BOMB_COUNT = 3;
+//constexpr int MAX_AI_PLAYER_BOMB_COUNT = 2;
 
 Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType controllerType)
-	: m_maxBombCount(5),
+	: m_maxBombCount(2),
 	m_maxBombExplosionSize(5),
 	m_currentBombCount(1),
 	m_bombsPlaced(0),
@@ -18,9 +21,9 @@ Player::Player(int ID, sf::Vector2f startingPosition, ePlayerControllerType cont
 	m_bombPlacementTimer(2.0f, eTimerActive::eTrue)
 {}
 
-bool Player::isBombCountReached() const
+bool Player::isBombPlaced() const
 {
-	return m_currentBombCount < m_maxBombCount;
+	return m_bombsPlaced != 0;
 }
 
 eDirection Player::getFacingDirection() const
