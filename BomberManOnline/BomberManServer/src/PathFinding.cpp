@@ -500,14 +500,8 @@ void PathFinding::getSafePathToClosestBox(sf::Vector2f sourcePosition, std::vect
 		getNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (server.isBombAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
-			{
-				continue;
-			}
-			
-
-			if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eWall ||
-				isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			if (server.getCollidableTile(neighbourPosition) != eCollidableTile::eWall &&
+				!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
 			{
 				continue;
 			}
@@ -535,14 +529,14 @@ void PathFinding::getSafePathToClosestBox(sf::Vector2f sourcePosition, std::vect
 	{
 		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
 		sf::Vector2i position = m_graph.getPreviousPosition(boxSelection[randNumb], levelSize);
-		pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+		pathToTile.push_back(Utilities::convertToWorldPosition(position, tileSize));
 
 		while (position != sourcePositionOnGrid)
 		{
 			position = m_graph.getPreviousPosition(position, levelSize);
 			if (position != sourcePositionOnGrid)
 			{
-				pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+				pathToTile.push_back(Utilities::convertToWorldPosition(position, tileSize));
 			}
 		}
 	}
