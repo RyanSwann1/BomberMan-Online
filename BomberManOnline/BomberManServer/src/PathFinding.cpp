@@ -214,9 +214,9 @@ void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf
 		pathToTile.clear();
 		std::vector<sf::Vector2f> newPathToTile;
 		getSafePathToTile(sourcePosition, targetPosition, bomb, newPathToTile, server);
-		if (!pathToTile.empty())
+		if (!newPathToTile.empty())
 		{
-			pathToTile.push_back(pathToTile.back());
+			pathToTile.push_back(newPathToTile.back());
 		}
 	}
 }
