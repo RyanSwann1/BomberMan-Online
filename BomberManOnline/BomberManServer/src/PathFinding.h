@@ -59,8 +59,8 @@ public:
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server); 
 	void getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, std::vector<sf::Vector2f>& pathToTile, const Server& server);
-	void getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile);
-	void getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile);
+	void getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile);
+	void getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile);
 	void getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range);
 	void getPathToClosestSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);

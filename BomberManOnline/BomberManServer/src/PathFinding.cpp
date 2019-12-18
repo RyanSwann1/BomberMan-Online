@@ -143,7 +143,7 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 }
 
 //Path Finding
-void PathFinding::getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
 	if (sourcePosition == targetPosition)
 	{
@@ -172,18 +172,11 @@ void PathFinding::getPositionClosestToTarget(sf::Vector2f sourcePosition, sf::Ve
 	else
 	{
 		pathToTile.clear();
-
-		std::vector<sf::Vector2f> newPathToTile;
-		getPathToTile(sourcePosition, targetPosition, newPathToTile, server);
-		assert(!newPathToTile.empty());
-		if (!newPathToTile.empty())
-		{
-			pathToTile.push_back(newPathToTile.back());
-		}
+		getPathToTile(sourcePosition, targetPosition, pathToTile, server);
 	}
 }
 
-void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile)
+void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile)
 {
 	if (sourcePosition == targetPosition)
 	{
@@ -212,12 +205,7 @@ void PathFinding::getSafePositionClosestToTarget(sf::Vector2f sourcePosition, sf
 	else
 	{
 		pathToTile.clear();
-		std::vector<sf::Vector2f> newPathToTile;
-		getSafePathToTile(sourcePosition, targetPosition, bomb, newPathToTile, server);
-		if (!newPathToTile.empty())
-		{
-			pathToTile.push_back(newPathToTile.back());
-		}
+		getSafePathToTile(sourcePosition, targetPosition, bomb, pathToTile, server);
 	}
 }
 

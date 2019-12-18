@@ -186,7 +186,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eMovingToTargetPlayer:
 	{
-		if (!isMoving() && m_pathToTile.empty())
+		if (!isMoving())
 		{
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
@@ -258,7 +258,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 {
 	sf::Vector2i tileSize = m_server.getTileSize();
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	if (Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
+	if (targetPosition == m_position || Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
 	{
 		m_currentState = eAIState::ePlantBomb;
 	}
@@ -276,7 +276,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 				{
 					bombFound = true;
 
-					PathFinding::getInstance().getSafePositionClosestToTarget(m_position, targetPosition, *bomb, m_server, m_pathToTile);
+					PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *bomb, m_server, m_pathToTile);
 					if (!m_pathToTile.empty())
 					{
 #ifdef RENDER_PATHING
@@ -306,14 +306,18 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 			}
 			if (!bombFound)
 			{
-				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				std::cout << "Moving To Target\n";
+				PathFinding::getInstance().getPathToTarget(m_position, targetPosition, m_server, m_pathToTile);
+				assert(!m_pathToTile.empty());
+				if (!m_pathToTile.empty())
+				{
+					std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
-				handleRenderPathing();
+					handleRenderPathing();
 #endif // RENDER_PATHING
-				setNewPosition(m_pathToTile.back(), m_server);
-				m_pathToTile.pop_back();
-				m_currentState = eAIState::eMovingToTargetPlayer;
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_pathToTile.pop_back();
+					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
 			}
 		}
 	}
