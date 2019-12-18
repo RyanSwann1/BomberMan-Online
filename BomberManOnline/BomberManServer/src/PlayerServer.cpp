@@ -5,6 +5,7 @@
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
 #include <iostream>
+#include <algorithm>
 #include <assert.h>
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
@@ -268,7 +269,20 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 		assert(!m_pathToTile.empty());
 		if (!m_pathToTile.empty())
 		{
-			bool bombFound = false;
+			const Server& server = m_server;
+			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [&server](sf::Vector2f position) -> bool
+			{
+				return server.getBomb(position);
+			});
+			if(cIter != m_pathToTile.cend())
+			{ 
+			
+			}
+			else
+				P{
+
+			}
+
 			for (sf::Vector2f positionInPath : m_pathToTile)
 			{
 				const BombServer* bomb = m_server.getBomb(positionInPath);
