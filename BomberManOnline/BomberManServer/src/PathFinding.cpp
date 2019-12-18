@@ -171,7 +171,6 @@ void PathFinding::getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targ
 	}
 	else
 	{
-		pathToTile.clear();
 		getPathToTile(sourcePosition, targetPosition, pathToTile, server);
 	}
 }
@@ -180,6 +179,7 @@ void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f 
 {
 	if (sourcePosition == targetPosition)
 	{
+		pathToTile.clear();
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
 		std::vector<sf::Vector2i> neighbours;
@@ -204,7 +204,6 @@ void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f 
 	}
 	else
 	{
-		pathToTile.clear();
 		getSafePathToTile(sourcePosition, targetPosition, bomb, pathToTile, server);
 	}
 }
@@ -820,6 +819,8 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 
 void PathFinding::getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
+	pathToTile.clear();
+
 	assert(isPositionReachable(sourcePosition, targetPosition, server));
 	if (isPositionReachable(sourcePosition, targetPosition, server))
 	{

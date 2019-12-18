@@ -269,7 +269,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 		if (!m_pathToTile.empty())
 		{
 			bool bombFound = false;
-			for (sf::Vector2f position : PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server))
+			for (sf::Vector2f position : m_pathToTile)
 			{
 				const BombServer* bomb = m_server.getBomb(position);
 				if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
@@ -290,6 +290,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 					else
 					{
 						PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+						assert(m_pathToTile.empty());
 						if (!m_pathToTile.empty())
 						{
 #ifdef RENDER_PATHING
@@ -306,18 +307,13 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 			}
 			if (!bombFound)
 			{
-				PathFinding::getInstance().getPathToTarget(m_position, targetPosition, m_server, m_pathToTile);
-				assert(!m_pathToTile.empty());
-				if (!m_pathToTile.empty())
-				{
-					std::cout << "Moving To Target\n";
+				std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
-					handleRenderPathing();
+				handleRenderPathing();
 #endif // RENDER_PATHING
-					setNewPosition(m_pathToTile.back(), m_server);
-					m_pathToTile.pop_back();
-					m_currentState = eAIState::eMovingToTargetPlayer;
-				}
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_pathToTile.pop_back();
+				m_currentState = eAIState::eMovingToTargetPlayer;
 			}
 		}
 	}
