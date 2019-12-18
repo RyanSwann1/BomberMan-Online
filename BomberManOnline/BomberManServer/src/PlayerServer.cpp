@@ -144,7 +144,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			}
 		}
 
-		break;
+	break;
 	case eAIState::eSetPositionToTargetPlayer:
 	{
 		if (!isMoving())
@@ -208,14 +208,14 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			m_currentState = eAIState::eWait;
 		}
 
-		break;
+	break;
 	case eAIState::eMoveToPickUp:
 		if (!isMoving() && m_pathToTile.empty())
 		{
 			m_currentState = eAIState::eMakeDecision;
 		}
 
-		break;
+	break;
 	case eAIState::ePlantBomb:
 	{
 		if (placeBomb())
@@ -269,10 +269,10 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 		if (!m_pathToTile.empty())
 		{
 			bool bombFound = false;
-			for (sf::Vector2f position : m_pathToTile)
+			for (sf::Vector2f positionInPath : m_pathToTile)
 			{
-				const BombServer* bomb = m_server.getBomb(position);
-				if (bomb && PathFinding::getInstance().isPositionInRangeOfExplosion(m_position, *bomb, m_server))
+				const BombServer* bomb = m_server.getBomb(positionInPath);
+				if (bomb)
 				{
 					bombFound = true;
 
