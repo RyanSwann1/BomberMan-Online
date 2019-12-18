@@ -307,7 +307,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 			if (!bombFound)
 			{
 				PathFinding::getInstance().getPositionClosestToTarget(m_position, targetPosition, m_server, m_pathToTile);
-
+				std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
 				handleRenderPathing();
 #endif // RENDER_PATHING
