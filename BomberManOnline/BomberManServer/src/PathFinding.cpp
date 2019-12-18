@@ -328,7 +328,7 @@ bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, cons
 	sf::Vector2f bombPosition = bomb.getPosition();
 	int explosionSize = bomb.getExplosionSize();
 	sf::Vector2f explosionPosition;
-	
+
 	//left
 	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
@@ -515,7 +515,8 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	pathToTile.clear();
-	m_graph.resetGraph(server.getLevelSize());
+	sf::Vector2i levelSize = server.getLevelSize();
+	m_graph.resetGraph(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
@@ -535,9 +536,9 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				frontier.push(neighbourPosition);
 			}
 
@@ -556,7 +557,8 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, const BombServer& bomb, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	pathToTile.clear();
-	m_graph.resetGraph(server.getLevelSize());
+	sf::Vector2i levelSize = server.getLevelSize();
+	m_graph.resetGraph(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
@@ -576,9 +578,9 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 		getNonCollidableNeighbouringPoints(lastPosition, neighbours, server, sourcePositionOnGrid);
 		for (const sf::Vector2i neighbourPosition : neighbours)
 		{
-			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				frontier.push(neighbourPosition);
 			}
 			
