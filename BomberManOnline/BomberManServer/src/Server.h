@@ -24,6 +24,7 @@ class Server : private NonCopyable
 public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
+	bool isPickUpAtPosition(sf::Vector2f position) const;
 	bool isBombAtPosition(sf::Vector2f position) const;
 	const PlayerServer* getPlayer(int ID) const;
 	const BombServer* getBomb(sf::Vector2f position) const;
