@@ -10,6 +10,9 @@
 
 //https://gamedev.stackexchange.com/questions/29434/fps-networking-with-server-sending-input-instead-of-gamestate?rq=1wh
 
+
+//https://embeddedartistry.com/blog/2017/09/11/choosing-the-right-container-sequential-containers/
+
 int main()
 {
 	std::unique_ptr<Server> server = Server::create(sf::IpAddress::LocalHost, 55001);

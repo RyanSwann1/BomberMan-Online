@@ -73,8 +73,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		{
 			for (const auto& targetPlayer : m_server.getPlayers())
 			{
-				sf::Vector2i tileSize = m_server.getTileSize();
-				sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), tileSize);
+				sf::Vector2f targetPlayerPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
 				if (targetPlayer->getID() != m_ID && targetPlayer->getControllerType() == ePlayerControllerType::eHuman &&
 					PathFinding::getInstance().isPositionReachable(m_position, targetPlayerPosition, m_server))
 				{
