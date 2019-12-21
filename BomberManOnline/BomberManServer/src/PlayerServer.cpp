@@ -166,6 +166,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	case eAIState::eSetTargetAtSafePosition:
 	{
 		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+		assert(!m_pathToTile.empty());
 		if (!m_pathToTile.empty())
 		{
 #ifdef RENDER_PATHING
@@ -176,10 +177,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			m_pathToTile.pop_back();
 
 			m_currentState = eAIState::eMoveToSafePosition;
-		}
-		else
-		{
-			m_currentState = eAIState::eMakeDecision;
 		}
 	}
 
