@@ -509,7 +509,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 	frontier.push(sourcePositionOnGrid);
 
 	bool safePositionFound = false;
-	while (!frontier.empty() && !safePositionFound)
+	while (!safePositionFound && !frontier.empty())
 	{
 		sf::Vector2i lastPosition = frontier.front();
 		frontier.pop();

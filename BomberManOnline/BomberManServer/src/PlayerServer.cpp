@@ -256,9 +256,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& targetPlayer)
 {
-	sf::Vector2i tileSize = m_server.getTileSize();
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
-	if (targetPosition == m_position || Utilities::isPositionAdjacent(m_position, targetPosition, tileSize))
+	if (targetPosition == m_position || Utilities::isPositionAdjacent(m_position, targetPosition, m_server.getTileSize()))
 	{
 		m_currentState = eAIState::ePlantBomb;
 	}
@@ -276,7 +275,8 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 			});
 			if(cIter != m_pathToTile.cend())
 			{ 
-				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *server.getBomb(*cIter), m_server, m_pathToTile);
+				sf::Vector2f positionOnBomb = *cIter;
+				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *server.getBomb(positionOnBomb), m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
@@ -290,7 +290,7 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 				else
 				{
 					PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
-					assert(m_pathToTile.empty());
+					assert(!m_pathToTile.empty());
 					if (!m_pathToTile.empty())
 					{
 #ifdef RENDER_PATHING
