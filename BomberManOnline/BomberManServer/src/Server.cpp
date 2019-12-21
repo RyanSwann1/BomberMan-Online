@@ -67,6 +67,22 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	}
 }
 
+bool Server::isPickUpAtPosition(sf::Vector2f position) const
+{
+	for (const GameObject& gameObject : m_gameObjects)
+	{
+		if (gameObject.getPosition() == position
+			&& (gameObject.getType() == eGameObjectType::eMovementPickUp ||
+				gameObject.getType() == eGameObjectType::eExtraBombPickUp ||
+				gameObject.getType() == eGameObjectType::eBiggerExplosionPickUp))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool Server::isBombAtPosition(sf::Vector2f position) const
 {
 	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });

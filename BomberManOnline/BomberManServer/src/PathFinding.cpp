@@ -13,13 +13,11 @@ constexpr size_t MAX_NEIGHBOURS = 4;
 constexpr size_t MAX_BOX_SELECTION = 5;
 constexpr int FURTHEST_NON_COLLIDABLE_POSITION = 4;
 
-std::vector<sf::Vector2i> getNonCollidableNeighbouringPoints(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition);
-std::vector<sf::Vector2i> getNeighbouringPoints(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition);
+void getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions);
+void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions);
 
-std::vector<sf::Vector2i> getNonCollidableNeighbouringPoints(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition)
+void getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {
-	std::vector<sf::Vector2i> positions;
-
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
 		if (x >= 0 && x < server.getLevelSize().x && server.getCollidableTile({ x, position.y }) != eCollidableTile::eWall
@@ -39,14 +37,10 @@ std::vector<sf::Vector2i> getNonCollidableNeighbouringPoints(sf::Vector2i positi
 			positions.emplace_back(position.x, y);
 		}
 	}
-
-	return positions;
 }
 
-std::vector<sf::Vector2i> getNeighbouringPoints(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition)
+void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {
-	std::vector<sf::Vector2i> positions;
-
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
 		if (x >= 0 && x < server.getLevelSize().x && sf::Vector2i(x, position.y) != ignorePosition)
@@ -62,8 +56,6 @@ std::vector<sf::Vector2i> getNeighbouringPoints(sf::Vector2i position, const Ser
 			positions.emplace_back(position.x, y);
 		}
 	}
-
-	return positions;
 }
 
 //Graph Node
@@ -159,7 +151,8 @@ void PathFinding::getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targ
 		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
 		bool safePositionFound = false;
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(sourcePositionOnGrid, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
 			{
@@ -169,9 +162,13 @@ void PathFinding::getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targ
 			}
 		}
 
+		m_adjacentPositions.clear();
+
 		if (!safePositionFound)
 		{
-			pathToTile.push_back(Utilities::convertToWorldPosition(getNonCollidableNeighbouringPoints(sourcePositionOnGrid, server, sourcePositionOnGrid).front(), tileSize));
+			getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
+			pathToTile.push_back(Utilities::convertToWorldPosition(m_adjacentPositions.front(), tileSize));
+			m_adjacentPositions.clear();
 		}
 	}
 	else
@@ -185,11 +182,13 @@ void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f 
 	if (sourcePosition == targetPosition)
 	{
 		pathToTile.clear();
+		reset(server.getLevelSize());
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
 		bool safePositionFound = false;
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(sourcePositionOnGrid, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
 			{
@@ -199,9 +198,13 @@ void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f 
 			}
 		}
 
+		m_adjacentPositions.clear();
+
 		if (!safePositionFound)
 		{
-			pathToTile.push_back(Utilities::convertToWorldPosition(getNonCollidableNeighbouringPoints(sourcePositionOnGrid, server, sourcePositionOnGrid).front(), tileSize));
+			getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
+			pathToTile.push_back(Utilities::convertToWorldPosition(m_adjacentPositions.front(), tileSize));
+			m_adjacentPositions.clear();
 		}
 	}
 	else
@@ -216,37 +219,40 @@ bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f 
 	{
 		return true;
 	}
-
-	m_graph.resetGraph(server.getLevelSize());
+	
+	sf::Vector2i levelSize = server.getLevelSize();
+	reset(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
 
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
+	m_frontier.push(sourcePositionOnGrid);
 
-	while (!frontier.empty())
+	bool targetReachable = false;
+	while (!targetReachable && !m_frontier.empty())
 	{
-		sf::Vector2i lastPosition = frontier.front();
-		frontier.pop();
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
-			//Target Reachable
 			if (neighbourPosition == Utilities::convertToGridPosition(targetPosition, tileSize))
 			{
-				return true;
+				targetReachable = true;
+				break;
 			}
-			else if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			else if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
-				frontier.push(neighbourPosition);
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
+				m_frontier.push(neighbourPosition);
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 
-	//Target Unreachable
-	return false;
+	return targetReachable;
 }
 
 bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, const Server& server)
@@ -388,28 +394,30 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 {
 	assert(m_graph.isEmpty());
 	m_graph.resetGraph(levelSize);
+	m_adjacentPositions.reserve(MAX_NEIGHBOURS);
 }
 
 void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
 	pathToTile.clear();
-	m_graph.resetGraph(server.getLevelSize());
-
+	sf::Vector2i levelSize = server.getLevelSize();
+	reset(levelSize);
+	
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
+	m_frontier.push(sourcePositionOnGrid);
 
 	std::vector<sf::Vector2i> boxSelection;
 	boxSelection.reserve(MAX_BOX_SELECTION);
 
-	while (!frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
+	while (!m_frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
 	{
-		sf::Vector2i lastPosition = frontier.front();
-		frontier.pop();
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (sf::Vector2i neighbourPosition : getNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eWall)
 			{
@@ -425,12 +433,14 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 				}
 				else
 				{
-					frontier.push(neighbourPosition);
+					m_frontier.push(neighbourPosition);
 				}
 
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 
 	if (!boxSelection.empty())
@@ -457,22 +467,22 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
-	
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
 
-	bool searchForPickUp = true;
-	while (searchForPickUp && !frontier.empty())
+	m_frontier.push(sourcePositionOnGrid);
+
+	bool pickUpFound = false;
+	while (!pickUpFound && !m_frontier.empty())
 	{
-		sf::Vector2i lastPosition = frontier.front();
-		frontier.pop();
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
-				frontier.push(neighbourPosition);
+				m_frontier.push(neighbourPosition);
 			}
 
 			if (getPathToTile(sourcePositionOnGrid, neighbourPosition, server).size() > range)
@@ -480,19 +490,15 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 				continue;
 			}
 			
-			for (const GameObject& gameObject : server.getGameObjects())
+			if (server.isPickUpAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
 			{
-				if (gameObject.getPosition() == sf::Vector2f(Utilities::convertToWorldPosition(neighbourPosition, tileSize))
-					&& (gameObject.getType() == eGameObjectType::eMovementPickUp ||
-					gameObject.getType() == eGameObjectType::eExtraBombPickUp ||
-					gameObject.getType() == eGameObjectType::eBiggerExplosionPickUp))
-				{
-					searchForPickUp = false;
-					getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
-					break;
-				}
+				pickUpFound = true;
+				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
+				break;
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 }
 
@@ -500,26 +506,26 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 {
 	pathToTile.clear();
 	sf::Vector2i levelSize = server.getLevelSize();
-	m_graph.resetGraph(levelSize);
+	reset(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 	
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
+	m_frontier.push(sourcePositionOnGrid);
 
 	bool safePositionFound = false;
-	while (!safePositionFound && !frontier.empty())
+	while (!safePositionFound && !m_frontier.empty())
 	{
-		sf::Vector2i lastPosition = frontier.front();
-		frontier.pop();
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-				frontier.push(neighbourPosition);
+				m_frontier.push(neighbourPosition);
 			}
 
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
@@ -529,6 +535,8 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 				break;
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 }
 
@@ -536,26 +544,26 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 {
 	pathToTile.clear();
 	sf::Vector2i levelSize = server.getLevelSize();
-	m_graph.resetGraph(levelSize);
+	reset(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
+	m_frontier.push(sourcePositionOnGrid);
 
 	bool safePositionFound = false;
-	while (!safePositionFound && !frontier.empty())
+	while (!safePositionFound && !m_frontier.empty())
 	{
-		sf::Vector2i lastPosition = frontier.front();
-		frontier.pop();
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (const sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (const sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-				frontier.push(neighbourPosition);
+				m_frontier.push(neighbourPosition);
 			}
 			
 			if (!isPositionInRangeOfExplosion(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
@@ -565,14 +573,15 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 				break;
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 }
 
 std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i positionAtSource, sf::Vector2i targetPosition, const Server& server)
 {
-	sf::Vector2i tileSize = server.getTileSize();
 	std::vector<sf::Vector2f> pathToTile;
-	pathToTile.emplace_back(Utilities::convertToWorldPosition(targetPosition, tileSize));
+	pathToTile.push_back(Utilities::convertToWorldPosition(targetPosition, server.getTileSize()));
 
 	sf::Vector2i position = targetPosition;
 	while (position != positionAtSource)
@@ -580,7 +589,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2i positionAtSour
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
 		if (position != positionAtSource)
 		{
-			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, server.getTileSize()));
 		}
 	}
 
@@ -591,23 +600,23 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 {
 	pathToTile.clear();
 	sf::Vector2i levelSize = server.getLevelSize();
-	m_graph.resetGraph(levelSize);
+	reset(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 	sf::Vector2i targetPositionOnGrid(Utilities::convertToGridPosition(targetPosition, tileSize));
 
-	std::queue<sf::Vector2i> frontier;
-	frontier.push(sourcePositionOnGrid);
+	m_frontier.push(sourcePositionOnGrid);
 
 	sf::Vector2i lastPosition;
 	bool pathCompleted = false;
-	while (!pathCompleted && !frontier.empty())
+	while (!pathCompleted && !m_frontier.empty())
 	{
-		lastPosition = frontier.front();
-		frontier.pop();
+		lastPosition = m_frontier.front();
+		m_frontier.pop();
 
-		for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
 			if (server.isBombAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
 			{
@@ -617,7 +626,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-				frontier.push(neighbourPosition);
+				m_frontier.push(neighbourPosition);
 			}
 
 			if (neighbourPosition == targetPositionOnGrid)
@@ -626,6 +635,8 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				break;
 			}
 		}
+
+		m_adjacentPositions.clear();
 	}
 		
 	if (pathCompleted)
@@ -732,27 +743,27 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 	if (isPositionReachable(sourcePosition, targetPosition, server))
 	{
 		sf::Vector2i levelSize = server.getLevelSize();
-		m_graph.resetGraph(levelSize);
+		reset(levelSize);
 
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 
-		std::queue<sf::Vector2i> frontier;
-		frontier.push(sourcePositionOnGrid);
+		m_frontier.push(sourcePositionOnGrid);
 
 		sf::Vector2i lastPosition;
 		bool destinationFound = false;
-		while (!frontier.empty() && !destinationFound)
+		while (!m_frontier.empty() && !destinationFound)
 		{
-			lastPosition = frontier.front();
-			frontier.pop();
+			lastPosition = m_frontier.front();
+			m_frontier.pop();
 
-			for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+			getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+			for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 			{
 				if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 				{
 					m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-					frontier.push(neighbourPosition);
+					m_frontier.push(neighbourPosition);
 				}
 
 				if (Utilities::convertToWorldPosition(neighbourPosition, tileSize) == targetPosition)
@@ -761,6 +772,8 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 					break;
 				}
 			}
+
+			m_adjacentPositions.clear();
 		}
 
 		if (destinationFound)
@@ -790,27 +803,27 @@ void PathFinding::getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f target
 	if (isPositionReachable(sourcePosition, targetPosition, server))
 	{
 		sf::Vector2i levelSize = server.getLevelSize();
-		m_graph.resetGraph(levelSize);
+		reset(levelSize);
 
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
 
-		std::queue<sf::Vector2i> frontier;
-		frontier.push(sourcePositionOnGrid);
+		m_frontier.push(sourcePositionOnGrid);
 
 		sf::Vector2i lastPosition;
 		bool destinationFound = false;
-		while (!frontier.empty() && !destinationFound)
+		while (!m_frontier.empty() && !destinationFound)
 		{
-			lastPosition = frontier.front();
-			frontier.pop();
+			lastPosition = m_frontier.front();
+			m_frontier.pop();
 
-			for (sf::Vector2i neighbourPosition : getNonCollidableNeighbouringPoints(lastPosition, server, sourcePositionOnGrid))
+			getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+			for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 			{
 				if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 				{
 					m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-					frontier.push(neighbourPosition);
+					m_frontier.push(neighbourPosition);
 				}
 
 				if (Utilities::convertToWorldPosition(neighbourPosition, tileSize) == targetPosition)
@@ -819,6 +832,8 @@ void PathFinding::getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f target
 					break;
 				}
 			}
+
+			m_adjacentPositions.clear();
 		}
 
 		if (destinationFound)
@@ -840,8 +855,7 @@ void PathFinding::getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f target
 
 void PathFinding::getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
 {
-	sf::Vector2i tileSize = server.getTileSize();
-	pathToTile.emplace_back(Utilities::convertToWorldPosition(targetPosition, tileSize));
+	pathToTile.push_back(Utilities::convertToWorldPosition(targetPosition, server.getTileSize()));
 
 	sf::Vector2i position = sf::Vector2i(targetPosition);
 	while (position != sourcePosition)
@@ -849,7 +863,15 @@ void PathFinding::getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i target
 		position = m_graph.getPreviousPosition(position, server.getLevelSize());
 		if (position != sourcePosition)
 		{
-			pathToTile.emplace_back(Utilities::convertToWorldPosition(position, tileSize));
+			pathToTile.push_back(Utilities::convertToWorldPosition(position, server.getTileSize()));
 		}
 	}
+}
+
+void PathFinding::reset(sf::Vector2i levelSize)
+{
+	m_graph.resetGraph(levelSize);
+	m_adjacentPositions.clear();
+	std::queue<sf::Vector2i> emptyFrontier;
+	m_frontier.swap(emptyFrontier);
 }
