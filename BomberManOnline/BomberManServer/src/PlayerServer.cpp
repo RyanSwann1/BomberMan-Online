@@ -269,57 +269,41 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 		assert(!m_pathToTile.empty());
 		if (!m_pathToTile.empty())
 		{
+			//Find bomb in path
 			const Server& server = m_server;
-			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [&server](sf::Vector2f position) -> bool
+			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [&server](sf::Vector2f position)
 			{
 				return server.getBomb(position);
 			});
 			if(cIter != m_pathToTile.cend())
 			{ 
-			
-			}
-			else
-				P{
-
-			}
-
-			for (sf::Vector2f positionInPath : m_pathToTile)
-			{
-				const BombServer* bomb = m_server.getBomb(positionInPath);
-				if (bomb)
+				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *server.getBomb(*cIter), m_server, m_pathToTile);
+				if (!m_pathToTile.empty())
 				{
-					bombFound = true;
-
-					PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *bomb, m_server, m_pathToTile);
+#ifdef RENDER_PATHING
+					handleRenderPathing();
+#endif // RENDER_PATHING
+					std::cout << "Redirect path to safe path\n";
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_pathToTile.pop_back();
+					m_currentState = eAIState::eMovingToTargetPlayer;
+				}
+				else
+				{
+					PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+					assert(m_pathToTile.empty());
 					if (!m_pathToTile.empty())
 					{
 #ifdef RENDER_PATHING
 						handleRenderPathing();
 #endif // RENDER_PATHING
-						std::cout << "Redirect path to safe path\n";
 						setNewPosition(m_pathToTile.back(), m_server);
 						m_pathToTile.pop_back();
-						m_currentState = eAIState::eMovingToTargetPlayer;
+						m_currentState = eAIState::eMoveToSafePosition;
 					}
-					else
-					{
-						PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
-						assert(m_pathToTile.empty());
-						if (!m_pathToTile.empty())
-						{
-#ifdef RENDER_PATHING
-							handleRenderPathing();
-#endif // RENDER_PATHING
-							setNewPosition(m_pathToTile.back(), m_server);
-							m_pathToTile.pop_back();
-							m_currentState = eAIState::eMoveToSafePosition;
-						}
-					}
-
-					break;
 				}
 			}
-			if (!bombFound)
+			else
 			{
 				std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
