@@ -1,6 +1,7 @@
 #include "Utilities.h"
 #include "CollidableTile.h"
 #include "Box.h"
+#include "Direction.h"
 #include <algorithm>
 #include <random>
 
@@ -94,6 +95,27 @@ sf::Vector2i Utilities::convertToGridPosition(sf::Vector2f position, sf::Vector2
 sf::Vector2f Utilities::convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize)
 {
 	return sf::Vector2f(position.x * tileSize.x, position.y * tileSize.y);
+}
+
+bool Utilities::traverseDirection(sf::Vector2f& position, sf::Vector2f endPosition, sf::Vector2i tileSize, eDirection direction)
+{
+	switch (direction)
+	{
+	case eDirection::eLeft :
+		position.x -= tileSize.x;
+		break;
+	case eDirection::eRight :
+		position.x += tileSize.x;
+		break;
+	case eDirection::eUp :
+		position.y -= tileSize.y;
+		break;
+	case eDirection::eDown :
+		position.y += tileSize.y;
+		break;
+	}
+
+	return position == endPosition;
 }
 
 bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)

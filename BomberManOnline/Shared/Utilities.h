@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
+enum class eDirection;
 enum class eCollidableTile;
 namespace Utilities
 {
@@ -17,6 +18,8 @@ namespace Utilities
 
 	sf::Vector2i convertToGridPosition(sf::Vector2f position, sf::Vector2i tileSize);
 	sf::Vector2f convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize);
+
+	bool traverseDirection(sf::Vector2f& position, sf::Vector2f endPosition, sf::Vector2i tileSize, eDirection direction);
 
 	bool isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSizedo);
 

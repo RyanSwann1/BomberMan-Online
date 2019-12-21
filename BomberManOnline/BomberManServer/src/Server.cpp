@@ -403,6 +403,17 @@ void Server::update(float frameTime)
 
 			onBombExplosion(explosionPosition);
 
+			//sf::Vector2f endPosition(explosionPosition.x + (explosionSize * m_tileSize.x), explosionPosition.y);
+			//while (Utilities::traverseDirection(explosionPosition, endPosition, m_tileSize, eDirection::eRight))
+			//{
+			//	onBombExplosion(explosionPosition);
+			//	if (getCollidableTile(explosionPosition) == eCollidableTile::eBox || getCollidableTile(explosionPosition) == eCollidableTile::eWall)
+			//	{
+			//		break;
+			//	}
+			//}
+
+			explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
 			for (int x = explosionPosition.x + m_tileSize.x; x <= explosionPosition.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
 			{
 				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, explosionPosition.y));

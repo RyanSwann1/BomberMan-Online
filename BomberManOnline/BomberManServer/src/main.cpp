@@ -2,6 +2,7 @@
 #include "Server.h"
 #include <unordered_map>
 #include <vector>
+#include <assert.h>
 
 //https://gamedev.stackexchange.com/questions/119342/authoritative-server-movement-and-collision
 
@@ -16,6 +17,7 @@
 int main()
 {
 	std::unique_ptr<Server> server = Server::create(sf::IpAddress::LocalHost, 55001);
+	assert(server);
 	if (!server)
 	{
 		std::cout << "Failed to start server\n";
