@@ -7,15 +7,6 @@
 #include <utility>
 #include <vector>
 
-//TWO ISSUES
-//1. eAIState:eMovingToTargetPlayerSafePath
-//Don't adjust the path when moving to the player - temporary fix
-//2. PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
-//Can sometimes result in an empty path
-//this shouldn't happen
-//If happens, get selection of potential positions to move to
-//Choose the furthest one away from the target player to move to
-
 enum class eAIBehaviour
 {
 	ePassive = 0, //Target boxes until non left, then Player
@@ -25,14 +16,14 @@ enum class eAIBehaviour
 enum class eAIState
 {
 	eMakeDecision = 0,
-	eSetTargetAtBox,
-	eMoveToBox,
-	eSetPositionToTargetPlayer,
+	eMovingToBox,
 	eMovingToTargetPlayer,
-	eMoveToNearestPlayer,
-	eSetTargetAtSafePosition,
-	eMoveToSafePosition,
-	eMoveToPickUp,
+	eMovingToNearestPlayer,
+	eMovingToSafePosition,
+	eMovingToPickUp,
+	eSetDestinationAtBox,
+	eSetDestinationToTargetPlayer,
+	eSetDestinationAtSafePosition,
 	ePlantBomb,
 	eWait
 };
