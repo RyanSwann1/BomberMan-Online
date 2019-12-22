@@ -470,26 +470,26 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
 		//Spawn PickUp
-		if (Utilities::getRandomNumber(0, 10) >= 9)
+		if (Utilities::getRandomNumber(0, 10) >= 7)
 		{
 			sf::Packet packetToSend;
-			switch (Utilities::getRandomNumber(0, 2))
+			switch (0)
 			{
 			case 0:
 				packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition.x << explosionPosition.y;
 				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eExtraBombPickUp);
 
 				break;
-			case 1:
-				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+			//case 1:
+			//	packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+			//	m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
-				break;
-			case 2:
-				packetToSend << eServerMessageType::eSpawnBiggerExplosionPickUp << explosionPosition.x << explosionPosition.y;
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eBiggerExplosionPickUp);
+			//	break;
+			//case 2:
+			//	packetToSend << eServerMessageType::eSpawnBiggerExplosionPickUp << explosionPosition.x << explosionPosition.y;
+			//	m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eBiggerExplosionPickUp);
 
-				break;
+			//	break;
 			}
 
 			broadcastMessage(packetToSend);

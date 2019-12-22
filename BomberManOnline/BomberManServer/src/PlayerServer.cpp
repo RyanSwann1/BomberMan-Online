@@ -230,7 +230,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		{
 			m_currentState = eAIState::eSetDestinationAtSafePosition;
 			m_waitTimer.setActive(false);
-			//m_waitTimer.resetElaspedTime();
+			m_waitTimer.resetElaspedTime();
 		}
 		else
 		{
