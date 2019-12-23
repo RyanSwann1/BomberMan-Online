@@ -157,6 +157,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				if (!PathFinding::getInstance().isPositionInRangeOfAllExplosions(positionInPath, m_server))
 				{
 					continue;
+
 				}
 
 				m_currentState = eAIState::eSetDestinationAtSafePosition;
@@ -336,12 +337,6 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 			}
 		}
 	}
-}
-
-void PlayerServerAI::onMovingToSafePositionState()
-{
-	assert(!isMoving() && !m_pathToTile.empty() && m_currentState == eAIState::eMovingToSafePosition);
-
 }
 
 #ifdef RENDER_PATHING
