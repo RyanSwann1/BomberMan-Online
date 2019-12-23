@@ -680,7 +680,6 @@ void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const
 
 sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server) const
 {
-	sf::Vector2i levelSize = server.getLevelSize();
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2f furthestPosition;
 	switch (direction)
