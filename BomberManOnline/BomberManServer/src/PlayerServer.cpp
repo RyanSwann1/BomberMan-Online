@@ -257,6 +257,25 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 	}
 	else
 	{
+		std::vector<sf::Vector2f> adjacentPositions;
+		PathFinding::getInstance().getNonCollidableAdjacentPositions(m_position, m_server, adjacentPositions);
+		for (sf::Vector2f position : adjacentPositions)
+		{
+			const BombServer* bomb = m_server.getBomb(position);
+			if (bomb)
+			{
+				std::cout << "Bomb Adjacent to AI Player\n";
+				eDirection kickDirection = Utilities::getDirectionToAdjacentFromSourcePosition(position, bomb->getPosition());
+				sf::Vector2f newBombPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(bomb->getPosition(), kickDirection, m_server);
+
+				if (PathFinding::getInstance().getPathToTile(bomb->getPosition(), newBombPosition, m_server).size() <= bomb->getExplosionSize())
+				{
+					m_server.kickBombInDirection(bomb->getPosition(), newBombPosition);
+					break;
+				}
+			}		
+		}
+
 		PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_pathToTile, m_server);
 		assert(!m_pathToTile.empty());
 		if (!m_pathToTile.empty())

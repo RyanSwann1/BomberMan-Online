@@ -3,6 +3,7 @@
 #include "Box.h"
 #include "Direction.h"
 #include <algorithm>
+#include <assert.h>
 #include <random>
 
 int Utilities::distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize)
@@ -17,6 +18,22 @@ int Utilities::distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i t
 int Utilities::distance(sf::Vector2i source, sf::Vector2i target)
 {
 	return std::abs(source.x - target.x) + std::abs(source.y - target.y);
+}
+
+eDirection Utilities::getDirectionToAdjacentFromSourcePosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition)
+{
+	assert(sourcePosition != targetPosition);
+
+	if (sourcePosition.x == targetPosition.x)
+	{
+		assert(sourcePosition.y != targetPosition.y);
+		return (targetPosition.y < sourcePosition.y ? eDirection::eUp : eDirection::eDown);
+	}
+	else if (sourcePosition.y == targetPosition.y)
+	{
+		assert(sourcePosition.x != targetPosition.x);
+		return (targetPosition.x < sourcePosition.x ? eDirection::eLeft : eDirection::eRight);
+	}
 }
 
 bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize)

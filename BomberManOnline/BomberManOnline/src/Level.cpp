@@ -228,7 +228,7 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 		break;
 
-	case sf::Keyboard::Space:
+	case sf::Keyboard::E:
 		if (m_localPlayer->placeBomb())
 		{
 			sf::Packet packetToSend;

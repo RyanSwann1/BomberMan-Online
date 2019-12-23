@@ -275,12 +275,37 @@ void Server::listen()
 	}
 }
 
+void Server::kickBombInDirection(sf::Vector2f bombPosition, sf::Vector2f newPosition)
+{
+	auto bomb = std::find_if(m_bombs.begin(), m_bombs.end(), [bombPosition](const auto& bomb) { return bomb.getPosition() == bombPosition; });
+	assert(bomb != m_bombs.end());
+	if (bomb != m_bombs.end())
+	{
+		bomb->setNewPosition(newPosition);
+
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eBombKicked << bomb->getPosition() << newPosition;
+
+		broadcastMessage(packetToSend);
+	}
+	else
+
+	{
+		//asdasdasd
+	}
+}
+
 void Server::placeBomb(sf::Vector2f position, int explosionRange)
 {
 	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
 	if (position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y)
 	{
 		m_bombs.emplace_back(position, explosionRange);
+	}
+	else
+
+	{
+		//asdasdasd
 	}
 }
 

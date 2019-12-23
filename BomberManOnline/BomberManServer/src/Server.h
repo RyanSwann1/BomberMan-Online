@@ -36,6 +36,7 @@ public:
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
 
+	void kickBombInDirection(sf::Vector2f bombPosition, sf::Vector2f newPosition);
 	void placeBomb(sf::Vector2f position, int explosionRange);
 	void broadcastMessage(sf::Packet& packetToSend);
 	void run();

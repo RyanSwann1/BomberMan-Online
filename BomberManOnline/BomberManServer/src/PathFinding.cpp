@@ -13,10 +13,9 @@ constexpr size_t MAX_NEIGHBOURS = 4;
 constexpr size_t MAX_BOX_SELECTION = 5;
 constexpr int FURTHEST_NON_COLLIDABLE_POSITION = 4;
 
-void getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions);
 void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions);
 
-void getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
+void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
@@ -36,6 +35,7 @@ void getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& serv
 		{
 			positions.emplace_back(position.x, y);
 		}
+
 	}
 }
 
@@ -651,6 +651,29 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 			{
 				pathToTile.push_back(position);
 			}
+		}
+	}
+}
+
+void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const Server& server, std::vector<sf::Vector2f>& positions)
+{
+	sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(position, server.getTileSize());
+
+	for (int x = sourcePositionOnGrid.x - 1; x <= sourcePositionOnGrid.x + 1; x += 2)
+	{
+		if (x >= 0 && x < server.getLevelSize().x && server.getCollidableTile({ x, sourcePositionOnGrid.y }) != eCollidableTile::eWall
+			&& server.getCollidableTile({ x, sourcePositionOnGrid.y }) != eCollidableTile::eBox)
+		{
+			positions.push_back(Utilities::convertToWorldPosition({ x, sourcePositionOnGrid.y }, server.getTileSize()));
+		}
+	}
+
+	for (int y = sourcePositionOnGrid.y - 1; y <= sourcePositionOnGrid.y + 1; y += 2)
+	{
+		if (y >= 0 && y < server.getLevelSize().y && server.getCollidableTile({ sourcePositionOnGrid.x, y }) != eCollidableTile::eWall
+			&& server.getCollidableTile({ sourcePositionOnGrid.x, y }) != eCollidableTile::eBox)
+		{
+			positions.push_back(Utilities::convertToWorldPosition({ sourcePositionOnGrid.x, y }, server.getTileSize()));
 		}
 	}
 }
