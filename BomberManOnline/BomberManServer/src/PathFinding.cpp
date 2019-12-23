@@ -260,7 +260,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 	for (const auto& bomb : server.getBombs())
 	{
 		sf::Vector2i tileSize = server.getTileSize();
-		sf::Vector2f bombPosition = bomb.getPosition();
+		sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
 		int explosionSize = bomb.getExplosionSize();
 		sf::Vector2f explosionPosition;
 
@@ -327,7 +327,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server)
 {
 	sf::Vector2i tileSize = server.getTileSize();
-	sf::Vector2f bombPosition = bomb.getPosition();
+	sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
 	int explosionSize = bomb.getExplosionSize();
 	sf::Vector2f explosionPosition;
 

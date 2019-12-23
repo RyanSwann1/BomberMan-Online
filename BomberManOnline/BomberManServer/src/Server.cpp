@@ -285,13 +285,7 @@ void Server::kickBombInDirection(sf::Vector2f bombPosition, sf::Vector2f newPosi
 
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eBombKicked << bomb->getPosition() << newPosition;
-
 		broadcastMessage(packetToSend);
-	}
-	else
-
-	{
-		//asdasdasd
 	}
 }
 
@@ -301,11 +295,6 @@ void Server::placeBomb(sf::Vector2f position, int explosionRange)
 	if (position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y)
 	{
 		m_bombs.emplace_back(position, explosionRange);
-	}
-	else
-
-	{
-		//asdasdasd
 	}
 }
 

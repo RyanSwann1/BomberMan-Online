@@ -25,6 +25,7 @@ enum class eAIState
 	eSetDestinationToTargetPlayer,
 	eSetDestinationAtSafePosition,
 	ePlantBomb,
+	eKickBomb,
 	eWait
 };
 

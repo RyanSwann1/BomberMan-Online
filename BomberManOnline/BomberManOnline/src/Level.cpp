@@ -482,7 +482,6 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		assert(player);
 		if (player)
 			player->increaseMovementSpeed(movementSpeedIncrement);
-	
 	}
 	break;
 	case eServerMessageType::eSpawnExtraBombPickUp:

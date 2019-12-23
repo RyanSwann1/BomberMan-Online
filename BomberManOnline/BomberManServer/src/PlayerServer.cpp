@@ -257,18 +257,18 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 	}
 	else
 	{
+		//Kick Bomb
 		std::vector<sf::Vector2f> adjacentPositions;
 		PathFinding::getInstance().getNonCollidableAdjacentPositions(m_position, m_server, adjacentPositions);
-		for (sf::Vector2f position : adjacentPositions)
+		for (sf::Vector2f adjacentPosition : adjacentPositions)
 		{
-			const BombServer* bomb = m_server.getBomb(position);
-			if (bomb)
+			const BombServer* bomb = m_server.getBomb(adjacentPosition);
+			if (bomb && !bomb->isMoving())
 			{
-				std::cout << "Bomb Adjacent to AI Player\n";
-				eDirection kickDirection = Utilities::getDirectionToAdjacentFromSourcePosition(position, bomb->getPosition());
+				eDirection kickDirection = Utilities::getDirectionToAdjacentFromSourcePosition(m_position, bomb->getPosition());
 				sf::Vector2f newBombPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(bomb->getPosition(), kickDirection, m_server);
 
-				if (PathFinding::getInstance().getPathToTile(bomb->getPosition(), newBombPosition, m_server).size() <= bomb->getExplosionSize())
+				if (PathFinding::getInstance().getPathToTile(bomb->getPosition(), newBombPosition, m_server).size() >= bomb->getExplosionSize())
 				{
 					m_server.kickBombInDirection(bomb->getPosition(), newBombPosition);
 					break;
@@ -281,11 +281,10 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 		if (!m_pathToTile.empty())
 		{
 			//Find bomb in path
-			const Server& server = m_server;
-			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [&server](sf::Vector2f position) { return server.getBomb(position); });
+			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [this](sf::Vector2f position) { return this->m_server.getBomb(position); });
 			if(cIter != m_pathToTile.cend())
 			{ 
-				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *server.getBomb(*cIter), m_server, m_pathToTile);
+				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *m_server.getBomb(*cIter), m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
