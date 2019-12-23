@@ -54,7 +54,8 @@ private:
 	int m_targetPlayerID;
 
 	void handleAIStates(float frameTime);
-	void onSetPositionToTargetPlayerState(const PlayerServer& targetPlayer);
+	void onSetDestinationToTargetPlayer(const PlayerServer& targetPlayer);
+	void onMovingToSafePositionState();
 
 #ifdef RENDER_PATHING
 	void handleRenderPathing();

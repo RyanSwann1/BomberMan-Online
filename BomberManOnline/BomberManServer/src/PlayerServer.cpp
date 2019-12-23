@@ -150,6 +150,19 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		{
 			m_currentState = eAIState::eWait;
 		}
+		else if (!isMoving() && !m_pathToTile.empty())
+		{
+			for (sf::Vector2f positionInPath : m_pathToTile)
+			{
+				if (!PathFinding::getInstance().isPositionInRangeOfAllExplosions(positionInPath, m_server))
+				{
+					continue;
+				}
+
+				m_currentState = eAIState::eSetDestinationAtSafePosition;
+				break;
+			}
+		}
 
 	break;
 	case eAIState::eMovingToPickUp:
@@ -181,7 +194,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
 			if (targetPlayer)
 			{
-				onSetPositionToTargetPlayerState(*targetPlayer);
+				onSetDestinationToTargetPlayer(*targetPlayer);
 			}
 			else
 			{
@@ -248,8 +261,9 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	}
 }
 
-void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& targetPlayer)
+void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPlayer)
 {
+	assert(m_currentState == eAIState::eSetDestinationToTargetPlayer);
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
 	if (targetPosition == m_position || Utilities::isPositionAdjacent(m_position, targetPosition, m_server.getTileSize()))
 	{
@@ -322,6 +336,12 @@ void PlayerServerAI::onSetPositionToTargetPlayerState(const PlayerServer& target
 			}
 		}
 	}
+}
+
+void PlayerServerAI::onMovingToSafePositionState()
+{
+	assert(!isMoving() && !m_pathToTile.empty() && m_currentState == eAIState::eMovingToSafePosition);
+
 }
 
 #ifdef RENDER_PATHING
