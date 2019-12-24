@@ -30,7 +30,7 @@ void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
 	: PlayerServer(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
-	m_behavour(eAIBehaviour::ePassive),
+	m_behavour(eAIBehaviour::eAggressive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
