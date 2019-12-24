@@ -269,7 +269,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::ePlantAndKickBomb :
 	{
-		assert(isMoving());
 		if (!isMoving())
 		{
 			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
@@ -322,7 +321,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 	}
 	else
 	{
-		if (Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) && 
+		if (Utilities::getRandomNumber(0, 15) > 12 && Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) && 
 			PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= 6)
 		{
 			m_currentState = eAIState::ePlantAndKickBomb;
@@ -331,6 +330,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 
 		//Kick Bomb that is in way of path - Planted by another Player
 		std::vector<sf::Vector2f> adjacentPositions;
+		adjacentPositions.reserve(4);
 		PathFinding::getInstance().getNonCollidableAdjacentPositions(m_position, m_server, adjacentPositions);
 		for (sf::Vector2f adjacentPosition : adjacentPositions)
 		{
