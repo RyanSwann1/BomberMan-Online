@@ -25,6 +25,7 @@ enum class eAIState
 	eSetDestinationToTargetPlayer,
 	eSetDestinationAtSafePosition,
 	ePlantBomb,
+	ePlantAndKickBomb,
 	eWait
 };
 
@@ -42,7 +43,8 @@ class PlayerServerAI : public PlayerServer
 public:
 	PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server);
 
-	void update(float frameTime) override final;
+	void update(float frameTime) override final;	
+	virtual bool placeBomb() override final;
 
 private:
 	Server& m_server;

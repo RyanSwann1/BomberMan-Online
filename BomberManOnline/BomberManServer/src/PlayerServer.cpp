@@ -18,6 +18,24 @@ PlayerServer::PlayerServer(int ID, sf::Vector2f startingPosition, ePlayerControl
 
 void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 {
+	//Assign new movement direction
+	if (newPosition.x > m_position.x)
+	{
+		m_facingDirection = eDirection::eRight;
+	}
+	else if (newPosition.x < m_position.x)
+	{
+		m_facingDirection = eDirection::eLeft;
+	}
+	else if (newPosition.y < m_position.y)
+	{
+		m_facingDirection = eDirection::eUp;
+	}
+	else if (newPosition.y > m_position.y)
+	{
+		m_facingDirection = eDirection::eDown;
+	}
+
 	m_newPosition = newPosition;
 	m_previousPosition = m_position;
 
@@ -47,6 +65,21 @@ void PlayerServerAI::update(float frameTime)
 		setNewPosition(m_pathToTile.back(), m_server);
 		m_pathToTile.pop_back();
 	}
+}
+
+bool PlayerServerAI::placeBomb()
+{
+	if (Player::placeBomb())
+	{
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::ePlaceBomb << m_position.x << m_position.y;
+		m_server.broadcastMessage(packetToSend);
+		m_server.placeBomb(m_position, m_currentBombExplosionSize);
+
+		return true;
+	}
+
+	return false;
 }
 
 void PlayerServerAI::handleAIStates(float frameTime)
@@ -226,14 +259,31 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::ePlantBomb:
 	{
-		if (placeBomb())
+		assert(!isMoving());
+		if (!isMoving() && placeBomb())
 		{
-			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::ePlaceBomb << m_position.x << m_position.y;
-			m_server.broadcastMessage(packetToSend);
-			m_server.placeBomb(m_position, m_currentBombExplosionSize);
-
 			m_currentState = eAIState::eSetDestinationAtSafePosition;
+		}
+	}
+
+	break;
+	case eAIState::ePlantAndKickBomb :
+	{
+		assert(isMoving());
+		if (!isMoving())
+		{
+			const PlayerServer* targetPlayer = m_server.getPlayer(m_targetPlayerID);
+			assert(targetPlayer);
+			if (targetPlayer)
+			{
+				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+				if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= 6 && placeBomb())
+				{
+					sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(m_position, m_facingDirection, m_server);
+					m_server.kickBombInDirection(m_position, kickToPosition);
+					m_currentState = eAIState::eSetDestinationAtSafePosition;
+				}
+			}
 		}
 	}
 
@@ -272,7 +322,14 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 	}
 	else
 	{
-		//Kick Bomb
+		if (Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) && 
+			PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= 6)
+		{
+			m_currentState = eAIState::ePlantAndKickBomb;
+			return;
+		}
+
+		//Kick Bomb that is in way of path - Planted by another Player
 		std::vector<sf::Vector2f> adjacentPositions;
 		PathFinding::getInstance().getNonCollidableAdjacentPositions(m_position, m_server, adjacentPositions);
 		for (sf::Vector2f adjacentPosition : adjacentPositions)
