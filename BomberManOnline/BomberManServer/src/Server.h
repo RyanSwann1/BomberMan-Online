@@ -10,6 +10,8 @@
 
 //https://stackoverflow.com/questions/385506/when-is-optimisation-premature
 
+//https://www.youtube.com/watch?v=k7RM-ot2NWY&list=PLZHQObOWTQDPD3MizzM2xVFitgF8hE_ab&index=2
+
 struct ServerMessagePlayerMove;
 class PlayerServerHuman;
 class PlayerServerAI;
