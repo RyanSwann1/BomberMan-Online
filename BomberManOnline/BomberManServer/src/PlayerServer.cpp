@@ -311,7 +311,6 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 #ifdef RENDER_PATHING
 					handleRenderPathing();
 #endif // RENDER_PATHING
-					std::cout << "Redirect path to safe path\n";
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_pathToTile.pop_back();
 					m_currentState = eAIState::eMovingToTargetPlayer;
@@ -336,7 +335,6 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 		}
 		if (!bombFound)
 		{
-			std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
 			handleRenderPathing();
 #endif // RENDER_PATHING
