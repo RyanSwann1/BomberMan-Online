@@ -30,7 +30,7 @@ void PlayerServer::setNewPosition(sf::Vector2f newPosition, Server & server)
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
 	: PlayerServer(ID, startingPosition, ePlayerControllerType::eAI),
 	m_server(server),
-	m_behavour(eAIBehaviour::eAggressive),
+	m_behavour(eAIBehaviour::ePassive),
 	m_currentState(eAIState::eMakeDecision),
 	m_pathToTile(),
 	m_waitTimer(2.5f),
@@ -293,13 +293,19 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 
 		PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_pathToTile, m_server);
 		assert(!m_pathToTile.empty());
-		if (!m_pathToTile.empty())
+		bool bombFound = false;
+		for (sf::Vector2f positionInPath : m_pathToTile)
 		{
-			//Find bomb in path
-			auto cIter = std::find_if(m_pathToTile.cbegin(), m_pathToTile.cend(), [this](sf::Vector2f position) { return this->m_server.getBomb(position); });
-			if(cIter != m_pathToTile.cend())
-			{ 
-				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *m_server.getBomb(*cIter), m_server, m_pathToTile);
+			const BombServer* bomb = m_server.getBomb(positionInPath);
+			if (bomb && bomb->isMoving())
+			{
+				continue;
+			}
+			else if (bomb)
+			{
+				bombFound = true;
+
+				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *bomb, m_server, m_pathToTile);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
@@ -324,17 +330,19 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 						m_currentState = eAIState::eMovingToSafePosition;
 					}
 				}
+
+				break;
 			}
-			else
-			{
-				std::cout << "Moving To Target\n";
+		}
+		if (!bombFound)
+		{
+			std::cout << "Moving To Target\n";
 #ifdef RENDER_PATHING
-				handleRenderPathing();
+			handleRenderPathing();
 #endif // RENDER_PATHING
-				setNewPosition(m_pathToTile.back(), m_server);
-				m_pathToTile.pop_back();
-				m_currentState = eAIState::eMovingToTargetPlayer;
-			}
+			setNewPosition(m_pathToTile.back(), m_server);
+			m_pathToTile.pop_back();
+			m_currentState = eAIState::eMovingToTargetPlayer;
 		}
 	}
 }
