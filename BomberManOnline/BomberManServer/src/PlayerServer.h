@@ -7,28 +7,6 @@
 #include <utility>
 #include <vector>
 
-enum class eAIBehaviour
-{
-	ePassive = 0, //Target boxes until non left, then Player
-	eAggressive //Target Player when in sight
-};
-
-enum class eAIState
-{
-	eMakeDecision = 0,
-	eMovingToBox,
-	eMovingToTargetPlayer,
-	eMovingToNearestPlayer,
-	eMovingToSafePosition,
-	eMovingToPickUp,
-	eSetDestinationAtBox,
-	eSetDestinationToTargetPlayer,
-	eSetDestinationAtSafePosition,
-	ePlantBomb,
-	ePlantAndKickBomb,
-	eWait
-};
-
 class Server;
 class PlayerServer : public Player
 {
