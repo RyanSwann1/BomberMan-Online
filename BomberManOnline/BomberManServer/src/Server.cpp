@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "Utilities.h"
 #include "PlayerServer.h"
+#include "PlayerServerAI.h"
 #include "PathFinding.h"
 
 constexpr size_t MAX_PLAYERS = 2;

@@ -139,6 +139,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\PathFinding.cpp" />
     <ClCompile Include="src\PlayerServer.cpp" />
+    <ClCompile Include="src\PlayerServerAI.cpp" />
     <ClCompile Include="src\Server.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="src\BombServer.h" />
     <ClInclude Include="src\PathFinding.h" />
     <ClInclude Include="src\PlayerServer.h" />
+    <ClInclude Include="src\PlayerServerAI.h" />
     <ClInclude Include="src\Server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
