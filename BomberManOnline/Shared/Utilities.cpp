@@ -82,6 +82,25 @@ bool Utilities::isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, 
 	return neighbourPosition;
 }
 
+bool Utilities::isTargetInDirectSight(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, eDirection facingDirection)
+{
+	switch (facingDirection)
+	{
+	case eDirection::eLeft :
+		return (sourcePosition.x > targetPosition.x && sourcePosition.y == targetPosition.y);
+	break;
+	case eDirection::eRight :
+		return (sourcePosition.x < targetPosition.x && sourcePosition.y == targetPosition.y);
+	break;
+	case eDirection::eUp :
+		return (sourcePosition.y > targetPosition.y && sourcePosition.x == targetPosition.x);
+	break;
+	case eDirection::eDown :
+		return (sourcePosition.y < targetPosition.y && sourcePosition.x == targetPosition.x);
+	break;
+	}
+}
+
 sf::Vector2f Utilities::Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor)
 {;
 	if (factor > 1.f)

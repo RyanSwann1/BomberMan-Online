@@ -463,7 +463,8 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range)
 {
 	pathToTile.clear();
-	m_graph.resetGraph(server.getLevelSize());
+	sf::Vector2i levelSize = server.getLevelSize();
+	reset(levelSize);
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
@@ -479,9 +480,9 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
 		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
-			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, server.getLevelSize());
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				m_frontier.push(neighbourPosition);
 			}
 
@@ -680,6 +681,7 @@ void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const
 
 sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server) const
 {
+	assert(direction != eDirection::eNone);
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2f furthestPosition;
 	switch (direction)

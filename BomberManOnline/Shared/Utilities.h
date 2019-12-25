@@ -13,6 +13,7 @@ namespace Utilities
 
 	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);
+	bool isTargetInDirectSight(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, eDirection facingDirection);
 
 	sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor);
 	sf::Vector2f getClosestGridPosition(sf::Vector2f position, sf::Vector2i tileSize);

@@ -24,7 +24,7 @@ public:
 	sf::Vector2f getNewPosition() const;
 	sf::Vector2f getPreviousPosition() const;
 
-	bool placeBomb();
+	virtual bool placeBomb();
 	virtual void update(float deltaTime);
 	void increaseMovementSpeed(float amount);
 	void increaseBombCount();
