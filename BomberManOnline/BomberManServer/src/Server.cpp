@@ -9,8 +9,8 @@
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 2;
-constexpr int MAX_AI_PLAYERS = 1;
+constexpr size_t MAX_PLAYERS = 3;
+constexpr int MAX_AI_PLAYERS = 2;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -39,7 +39,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
-		server->m_levelName = "Level1.tmx";
+		server->m_levelName = "Level1DEBUG.tmx";
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
@@ -65,6 +65,17 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		delete server;
 		return std::unique_ptr<Server>();
+	}
+}
+
+bool Server::isPositionAIDestination(sf::Vector2f position) const
+{
+	for (const auto& player : m_players)
+	{
+		if (player->getControllerType() == ePlayerControllerType::eAI)
+		{
+
+		}
 	}
 }
 
@@ -99,15 +110,8 @@ bool Server::isBombAtPosition(sf::Vector2f position) const
 
 const PlayerServer* Server::getPlayer(int ID) const
 {
-	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });
-	if (cIter != m_players.cend())
-	{
-		return cIter->get();
-	}
-	else
-	{
-		return nullptr;
-	}
+	auto player = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });
+	return (player != m_players.cend() ? player->get() : nullptr);
 }
 
 const BombServer* Server::getBomb(sf::Vector2f position) const
