@@ -299,7 +299,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			if (m_waitTimer.isExpired())
 			{
 				m_currentState = eAIState::eMakeDecision;
-				std::cout << "Reset\n";
 				m_waitTimer.resetElaspedTime();
 			}
 		}
