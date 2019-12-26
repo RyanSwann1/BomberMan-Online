@@ -98,14 +98,7 @@ bool Server::isPickUpAtPosition(sf::Vector2f position) const
 bool Server::isBombAtPosition(sf::Vector2f position) const
 {
 	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
-	if (bomb != m_bombs.cend())
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return bomb != m_bombs.cend();
 }
 
 const PlayerServer* Server::getPlayer(int ID) const
@@ -117,14 +110,7 @@ const PlayerServer* Server::getPlayer(int ID) const
 const BombServer* Server::getBomb(sf::Vector2f position) const
 {
 	auto bomb = std::find_if(m_bombs.cbegin(), m_bombs.cend(), [position](const auto& bomb) { return bomb.getPosition() == position; });
-	if (bomb != m_bombs.cend())
-	{
-		return &(*bomb);
-	}
-	else
-	{
-		return nullptr;
-	}
+	return (bomb != m_bombs.cend() ? &(*bomb) : nullptr);
 }
 
 const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const

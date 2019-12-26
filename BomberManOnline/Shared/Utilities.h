@@ -9,7 +9,7 @@ namespace Utilities
 {
 	int distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
 	int distance(sf::Vector2i source, sf::Vector2i target);
-	eDirection getDirectionToAdjacentFromSourcePosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition);
+	eDirection getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition);
 
 	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);

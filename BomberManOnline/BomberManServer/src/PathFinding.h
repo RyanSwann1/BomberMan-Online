@@ -50,7 +50,7 @@ public:
 
 	bool isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server);
 	bool isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, const Server& server);
-	bool isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server);
+	bool isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server);
 	
 	void createGraph(sf::Vector2i levelSize);
 
@@ -60,8 +60,6 @@ public:
 	std::vector<sf::Vector2f> getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server); 
 	void getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, std::vector<sf::Vector2f>& pathToTile, const Server& server);
-	void getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile);
-	void getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile);
 	void getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server, int range);
 	void getPathToClosestSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);

@@ -142,77 +142,6 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 	}
 }
 
-//Path Finding
-void PathFinding::getPathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server, std::vector<sf::Vector2f>& pathToTile)
-{
-	if (sourcePosition == targetPosition)
-	{
-		sf::Vector2i tileSize = server.getTileSize();
-		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
-		bool safePositionFound = false;
-
-		getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
-		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
-		{
-			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
-			{
-				safePositionFound = true;
-				pathToTile.push_back(Utilities::convertToWorldPosition(neighbourPosition, tileSize));
-				break;
-			}
-		}
-
-		m_adjacentPositions.clear();
-
-		if (!safePositionFound)
-		{
-			getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
-			pathToTile.push_back(Utilities::convertToWorldPosition(m_adjacentPositions.front(), tileSize));
-			m_adjacentPositions.clear();
-		}
-	}
-	else
-	{
-		getPathToTile(sourcePosition, targetPosition, pathToTile, server);
-	}
-}
-
-void PathFinding::getSafePathToTarget(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const BombServer& bomb, const Server& server, std::vector<sf::Vector2f>& pathToTile)
-{
-	if (sourcePosition == targetPosition)
-	{
-		pathToTile.clear();
-		reset(server.getLevelSize());
-		sf::Vector2i tileSize = server.getTileSize();
-		sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(sourcePosition, tileSize);
-		bool safePositionFound = false;
-
-		getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
-		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
-		{
-			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
-			{
-				safePositionFound = true;
-				pathToTile.push_back(Utilities::convertToWorldPosition(neighbourPosition, tileSize));
-				break;
-			}
-		}
-
-		m_adjacentPositions.clear();
-
-		if (!safePositionFound)
-		{
-			getNonCollidableAdjacentPositions(sourcePositionOnGrid, server, sourcePositionOnGrid, m_adjacentPositions);
-			pathToTile.push_back(Utilities::convertToWorldPosition(m_adjacentPositions.front(), tileSize));
-			m_adjacentPositions.clear();
-		}
-	}
-	else
-	{
-		getSafePathToTile(sourcePosition, targetPosition, bomb, pathToTile, server);
-	}
-}
-
 bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
 	if (sourcePosition == targetPosition)
@@ -324,7 +253,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 	return false;
 }
 
-bool PathFinding::isPositionInRangeOfExplosion(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server)
+bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition, const BombServer& bomb, const Server& server)
 {
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
@@ -567,7 +496,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 				m_frontier.push(neighbourPosition);
 			}
 			
-			if (!isPositionInRangeOfExplosion(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
+			if (!isPositionInRangeOfBombDetonation(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
 			{
 				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
 				safePositionFound = true;
@@ -623,7 +552,7 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 			{
 				continue;
 			}
-			else if (!isPositionInRangeOfExplosion(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server) &&
+			else if (!isPositionInRangeOfBombDetonation(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server) &&
 				!m_graph.isPositionVisited(neighbourPosition, levelSize))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);

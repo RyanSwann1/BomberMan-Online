@@ -20,7 +20,7 @@ int Utilities::distance(sf::Vector2i source, sf::Vector2i target)
 	return std::abs(source.x - target.x) + std::abs(source.y - target.y);
 }
 
-eDirection Utilities::getDirectionToAdjacentFromSourcePosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition)
+eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition)
 {
 	assert(sourcePosition != targetPosition);
 

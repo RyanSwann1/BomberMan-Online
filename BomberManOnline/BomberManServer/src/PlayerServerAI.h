@@ -16,9 +16,11 @@ enum class eAIState
 	eMovingToNearestPlayer,
 	eMovingToSafePosition,
 	eMovingToPickUp,
+	eMovingToPositionToPlantBomb,
 	eSetDestinationAtBox,
 	eSetDestinationToTargetPlayer,
 	eSetDestinationAtSafePosition,
+	eSetDestinationToPlantBomb,
 	ePlantBomb,
 	ePlantAndKickBomb,
 	eWait
