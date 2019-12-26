@@ -93,7 +93,7 @@ bool Server::isBombAtPosition(sf::Vector2f position) const
 const PlayerServer* Server::getPlayer(int ID) const
 {
 	auto cIter = std::find_if(m_players.cbegin(), m_players.cend(), [ID](const auto& player) { return player->getID() == ID; });
-	return cIter->get();
+	return (cIter != m_players.cend() ? cIter->get() : nullptr);
 }
 
 const BombServer* Server::getBomb(sf::Vector2f position) const
