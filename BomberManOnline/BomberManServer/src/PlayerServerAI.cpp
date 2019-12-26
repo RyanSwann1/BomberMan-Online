@@ -158,7 +158,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				if (!PathFinding::getInstance().isPositionInRangeOfAllExplosions(positionInPath, m_server))
 				{
 					continue;
-
 				}
 
 				m_currentState = eAIState::eSetDestinationAtSafePosition;
@@ -243,6 +242,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			if (targetPlayer)
 			{
 				sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer->getPosition(), m_server.getTileSize());
+
 				if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= MAX_KICK_RANGE && placeBomb())
 				{
 					sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(m_position, m_facingDirection, m_server);
@@ -332,7 +332,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 			{
 				bombFound = true;
 
-				PathFinding::getInstance().getSafePathToTarget(m_position, targetPosition, *bomb, m_server, m_pathToTile);
+				PathFinding::getInstance().getSafePathToTile(m_position, targetPosition, *bomb, m_pathToTile, m_server);
 				if (!m_pathToTile.empty())
 				{
 #ifdef RENDER_PATHING
