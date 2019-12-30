@@ -73,7 +73,7 @@ private:
 	std::queue<sf::Vector2i> m_frontier;
 	std::vector<sf::Vector2i> m_adjacentPositions;
 
-	std::vector<sf::Vector2f> getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, const Server& server);
-	void getPathToTile(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
+	std::vector<sf::Vector2f> getPathToVisitedTiles(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, const Server& server);
+	void getPathToVisitedTiles(sf::Vector2i sourcePosition, sf::Vector2i targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server);
 	void reset(sf::Vector2i levelSize);
 };
