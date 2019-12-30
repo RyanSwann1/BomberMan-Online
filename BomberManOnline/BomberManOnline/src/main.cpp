@@ -22,7 +22,6 @@
 
 //https://www.reddit.com/r/gamedev/comments/3krwlr/is_it_just_me_or_is_networking_really_hard_gaffer/
 
-
 int main()
 {
 	sf::RenderWindow window(sf::VideoMode(336, 336), "SFML_WINDOW", sf::Style::Default);
@@ -35,6 +34,7 @@ int main()
 
 	if (!Textures::getInstance().loadAllTextures())
 	{
+		std::cerr << "Couldn't load all textures\n";
 		return -1;
 	}
 

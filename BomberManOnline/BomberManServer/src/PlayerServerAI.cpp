@@ -182,15 +182,18 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetDestinationAtBox:
 	{
-		PathFinding::getInstance().getPathToClosestBox(m_position, m_pathToTile, m_server);
-		assert(!m_pathToTile.empty());
-		if (!m_pathToTile.empty())
+		if (!isMoving())
 		{
+			PathFinding::getInstance().getPathToClosestBox(m_position, m_pathToTile, m_server);
+			assert(!m_pathToTile.empty());
+			if (!m_pathToTile.empty())
+			{
 #ifdef RENDER_PATHING
-			handleRenderPathing();
+				handleRenderPathing();
 #endif // RENDER_PATHING
-			setNewPosition(m_pathToTile.back(), m_server);
-			m_currentState = eAIState::eMovingToBox;
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_currentState = eAIState::eMovingToBox;
+			}
 		}
 	}
 
@@ -215,19 +218,22 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eSetDestinationAtSafePosition:
 	{
-		PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
-		assert(!m_pathToTile.empty());
-		if (!m_pathToTile.empty())
+		if (!isMoving())
 		{
+			PathFinding::getInstance().getPathToLocalSafePosition(m_position, m_pathToTile, m_server);
+			assert(!m_pathToTile.empty());
+			if (!m_pathToTile.empty())
+			{
 #ifdef RENDER_PATHING
-			handleRenderPathing();
+				handleRenderPathing();
 #endif // RENDER_PATHING
 
-			setNewPosition(m_pathToTile.back(), m_server);
-			m_pathToTile.pop_back();
+				setNewPosition(m_pathToTile.back(), m_server);
+				m_pathToTile.pop_back();
 
-			m_currentState = eAIState::eMovingToSafePosition;
-		}
+				m_currentState = eAIState::eMovingToSafePosition;
+			}
+		}	
 	}
 
 	break;
@@ -242,11 +248,21 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				sf::Vector2f positionToMoveTo = m_pathToTile[Utilities::getRandomNumber(0, m_pathToTile.size() - 1)];
 				m_pathToTile.clear();
 				PathFinding::getInstance().getPathToTile(m_position, positionToMoveTo, m_pathToTile, m_server);
+				///////////////////////
+				//** POTENTIAL ERROR - LOOK INTO
+				///////////////////////
+				assert(!m_pathToTile.empty());
+				if (!m_pathToTile.empty())
+				{
 #ifdef RENDER_PATHING
-				handleRenderPathing();
+					handleRenderPathing();
 #endif // RENDER_PATHING
 
-				m_currentState = eAIState::eMovingToPositionToPlantBomb;
+					setNewPosition(m_pathToTile.back(), m_server);
+					m_pathToTile.pop_back();
+
+					m_currentState = eAIState::eMovingToPositionToPlantBomb;
+				}
 			}
 		}
 	}
@@ -284,27 +300,33 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	break;
 	case eAIState::eWait:
 	{
-		if (PathFinding::getInstance().isPositionInRangeOfAllExplosions(m_position, m_server))
+		if (!isMoving())
 		{
-			m_currentState = eAIState::eSetDestinationAtSafePosition;
-			m_waitTimer.setActive(false);
+			if (PathFinding::getInstance().isPositionInRangeOfAllExplosions(m_position, m_server))
+			{
+				m_waitTimer.resetElaspedTime();
+				m_waitTimer.setActive(false);
 			
-			if(m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 7)
-			{
-				m_waitTimer.resetElaspedTime();
-				m_currentState = eAIState::eSetDestinationToPlantBomb;
+				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 15)
+				{
+					m_currentState = eAIState::eSetDestinationToPlantBomb;
+				}
+				else
+				{
+					m_currentState = eAIState::eSetDestinationAtSafePosition;
+				}
 			}
-		}
-		else
-		{
-			m_waitTimer.setActive(true);
-			m_waitTimer.update(frameTime);
-			if (m_waitTimer.isExpired())
+			else
 			{
-				m_currentState = eAIState::eMakeDecision;
-				m_waitTimer.resetElaspedTime();
+				m_waitTimer.setActive(true);
+				m_waitTimer.update(frameTime);
+				if (m_waitTimer.isExpired())
+				{
+					m_currentState = eAIState::eMakeDecision;
+					m_waitTimer.resetElaspedTime();
+				}
 			}
-		}
+		}	
 	}
 
 	break;
@@ -315,13 +337,14 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 {
 	assert(m_currentState == eAIState::eSetDestinationToTargetPlayer);
 	sf::Vector2f targetPosition = Utilities::getClosestGridPosition(targetPlayer.getPosition(), m_server.getTileSize());
+
 	if (targetPosition == m_position || Utilities::isPositionAdjacent(m_position, targetPosition, m_server.getTileSize()))
 	{
 		m_currentState = eAIState::ePlantBomb;
 	}
 	else
 	{
-		if (Utilities::getRandomNumber(0, 15) > 13 && Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) &&
+		if (Utilities::getRandomNumber(0, 15) > 133 && Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) &&
 			PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= MAX_KICK_RANGE)
 		{
 			m_currentState = eAIState::ePlantAndKickBomb;
@@ -377,17 +400,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 				}
 				else
 				{
-					PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
-					assert(!m_pathToTile.empty());
-					if (!m_pathToTile.empty())
-					{
-#ifdef RENDER_PATHING
-						handleRenderPathing();
-#endif // RENDER_PATHING
-						setNewPosition(m_pathToTile.back(), m_server);
-						m_pathToTile.pop_back();
-						m_currentState = eAIState::eMovingToSafePosition;
-					}
+					m_currentState = eAIState::eSetDestinationAtSafePosition;
 				}
 
 				break;
@@ -408,8 +421,13 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 #ifdef RENDER_PATHING
 void PlayerServerAI::handleRenderPathing()
 {
-	sf::Packet packetToSend;
-	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
-	m_server.broadcastMessage(packetToSend);
+	assert(!m_pathToTile.empty());
+	if (!m_pathToTile.empty())
+	{
+		sf::Packet packetToSend;
+
+		packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
+		m_server.broadcastMessage(packetToSend);
+	}
 }
 #endif // RENDER_PATHING

@@ -9,8 +9,8 @@
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 3;
-constexpr int MAX_AI_PLAYERS = 2;
+constexpr size_t MAX_PLAYERS = 2;
+constexpr int MAX_AI_PLAYERS = 1;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -39,7 +39,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
-		server->m_levelName = "Level1DEBUG.tmx";
+		server->m_levelName = "Level1.tmx";
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
@@ -77,6 +77,8 @@ bool Server::isPositionAIDestination(sf::Vector2f position) const
 
 		}
 	}
+
+	return true;
 }
 
 bool Server::isPickUpAtPosition(sf::Vector2f position) const

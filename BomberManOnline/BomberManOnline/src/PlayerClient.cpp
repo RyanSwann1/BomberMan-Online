@@ -4,6 +4,7 @@
 #include "ServerMessages.h"
 #include "NetworkHandler.h"
 #include <SFML/Network.hpp>
+#include <assert.h>
 
 //Movemnet Point
 MovementPoint::MovementPoint(sf::Vector2f position, eDirection moveDirection)
@@ -120,21 +121,23 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 #ifdef RENDER_PATHING
 void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 {
-
 	m_path.clear();
 
-	for (sf::Vector2f i : path)
+	assert(!path.empty());
+	if (!path.empty())
 	{
-		sf::RectangleShape shape;
-		shape.setPosition(i);
-		shape.setFillColor(sf::Color::Red);
-		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-		shape.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+		for (sf::Vector2f i : path)
+		{
+			sf::RectangleShape shape;
+			shape.setPosition(i);
+			shape.setFillColor(sf::Color::Red);
+			sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+			shape.setSize(sf::Vector2f(tileSize.x, tileSize.y));
 
-		m_path.push_back(shape);
+			m_path.push_back(shape);
+		}
+
+		m_path.front().setFillColor(sf::Color::Green);
 	}
-
-	m_path.front().setFillColor(sf::Color::Green);
-
 }
 #endif // DEBUG

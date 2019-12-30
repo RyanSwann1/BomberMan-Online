@@ -430,6 +430,8 @@ void PathFinding::getPathToClosestPickUp(sf::Vector2f sourcePosition, std::vecto
 
 		m_adjacentPositions.clear();
 	}
+
+
 }
 
 void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
@@ -440,33 +442,49 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, std:
 
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
-	
+	sf::Vector2i lastPosition;
+
 	m_frontier.push(sourcePositionOnGrid);
 
 	bool safePositionFound = false;
 	while (!safePositionFound && !m_frontier.empty())
 	{
-		sf::Vector2i lastPosition = m_frontier.front();
+		lastPosition = m_frontier.front();
 		m_frontier.pop();
 
 		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
-		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
+		for (sf::Vector2i adjacentPosition : m_adjacentPositions)
 		{
-			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
+			if (!m_graph.isPositionVisited(adjacentPosition, levelSize))
 			{
-				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
-				m_frontier.push(neighbourPosition);
+				m_graph.addToGraph(adjacentPosition, lastPosition, levelSize);
+				m_frontier.push(adjacentPosition);
 			}
 
-			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(adjacentPosition, tileSize), server))
 			{
-				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
+				lastPosition = adjacentPosition;
 				safePositionFound = true;
 				break;
 			}
 		}
 
 		m_adjacentPositions.clear();
+	}
+
+	if (safePositionFound)
+	{
+		sf::Vector2f position = Utilities::convertToWorldPosition(lastPosition, tileSize);
+		pathToTile.push_back(position);
+		while (position != sourcePosition)
+		{
+			sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
+			position = Utilities::convertToWorldPosition(previousPosition, tileSize);
+			if (position != sourcePosition)
+			{
+				pathToTile.push_back(position);
+			}
+		}
 	}
 }
 
@@ -495,7 +513,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				m_frontier.push(neighbourPosition);
 			}
-			
+
 			if (!isPositionInRangeOfBombDetonation(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
 			{
 				getPathToTile(sourcePositionOnGrid, neighbourPosition, pathToTile, server);
@@ -505,6 +523,64 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 		}
 
 		m_adjacentPositions.clear();
+	}
+}
+
+void PathFinding::getPathToLocalSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+{
+	pathToTile.clear();
+	sf::Vector2i levelSize = server.getLevelSize();
+	reset(levelSize);
+
+	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
+
+	m_frontier.push(sourcePositionOnGrid);
+	std::vector<sf::Vector2i> safePositions;
+	safePositions.reserve(5);
+	
+	while (safePositions.size() <= 5 && !m_frontier.empty())
+	{
+		sf::Vector2i lastPosition = m_frontier.front();
+		m_frontier.pop();
+
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
+		{
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize))
+			{
+				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
+				m_frontier.push(neighbourPosition);
+			}
+
+			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
+			{
+				safePositions.push_back(neighbourPosition);
+				if (safePositions.size() == 5)
+				{
+					break;
+				}
+			}
+		}
+
+		m_adjacentPositions.clear();
+	}
+
+	if (!safePositions.empty())
+	{
+		sf::Vector2i targetPosition = safePositions[Utilities::getRandomNumber(0, static_cast<int>(safePositions.size() - 1))];
+		
+		sf::Vector2f position = Utilities::convertToWorldPosition(targetPosition, tileSize);
+		pathToTile.push_back(position);
+		while (position != sourcePosition)
+		{
+			sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
+			position = Utilities::convertToWorldPosition(previousPosition, tileSize);
+			if (position != sourcePosition)
+			{
+				pathToTile.push_back(position);
+			}
+		}
 	}
 }
 
@@ -583,6 +659,69 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 			}
 		}
 	}
+}
+
+void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+{
+	pathToTile.clear();
+	sf::Vector2i levelSize = server.getLevelSize();
+	reset(levelSize);
+
+	sf::Vector2i tileSize = server.getTileSize();
+	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(sourcePosition, tileSize));
+	sf::Vector2i targetPositionOnGrid(Utilities::convertToGridPosition(targetPosition, tileSize));
+
+	m_frontier.push(sourcePositionOnGrid);
+
+	sf::Vector2i lastPosition;
+	bool pathCompleted = false;
+	while (!pathCompleted && !m_frontier.empty())
+	{
+		lastPosition = m_frontier.front();
+		m_frontier.pop();
+
+		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
+		for (sf::Vector2i adjacentPosition : m_adjacentPositions)
+		{
+			m_frontier.push(adjacentPosition);
+
+			if (server.isBombAtPosition(Utilities::convertToWorldPosition(adjacentPosition, tileSize)))
+			{
+				continue;
+			}
+			else if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(adjacentPosition, tileSize), server) &&
+				!m_graph.isPositionVisited(adjacentPosition, levelSize))
+			{
+				m_graph.addToGraph(adjacentPosition, lastPosition, levelSize);
+	
+			}
+
+			if (adjacentPosition == targetPositionOnGrid)
+			{
+				lastPosition = adjacentPosition;
+				pathCompleted = true;
+				break;
+			}
+		}
+
+		m_adjacentPositions.clear();
+	}
+
+	if (pathCompleted)
+	{
+		sf::Vector2f position = Utilities::convertToWorldPosition(lastPosition, tileSize);
+		pathToTile.push_back(position);
+		while (position != sourcePosition)
+		{
+			sf::Vector2i previousPosition = m_graph.getPreviousPosition(Utilities::convertToGridPosition(position, tileSize), levelSize);
+			position = Utilities::convertToWorldPosition(previousPosition, tileSize);
+			if (position != sourcePosition)
+			{
+				pathToTile.push_back(position);
+			}
+		}
+	}
+	int i = 0;
 }
 
 void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const Server& server, std::vector<sf::Vector2f>& positions)
@@ -722,6 +861,7 @@ std::vector<sf::Vector2f> PathFinding::getPathToTile(sf::Vector2f sourcePosition
 				if (Utilities::convertToWorldPosition(neighbourPosition, tileSize) == targetPosition)
 				{
 					destinationFound = true;
+					lastPosition = neighbourPosition;
 					break;
 				}
 			}
@@ -782,6 +922,7 @@ void PathFinding::getPathToTile(sf::Vector2f sourcePosition, sf::Vector2f target
 				if (Utilities::convertToWorldPosition(neighbourPosition, tileSize) == targetPosition)
 				{
 					destinationFound = true;
+					lastPosition = neighbourPosition;
 					break;
 				}
 			}
