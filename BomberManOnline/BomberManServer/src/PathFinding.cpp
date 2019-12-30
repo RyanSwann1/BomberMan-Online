@@ -191,15 +191,10 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
 		int explosionSize = bomb.getExplosionSize();
-		sf::Vector2f explosionPosition = bombPosition;
-
-		if (explosionPosition == bombPosition)
-		{
-			return true;
-		}
+		sf::Vector2f explosionPosition;
 
 		//Up
-		for (int y = bombPosition.y - tileSize.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
+		for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -213,7 +208,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		}
 
 		//Down
-		for (int y = bombPosition.y + tileSize.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
+		for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -227,7 +222,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		}
 
 		//Left
-		for (int x = bombPosition.x - tileSize.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
+		for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -241,7 +236,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		}
 
 		//Right
-		for (int x = bombPosition.x + tileSize.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
+		for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -263,15 +258,10 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	sf::Vector2i tileSize = server.getTileSize();
 	sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
 	int explosionSize = bomb.getExplosionSize();
-	sf::Vector2f explosionPosition = bombPosition;
-
-	if (explosionPosition == sourcePosition)
-	{
-		return true;
-	}
+	sf::Vector2f explosionPosition;
 
 	//left
-	for (int x = bombPosition.x - tileSize.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
+	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
 		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -285,7 +275,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	}
 
 	//Right
-	for (int x = bombPosition.x + tileSize.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
+	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
 		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -299,7 +289,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	}
 
 	//Up
-	for (int y = bombPosition.y - tileSize.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
+	for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
 		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
@@ -313,7 +303,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	}
 
 	//Down
-	for (int y = bombPosition.y + tileSize.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
+	for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
 		if (server.getCollidableTile(Utilities::convertToGridPosition(explosionPosition, tileSize)) != eCollidableTile::eNonCollidable)
