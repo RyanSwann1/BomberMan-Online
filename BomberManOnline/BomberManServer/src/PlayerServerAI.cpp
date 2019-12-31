@@ -396,11 +396,8 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 #endif // RENDER_PATHING
 					setNewPosition(m_pathToTile.back(), m_server);
 					m_pathToTile.pop_back();
+
 					m_currentState = eAIState::eMovingToTargetPlayer;
-				}
-				else
-				{
-					m_currentState = eAIState::eSetDestinationAtSafePosition;
 				}
 
 				break;

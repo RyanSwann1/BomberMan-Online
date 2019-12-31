@@ -592,12 +592,8 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 		getNonCollidableAdjacentPositions(lastPosition, server, sourcePositionOnGrid, m_adjacentPositions);
 		for (sf::Vector2i neighbourPosition : m_adjacentPositions)
 		{
-			if (server.isBombAtPosition(Utilities::convertToWorldPosition(neighbourPosition, tileSize)))
-			{
-				continue;
-			}
-			else if (!isPositionInRangeOfBombDetonation(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server) &&
-				!m_graph.isPositionVisited(neighbourPosition, levelSize))
+			if (!m_graph.isPositionVisited(neighbourPosition, levelSize) && 
+				!isPositionInRangeOfBombDetonation(Utilities::convertToWorldPosition(neighbourPosition, tileSize), bomb, server))
 			{
 				m_graph.addToGraph(neighbourPosition, lastPosition, levelSize);
 				m_frontier.push(neighbourPosition);
@@ -651,7 +647,6 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 				!m_graph.isPositionVisited(adjacentPosition, levelSize))
 			{
 				m_graph.addToGraph(adjacentPosition, lastPosition, levelSize);
-	
 			}
 
 			if (adjacentPosition == targetPositionOnGrid)
