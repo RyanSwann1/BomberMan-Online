@@ -138,9 +138,5 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 
 		m_path.front().setFillColor(sf::Color::Green);
 	}
-	else
-	{
-		m_path = std::vector<sf::RectangleShape>();
-	}
 }
 #endif // DEBUG
