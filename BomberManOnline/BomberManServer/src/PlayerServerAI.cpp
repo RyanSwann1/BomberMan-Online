@@ -399,6 +399,12 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 
 					m_currentState = eAIState::eMovingToTargetPlayer;
 				}
+				else
+				{
+#ifdef RENDER_PATHING
+					handleRenderPathing();
+#endif // RENDER_PATHING
+				}
 
 				break;
 			}
@@ -418,13 +424,9 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 #ifdef RENDER_PATHING
 void PlayerServerAI::handleRenderPathing()
 {
-	assert(!m_pathToTile.empty());
-	if (!m_pathToTile.empty())
-	{
-		sf::Packet packetToSend;
+	sf::Packet packetToSend;
 
-		packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
-		m_server.broadcastMessage(packetToSend);
-	}
+	packetToSend << eServerMessageType::ePathToRender << m_pathToTile << m_ID;
+	m_server.broadcastMessage(packetToSend);
 }
 #endif // RENDER_PATHING

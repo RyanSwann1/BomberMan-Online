@@ -123,7 +123,6 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 {
 	m_path.clear();
 
-	assert(!path.empty());
 	if (!path.empty())
 	{
 		for (sf::Vector2f i : path)
@@ -138,6 +137,10 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 		}
 
 		m_path.front().setFillColor(sf::Color::Green);
+	}
+	else
+	{
+		m_path = std::vector<sf::RectangleShape>();
 	}
 }
 #endif // DEBUG
