@@ -10,8 +10,6 @@
 #include <assert.h>
 
 constexpr size_t MAX_NEIGHBOURS = 4;
-constexpr size_t MAX_BOX_SELECTION = 5;
-constexpr int FURTHEST_NON_COLLIDABLE_POSITION = 4;
 
 void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions);
 
@@ -326,7 +324,7 @@ void PathFinding::createGraph(sf::Vector2i levelSize)
 	m_adjacentPositions.reserve(MAX_NEIGHBOURS);
 }
 
-void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server, int maxBoxOptions)
 {
 	pathToTile.clear();
 	sf::Vector2i levelSize = server.getLevelSize();
@@ -338,9 +336,9 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 	m_frontier.push(sourcePositionOnGrid);
 
 	std::vector<sf::Vector2i> boxSelection;
-	boxSelection.reserve(MAX_BOX_SELECTION);
+	boxSelection.reserve(static_cast<size_t>(maxBoxOptions));
 
-	while (!m_frontier.empty() && boxSelection.size() < MAX_BOX_SELECTION)
+	while (!m_frontier.empty() && boxSelection.size() < static_cast<size_t>(maxBoxOptions))
 	{
 		sf::Vector2i lastPosition = m_frontier.front();
 		m_frontier.pop();
@@ -356,7 +354,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 			if (!m_graph.isPositionVisited(neighbourPosition, server.getLevelSize()))
 			{
 				if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox &&
-					boxSelection.size() < MAX_BOX_SELECTION)
+					boxSelection.size() < static_cast<size_t>(maxBoxOptions))
 				{
 					boxSelection.push_back(neighbourPosition);
 				}
@@ -505,7 +503,7 @@ void PathFinding::getPathToClosestSafePosition(sf::Vector2f sourcePosition, cons
 	}
 }
 
-void PathFinding::getPathToLocalSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server)
+void PathFinding::getPathToRandomLocalSafePosition(sf::Vector2f sourcePosition, std::vector<sf::Vector2f>& pathToTile, const Server& server, int maxPositionOptions)
 {
 	pathToTile.clear();
 	sf::Vector2i levelSize = server.getLevelSize();
@@ -516,9 +514,9 @@ void PathFinding::getPathToLocalSafePosition(sf::Vector2f sourcePosition, std::v
 
 	m_frontier.push(sourcePositionOnGrid);
 	std::vector<sf::Vector2i> safePositions;
-	safePositions.reserve(5);
+	safePositions.reserve(maxPositionOptions);
 	
-	while (safePositions.size() <= 5 && !m_frontier.empty())
+	while (safePositions.size() <= maxPositionOptions && !m_frontier.empty())
 	{
 		sf::Vector2i lastPosition = m_frontier.front();
 		m_frontier.pop();
@@ -535,7 +533,7 @@ void PathFinding::getPathToLocalSafePosition(sf::Vector2f sourcePosition, std::v
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(neighbourPosition, tileSize), server))
 			{
 				safePositions.push_back(neighbourPosition);
-				if (safePositions.size() == 5)
+				if (safePositions.size() == maxPositionOptions)
 				{
 					break;
 				}
@@ -689,7 +687,7 @@ void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const
 	}
 }
 
-sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server) const
+sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePosition, eDirection direction, const Server& server, int maxDistance) const
 {
 	assert(direction != eDirection::eNone);
 	sf::Vector2i tileSize = server.getTileSize();
@@ -698,7 +696,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 	{
 	case eDirection::eLeft:
 	{
-		for (int x = sourcePosition.x; x >= sourcePosition.x - (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int x = sourcePosition.x; x >= sourcePosition.x - (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
@@ -715,7 +713,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 	break;
 	case eDirection::eRight:
 	{
-		for (int x = sourcePosition.x; x < sourcePosition.x + (tileSize.x * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int x = sourcePosition.x; x < sourcePosition.x + (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
@@ -732,7 +730,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 	break;
 	case eDirection::eUp:
 	{
-		for (int y = sourcePosition.y; y >= sourcePosition.y - (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int y = sourcePosition.y; y >= sourcePosition.y - (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
@@ -749,7 +747,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 	break;
 	case eDirection::eDown:
 	{
-		for (int y = sourcePosition.y; y < sourcePosition.y + (tileSize.y * FURTHEST_NON_COLLIDABLE_POSITION);)
+		for (int y = sourcePosition.y; y < sourcePosition.y + (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
 			if (server.getCollidableTile(Utilities::convertToGridPosition(furthestPosition, tileSize)) == eCollidableTile::eNonCollidable)
