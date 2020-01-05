@@ -530,7 +530,7 @@ void Server::onBombKick(sf::Vector2f playerPosition, eDirection kickDirection)
 	auto bombToKick = std::find_if(m_bombs.begin(), m_bombs.end(), [playerPosition] (const auto& bomb) { return bomb.getPosition() == playerPosition; });
 	if (bombToKick != m_bombs.end())
 	{
-		sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(playerPosition, kickDirection, *this);
+		sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(playerPosition, kickDirection, *this, MAX_KICK_RANGE);
 		if (kickToPosition != playerPosition)
 		{
 			bombToKick->setNewPosition(kickToPosition);

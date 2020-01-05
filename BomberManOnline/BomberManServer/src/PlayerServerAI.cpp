@@ -10,7 +10,7 @@
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
 constexpr int MIN_DISTANCE_FROM_ENEMY = 1; // Min distance from enemy to place bomb
-constexpr int MAX_KICK_RANGE = 4;
+
 constexpr int MAX_SAFE_POSITIONS = 5;
 constexpr int MAX_BOX_OPTIONS = 5;
 
