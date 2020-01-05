@@ -10,7 +10,9 @@
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
 constexpr int MIN_DISTANCE_FROM_ENEMY = 1; // Min distance from enemy to place bomb
-constexpr int MAX_KICK_RANGE = 6;
+constexpr int MAX_KICK_RANGE = 4;
+constexpr int MAX_SAFE_POSITIONS = 5;
+constexpr int MAX_BOX_OPTIONS = 5;
 
 //Player AI
 PlayerServerAI::PlayerServerAI(int ID, sf::Vector2f startingPosition, Server& server)
@@ -184,7 +186,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (!isMoving())
 		{
-			PathFinding::getInstance().getPathToClosestBox(m_position, m_pathToTile, m_server);
+			PathFinding::getInstance().getPathToClosestBox(m_position, m_pathToTile, m_server, MAX_BOX_OPTIONS);
 			assert(!m_pathToTile.empty());
 			if (!m_pathToTile.empty())
 			{
@@ -220,7 +222,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (!isMoving())
 		{
-			PathFinding::getInstance().getPathToLocalSafePosition(m_position, m_pathToTile, m_server);
+			PathFinding::getInstance().getPathToRandomLocalSafePosition(m_position, m_pathToTile, m_server, MAX_SAFE_POSITIONS);
 			assert(!m_pathToTile.empty());
 			if (!m_pathToTile.empty())
 			{
@@ -289,7 +291,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 
 				if (PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= MAX_KICK_RANGE && placeBomb())
 				{
-					sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(m_position, m_facingDirection, m_server);
+					sf::Vector2f kickToPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(m_position, m_facingDirection, m_server, MAX_KICK_RANGE);
 					m_server.kickBombInDirection(m_position, kickToPosition);
 					m_currentState = eAIState::eSetDestinationAtSafePosition;
 				}
@@ -307,7 +309,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				m_waitTimer.resetElaspedTime();
 				m_waitTimer.setActive(false);
 			
-				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 15)
+				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 1)
 				{
 					m_currentState = eAIState::eSetDestinationToPlantBomb;
 				}
@@ -363,7 +365,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 				if (bomb && !bomb->isMoving())
 				{
 					eDirection kickDirection = Utilities::getDirectionToAdjacentFromPosition(m_position, bomb->getPosition());
-					sf::Vector2f newBombPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(bomb->getPosition(), kickDirection, m_server);
+					sf::Vector2f newBombPosition = PathFinding::getInstance().getFurthestNonCollidablePosition(bomb->getPosition(), kickDirection, m_server, MAX_KICK_RANGE);
 
 					if (PathFinding::getInstance().getPathToTile(bomb->getPosition(), newBombPosition, m_server).size() >= bomb->getExplosionSize())
 					{
