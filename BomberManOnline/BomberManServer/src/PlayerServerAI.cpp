@@ -344,7 +344,7 @@ void PlayerServerAI::onSetDestinationToTargetPlayer(const PlayerServer& targetPl
 	}
 	else
 	{
-		if (Utilities::getRandomNumber(0, 15) > 133 && Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) &&
+		if (Utilities::getRandomNumber(0, 15) > 13 && Utilities::isTargetInDirectSight(m_position, targetPosition, m_facingDirection) &&
 			PathFinding::getInstance().getPathToTile(m_position, targetPosition, m_server).size() <= MAX_KICK_RANGE)
 		{
 			m_currentState = eAIState::ePlantAndKickBomb;
