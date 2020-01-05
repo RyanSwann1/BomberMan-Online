@@ -353,7 +353,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 
 			if (!m_graph.isPositionVisited(adjacentPositions, server.getLevelSize()))
 			{
-				if (server.getCollidableTile(neighbourPosition) == eCollidableTile::eBox &&
+				if (server.getCollidableTile(adjacentPositions) == eCollidableTile::eBox &&
 					boxSelection.size() < static_cast<size_t>(maxBoxOptions))
 				{
 					boxSelection.push_back(adjacentPositions);
@@ -532,7 +532,7 @@ void PathFinding::getPathToRandomLocalSafePosition(sf::Vector2f sourcePosition, 
 
 			if (!isPositionInRangeOfAllExplosions(Utilities::convertToWorldPosition(adjacentPositions, tileSize), server))
 			{
-				safePositions.push_back(neighbourPosition);
+				safePositions.push_back(adjacentPositions);
 				if (safePositions.size() == maxPositionOptions)
 				{
 					break;
