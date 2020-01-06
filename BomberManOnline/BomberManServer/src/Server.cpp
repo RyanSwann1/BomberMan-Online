@@ -39,7 +39,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
-		server->m_levelName = "Level1DEBUG.tmx";
+		server->m_levelName = "Level1.tmx";
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
