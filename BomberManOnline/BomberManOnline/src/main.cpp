@@ -41,7 +41,7 @@ int main()
 	std::unique_ptr<Level> level;
 	sf::Clock gameClock;
 	float deltaTime = 0.0f;
-	int localClientID = INVALID_PLAYER_ID;
+	int localPlayerID = INVALID_PLAYER_ID;
 	while (window.isOpen())
 	{
 		//Handle Server Messages
@@ -54,7 +54,7 @@ int main()
 			switch (messageType)
 			{
 			case eServerMessageType::eInitializeClientID:
-				receivedMessage >> localClientID;
+				receivedMessage >> localPlayerID;
 				break;
 			case eServerMessageType::eInitialGameData:
 			{
@@ -63,7 +63,7 @@ int main()
 				assert(!level);
 				if (!level)
 				{
-					level = Level::create(localClientID, initialGameData);
+					level = Level::create(localPlayerID, initialGameData);
 				}
 			}
 			break;
