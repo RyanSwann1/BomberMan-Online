@@ -250,9 +250,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				sf::Vector2f positionToMoveTo = m_pathToTile[Utilities::getRandomNumber(0, m_pathToTile.size() - 1)];
 				m_pathToTile.clear();
 				PathFinding::getInstance().getPathToTile(m_position, positionToMoveTo, m_pathToTile, m_server);
-				///////////////////////
-				//** POTENTIAL ERROR - LOOK INTO
-				///////////////////////
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
