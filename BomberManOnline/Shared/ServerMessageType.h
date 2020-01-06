@@ -24,5 +24,5 @@ enum class eServerMessageType
 	eMovementPickUpCollision,
 	eExtraBombPickUpCollision,
 	eBiggerExplosionPickUpCollision,
-
+	eRemovePickUpAtLocation
 };

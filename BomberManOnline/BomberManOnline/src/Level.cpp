@@ -536,6 +536,15 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		kickBombToPosition(bombOnPosition, kickToPosition);
 	}
 	break;
+	case eServerMessageType::eRemovePickUpAtLocation :
+	{
+		sf::Vector2f pickUpPosition;
+		receivedMessage >> pickUpPosition;
+	
+		auto iter = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [pickUpPosition] (const auto gameObject) {})
+	}
+		
+	break;
 #ifdef RENDER_PATHING
 	case eServerMessageType::ePathToRender:
 	{
