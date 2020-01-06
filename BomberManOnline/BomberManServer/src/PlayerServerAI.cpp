@@ -243,7 +243,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (!isMoving())
 		{
-			PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+			PathFinding::getInstance().getPathToRandomLocalSafePosition(m_position, m_pathToTile, m_server, MAX_SAFE_POSITIONS);
 			assert(!m_pathToTile.empty());
 			if (!m_pathToTile.empty())
 			{
@@ -309,7 +309,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				m_waitTimer.resetElaspedTime();
 				m_waitTimer.setActive(false);
 			
-				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 1)
+				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 4)
 				{
 					m_currentState = eAIState::eSetDestinationToPlantBomb;
 				}
