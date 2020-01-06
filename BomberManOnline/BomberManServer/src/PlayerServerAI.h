@@ -2,6 +2,8 @@
 
 #include "PlayerServer.h"
 
+constexpr int MAX_KICK_RANGE = 4;
+
 enum class eAIBehaviour
 {
 	ePassive = 0, //Target boxes until non left, then Player

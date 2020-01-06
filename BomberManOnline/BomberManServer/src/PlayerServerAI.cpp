@@ -10,7 +10,7 @@
 
 constexpr int PICK_UP_SEARCH_RANGE = 5;
 constexpr int MIN_DISTANCE_FROM_ENEMY = 1; // Min distance from enemy to place bomb
-constexpr int MAX_KICK_RANGE = 4;
+
 constexpr int MAX_SAFE_POSITIONS = 5;
 constexpr int MAX_BOX_OPTIONS = 5;
 
@@ -243,16 +243,13 @@ void PlayerServerAI::handleAIStates(float frameTime)
 	{
 		if (!isMoving())
 		{
-			PathFinding::getInstance().getPathToClosestSafePosition(m_position, m_pathToTile, m_server);
+			PathFinding::getInstance().getPathToRandomLocalSafePosition(m_position, m_pathToTile, m_server, MAX_SAFE_POSITIONS);
 			assert(!m_pathToTile.empty());
 			if (!m_pathToTile.empty())
 			{
 				sf::Vector2f positionToMoveTo = m_pathToTile[Utilities::getRandomNumber(0, m_pathToTile.size() - 1)];
 				m_pathToTile.clear();
 				PathFinding::getInstance().getPathToTile(m_position, positionToMoveTo, m_pathToTile, m_server);
-				///////////////////////
-				//** POTENTIAL ERROR - LOOK INTO
-				///////////////////////
 				assert(!m_pathToTile.empty());
 				if (!m_pathToTile.empty())
 				{
@@ -309,7 +306,7 @@ void PlayerServerAI::handleAIStates(float frameTime)
 				m_waitTimer.resetElaspedTime();
 				m_waitTimer.setActive(false);
 			
-				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 1)
+				if (m_targetPlayerID != INVALID_PLAYER_ID && Utilities::getRandomNumber(0, 10) >= 4)
 				{
 					m_currentState = eAIState::eSetDestinationToPlantBomb;
 				}
