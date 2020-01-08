@@ -9,8 +9,8 @@
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 2;
-constexpr int MAX_AI_PLAYERS = 1;
+constexpr size_t MAX_PLAYERS = 4;
+constexpr int MAX_AI_PLAYERS = 3;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -410,16 +410,6 @@ void Server::update(float frameTime)
 
 			onBombExplosion(explosionPosition);
 
-			//sf::Vector2f endPosition(explosionPosition.x + (explosionSize * m_tileSize.x), explosionPosition.y);
-			//while (Utilities::traverseDirection(explosionPosition, endPosition, m_tileSize, eDirection::eRight))
-			//{
-			//	onBombExplosion(explosionPosition);
-			//	if (getCollidableTile(explosionPosition) == eCollidableTile::eBox || getCollidableTile(explosionPosition) == eCollidableTile::eWall)
-			//	{
-			//		break;
-			//	}
-			//}
-
 			explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
 			for (int x = explosionPosition.x + m_tileSize.x; x <= explosionPosition.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
 			{
@@ -483,7 +473,17 @@ void Server::update(float frameTime)
 
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
-	if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+	auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [explosionPosition](const auto& gameObject)
+		{ return gameObject.getPosition() == explosionPosition; });
+	if (gameObject != m_gameObjects.cend())
+	{
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eRemovePickUpAtLocation << explosionPosition;
+		broadcastMessage(packetToSend);
+
+		m_gameObjects.erase(gameObject);
+	}
+	else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
 	{
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
