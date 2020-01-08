@@ -68,19 +68,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	}
 }
 
-bool Server::isPositionAIDestination(sf::Vector2f position) const
-{
-	for (const auto& player : m_players)
-	{
-		if (player->getControllerType() == ePlayerControllerType::eAI)
-		{
-
-		}
-	}
-
-	return true;
-}
-
 bool Server::isPickUpAtPosition(sf::Vector2f position) const
 {
 	for (const GameObject& gameObject : m_gameObjects)
