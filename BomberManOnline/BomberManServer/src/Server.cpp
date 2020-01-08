@@ -167,6 +167,14 @@ void Server::run()
 	}
 }
 
+void Server::spawnCollidableBlocks()
+{
+	assert(!m_collidableBlocksSpawning);
+	m_collidableBlocksSpawning = true;
+
+
+}
+
 void Server::addNewClient()
 {
 	std::unique_ptr<sf::TcpSocket> tcpSocket = std::make_unique<sf::TcpSocket>();

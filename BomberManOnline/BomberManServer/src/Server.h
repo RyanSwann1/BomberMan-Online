@@ -61,6 +61,10 @@ private:
 	eServerState m_currentState;
 	bool m_running;
 
+	sf::Vector2f m_collidableBlockPlacementPosition = sf::Vector2f(4 * 16, 4 * 16);
+	bool m_collidableBlocksSpawning;
+	void spawnCollidableBlocks();
+
 	void addNewClient();
 	void listen();
 

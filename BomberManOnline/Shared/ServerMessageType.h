@@ -17,6 +17,7 @@ enum class eServerMessageType
 	eRequestKickBomb,
 	eBombKicked,
 	ePathToRender,
+	eNewCollidableTile,
 	//PickUps
 	eSpawnMovementPickUp,
 	eSpawnExtraBombPickUp,
