@@ -9,8 +9,8 @@
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 1;
-constexpr int MAX_AI_PLAYERS = 0;
+constexpr size_t MAX_PLAYERS = 4;
+constexpr int MAX_AI_PLAYERS = 3;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -172,10 +172,11 @@ void Server::placeNextCollidableTile()
 	if (getCollidableTile(m_levelCollapser.startingCollidablePlacementPosition) != eCollidableTile::eWall)
 	{
 		changeCollidableTile(m_levelCollapser.currentCollidablePlacementPosition, eCollidableTile::eWall);
+		m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
+
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eNewCollidableTile << m_levelCollapser.currentCollidablePlacementPosition;
 		broadcastMessage(packetToSend);
-		m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
 	}
 	else
 	{

@@ -218,6 +218,7 @@ void parseCollisionLayer(const TiXmlElement & rootElement, sf::Vector2i tileSize
 
 		for (const auto* entityElement = entityElementRoot->FirstChildElement(); entityElement != nullptr; entityElement = entityElement->NextSiblingElement())
 		{
+
 			sf::Vector2i spawnPosition;
 			entityElement->Attribute("x", &spawnPosition.x);
 			entityElement->Attribute("y", &spawnPosition.y);
