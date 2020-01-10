@@ -23,6 +23,17 @@ class Server : private NonCopyable
 		eGame
 	};
 
+	struct LevelCollapser
+	{
+		const sf::Vector2f startingCollidablePlacementPosition = sf::Vector2f(3 * 16, 3 * 16);
+		std::vector<sf::Vector2f> collidableTilePlacementBounds;
+		sf::Vector2f currentCollidablePlacementPosition = startingCollidablePlacementPosition;
+		eDirection collidablePlacementDirection = eDirection::eRight;
+		const float elaspedTimeUntilSpawnBlocks = 5.0f;
+		const float timeBetweenBlockPlacement = 0.2f;
+		bool collidableBlocksSpawning = false;
+	};
+
 public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
@@ -60,19 +71,17 @@ private:
 	sf::Clock m_clock;
 	eServerState m_currentState;
 	bool m_running;
+	float m_elaspedTime = 0.0f;
+	LevelCollapser m_levelCollapser;
 
-	sf::Vector2f m_collidableBlockPlacementPosition = sf::Vector2f(4 * 16, 4 * 16);
-	bool m_collidableBlocksSpawning;
-	void spawnCollidableBlocks();
+	void placeNextCollidableTile();
 
 	void addNewClient();
 	void listen();
-
 	void setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage);
 	void placeBomb(PlayerServerHuman& client, sf::Vector2f placementPosition);
-
 	void update(float frameTime);
-	
+
 	void onBombExplosion(sf::Vector2f explosionPosition);
 	void onBombKick(sf::Vector2f playerPosition, eDirection kickDirection);
 	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);

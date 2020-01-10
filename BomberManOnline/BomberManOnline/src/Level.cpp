@@ -44,10 +44,10 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 {
 	addExplosionObject(position);
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	sf::Vector2f explosionPosition;
+
 	for (int x = position.x + tileSize.x; x <= position.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
-		explosionPosition = sf::Vector2f(x, position.y);
+		sf::Vector2f explosionPosition = sf::Vector2f(x, position.y);
 		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
 		{
 			addExplosionObject(explosionPosition);
@@ -55,7 +55,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 		else if(getCollidableTile(explosionPosition) == eCollidableTile::eBox)
 		{
 			addExplosionObject(explosionPosition);
-			changeCollidableTile(sf::Vector2i(x, position.y), eCollidableTile::eNonCollidable);
+			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
@@ -66,7 +66,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 
 	for (int x = position.x - tileSize.x; x >= position.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
-		explosionPosition = sf::Vector2f(x, position.y);
+		sf::Vector2f explosionPosition = sf::Vector2f(x, position.y);
 		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
 		{
 			addExplosionObject(explosionPosition);
@@ -74,7 +74,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
 		{
 			addExplosionObject(explosionPosition);
-			changeCollidableTile(sf::Vector2i(x, position.y), eCollidableTile::eNonCollidable);
+			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
@@ -85,7 +85,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 
 	for (int y = position.y - tileSize.y; y >= position.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
-		explosionPosition = sf::Vector2f(position.x, y);
+		sf::Vector2f explosionPosition = sf::Vector2f(position.x, y);
 		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
 		{
 			addExplosionObject(explosionPosition);
@@ -93,7 +93,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
 		{
 			addExplosionObject(explosionPosition);
-			changeCollidableTile(sf::Vector2i(position.x, y), eCollidableTile::eNonCollidable);
+			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
@@ -104,6 +104,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 
 	for (int y = position.y + tileSize.y; y <= position.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
+		sf::Vector2f explosionPosition = sf::Vector2f(position.x, y);
 		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
 		{
 			addExplosionObject(explosionPosition);
@@ -111,7 +112,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
 		{
 			addExplosionObject(explosionPosition);
-			changeCollidableTile(sf::Vector2i(position.x, y), eCollidableTile::eNonCollidable);
+			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 			break;
 		}
 		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
@@ -131,7 +132,7 @@ eCollidableTile Level::getCollidableTile(sf::Vector2f position) const
 	}
 }
 
-void Level::changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile)
+void Level::changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile)
 {
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
 	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
@@ -281,12 +282,20 @@ void Level::render(sf::RenderWindow & window) const
 		for (int x = 0; x < m_levelSize.x; x++)
 		{
 			const auto& tileSheet = Textures::getInstance().getTileSheet();
-			if (getCollidableTile(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y)) == eCollidableTile::eBox)
+			sf::Vector2i tileSize = tileSheet.getTileSize();
+			if (getCollidableTile(sf::Vector2f(x * tileSize.x, y * tileSize.y)) == eCollidableTile::eBox)
 			{
 				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eBox)));
-				boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
+				boxSprite.setPosition(sf::Vector2f(x * tileSize.x, y * tileSize.y));
 
 				window.draw(boxSprite);
+			}
+			else if (getCollidableTile(sf::Vector2f(x * tileSize.x, y * tileSize.y)) == eCollidableTile::eWall)
+			{
+				sf::Sprite wallSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eWall)));
+				wallSprite.setPosition(sf::Vector2f(x * tileSize.x, y * tileSize.y));
+
+				window.draw(wallSprite);
 			}
 		}
 	}
@@ -473,6 +482,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 		sf::Vector2f spawnLocation;
 		receivedMessage >> spawnLocation;
 
+		std::cout << "Hit\n";
 		changeCollidableTile(spawnLocation, eCollidableTile::eWall);
 	}
 	break;

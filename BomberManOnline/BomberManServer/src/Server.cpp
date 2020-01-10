@@ -9,8 +9,8 @@
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
 
-constexpr size_t MAX_PLAYERS = 2;
-constexpr int MAX_AI_PLAYERS = 1;
+constexpr size_t MAX_PLAYERS = 1;
+constexpr int MAX_AI_PLAYERS = 0;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -167,12 +167,83 @@ void Server::run()
 	}
 }
 
-void Server::spawnCollidableBlocks()
+void Server::placeNextCollidableTile()
 {
-	assert(!m_collidableBlocksSpawning);
-	m_collidableBlocksSpawning = true;
+	if (getCollidableTile(m_levelCollapser.startingCollidablePlacementPosition) != eCollidableTile::eWall)
+	{
+		changeCollidableTile(m_levelCollapser.currentCollidablePlacementPosition, eCollidableTile::eWall);
+		sf::Packet packetToSend;
+		packetToSend << eServerMessageType::eNewCollidableTile << m_levelCollapser.currentCollidablePlacementPosition;
+		broadcastMessage(packetToSend);
+		m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
+	}
+	else
+	{
+		sf::Packet packetToSend;
+		switch (m_levelCollapser.collidablePlacementDirection)
+		{
+		case eDirection::eRight :
+			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x + m_tileSize.x, 
+				m_levelCollapser.currentCollidablePlacementPosition.y }) == eCollidableTile::eWall)
+			{
+				m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
+			}
+			else
+			{
+				m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
+			}
+			
 
+			break;
 
+		case eDirection::eLeft :
+			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x - m_tileSize.x, 
+				m_levelCollapser.currentCollidablePlacementPosition.y }) == eCollidableTile::eWall)
+			{
+				m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
+			}
+			else
+			{
+				m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
+			}
+			
+
+			break;
+
+		case eDirection::eUp :
+			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x, 
+				m_levelCollapser.currentCollidablePlacementPosition.y - m_tileSize.y }) == eCollidableTile::eWall)
+			{
+				m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
+			}
+			else
+			{
+				m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
+			}
+			
+
+			break;
+
+		case eDirection::eDown :
+			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x, 
+				m_levelCollapser.currentCollidablePlacementPosition.y + m_tileSize.y }) == eCollidableTile::eWall)
+			{
+				m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
+			}
+			else
+			{
+				m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
+			}
+			
+
+			break;
+		}
+
+		std::cout << "Sent New Block\n";
+	}
+
+	//Destroy Player, pick up or Bomb that is now occupying the same position 
+	//as newly spawned collidable tile
 }
 
 void Server::addNewClient()
@@ -333,6 +404,18 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
+	//Update LevelCollapser
+	m_elaspedTime += frameTime;
+	if (!m_levelCollapser.collidableBlocksSpawning && m_elaspedTime >= m_levelCollapser.elaspedTimeUntilSpawnBlocks)
+	{
+		m_levelCollapser.collidableBlocksSpawning = true;
+	}
+	else if (m_levelCollapser.collidableBlocksSpawning && m_elaspedTime >= m_levelCollapser.timeBetweenBlockPlacement)
+	{
+		m_elaspedTime = 0.0f;
+		placeNextCollidableTile();
+	}
+
 	//Clients To Remove
 	for (auto clientToRemove = m_clientsToRemove.begin(); clientToRemove != m_clientsToRemove.end();)
 	{
