@@ -4,6 +4,8 @@
 #include "CollidableTile.h"
 #include "PlayerServer.h"
 #include "BombServer.h"
+#include "TileID.h"
+#include "TileLayer.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
@@ -31,9 +33,8 @@ public:
 	const PlayerServer* getPlayer(int ID) const;
 	const BombServer* getBomb(sf::Vector2f position) const;
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
+	const std::vector<TileLayer>& getTileLayers() const;
 	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
-	eCollidableTile getCollidableTile(sf::Vector2i position) const;
-	const std::vector<GameObject>& getGameObjects() const;
 	const std::vector<BombServer>& getBombs() const;
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
@@ -50,6 +51,7 @@ private:
 	std::vector<std::unique_ptr<PlayerServer>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
+	std::vector<TileLayer> m_tileLayers;
 	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	std::vector<GameObject> m_gameObjectQueue;
 	std::vector<GameObject> m_gameObjects;
@@ -75,4 +77,6 @@ private:
 	void startGame();
 	void changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile);
 	eCollidableTile getCollidableTile(sf::Vector2f position);
+
+	eTileID getTileInTileLayer(const std::string& tileLayerName, sf::Vector2f position) const;
 };

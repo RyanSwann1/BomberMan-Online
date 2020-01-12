@@ -12,6 +12,7 @@
 #include <memory>
 #include <SFML/Network.hpp>
 
+enum class eTileID;
 struct ServerMessageInitialGameData;
 class Level : private NonCopyable
 {

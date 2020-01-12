@@ -23,6 +23,7 @@
     <ClCompile Include="..\Shared\GameObject.cpp" />
     <ClCompile Include="..\Shared\Player.cpp" />
     <ClCompile Include="..\Shared\Resources.cpp" />
+    <ClCompile Include="..\Shared\Shared.cpp" />
     <ClCompile Include="..\Shared\Texture.cpp" />
     <ClCompile Include="..\Shared\Timer.cpp" />
     <ClCompile Include="..\Shared\Utilities.cpp" />
@@ -50,7 +51,9 @@
     <ClInclude Include="..\Shared\Resources.h" />
     <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
+    <ClInclude Include="..\Shared\Shared.h" />
     <ClInclude Include="..\Shared\Texture.h" />
+    <ClInclude Include="..\Shared\TileID.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
     <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\Utilities.h" />

@@ -155,6 +155,7 @@
     <ClInclude Include="..\Shared\ServerMessages.h" />
     <ClInclude Include="..\Shared\ServerMessageType.h" />
     <ClInclude Include="..\Shared\Texture.h" />
+    <ClInclude Include="..\Shared\TileID.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
     <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\Utilities.h" />

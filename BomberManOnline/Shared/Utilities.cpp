@@ -2,6 +2,7 @@
 #include "CollidableTile.h"
 #include "Box.h"
 #include "Direction.h"
+#include "TileID.h"
 #include <algorithm>
 #include <assert.h>
 #include <random>
@@ -34,6 +35,47 @@ eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosi
 		assert(sourcePosition.x != targetPosition.x);
 		return (targetPosition.x < sourcePosition.x ? eDirection::eLeft : eDirection::eRight);
 	}
+}
+
+bool Utilities::isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2f position, eTileID tileID)
+{
+	switch (tileID)
+	{
+	case eTileID::eBox:
+		//see if box at position is in "Box Layer";
+		break;
+
+	case eTileID::eWall:
+		//See if Wall is at position in "Wall Layer";
+
+		break;
+	}
+}
+
+bool Utilities::isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2i position, eTileID tileID)
+{
+	switch (tileID)
+	{
+	case eTileID::eBox:
+		//see if box at position is in "Box Layer";
+		break;
+
+	case eTileID::eWall:
+		//See if Wall is at position in "Wall Layer";
+
+		break;
+	}
+}
+
+bool Utilities::isTileOnPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize)
+{
+	assert(position.x >= 0 && position.x < (levelSize.x * tileSize.x) && position.y >= 0 && position.y < (levelSize.y * tileSize.x));
+	if (position.x >= 0 && position.x < levelSize.x * tileSize.y && position.y >= 0 && position.y < levelSize.y * tileSize.y)
+	{
+		return collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] == eCollidableTile::eCollidable;
+	}
+
+	return false;
 }
 
 bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize)
@@ -121,6 +163,14 @@ sf::Vector2f Utilities::getClosestGridPosition(sf::Vector2f position, sf::Vector
 
 	sf::Vector2f pos((static_cast<int>(centerPosition.x / tileSize.x)) * tileSize.x, static_cast<int>((centerPosition.y / tileSize.y)) * tileSize.y);
 	return pos;
+}
+
+void Utilities::getClosestGridPosition(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i& newPosition)
+{
+	sf::Vector2f centerPosition(position.x + (tileSize.x / 2.0f), position.y + (tileSize.y / 2.0f));
+
+	newPosition.x = static_cast<int>(centerPosition.x / tileSize.x);
+	newPosition.y = static_cast<int>(centerPosition.y / tileSize.y);
 }
 
 sf::Vector2i Utilities::convertToGridPosition(sf::Vector2f position, sf::Vector2i tileSize)

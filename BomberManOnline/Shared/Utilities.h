@@ -5,11 +5,18 @@
 
 enum class eDirection;
 enum class eCollidableTile;
+class TileLayer;
+enum class eTileID;
 namespace Utilities
 {
 	int distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
 	int distance(sf::Vector2i source, sf::Vector2i target);
 	eDirection getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition);
+
+	bool isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2f position, eTileID tileID);
+	bool isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2i position, eTileID tileID);
+	bool isTileOnPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i leveLSize, sf::Vector2i tileSize);
+
 
 	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);
@@ -17,6 +24,7 @@ namespace Utilities
 
 	sf::Vector2f Interpolate(sf::Vector2f pointA, sf::Vector2f pointB, float factor);
 	sf::Vector2f getClosestGridPosition(sf::Vector2f position, sf::Vector2i tileSize);
+	void getClosestGridPosition(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i& newPosition);
 
 	sf::Vector2i convertToGridPosition(sf::Vector2f position, sf::Vector2i tileSize);
 	sf::Vector2f convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize);

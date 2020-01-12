@@ -8,6 +8,7 @@
 #include "PlayerServer.h"
 #include "PlayerServerAI.h"
 #include "PathFinding.h"
+#include "Shared.h"
 
 constexpr size_t MAX_PLAYERS = 2;
 constexpr int MAX_AI_PLAYERS = 1;
@@ -107,24 +108,24 @@ const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 	return m_players;
 }
 
+const std::vector<TileLayer>& Server::getTileLayers() const
+{
+	return m_tileLayers;
+}
+
 const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() const
 {
 	return m_collisionLayer;
 }
 
-eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
-{
-	assert(position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y);
-	if (position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y)
-	{
-		return m_collisionLayer[position.y][position.x];
-	}
-}
-
-const std::vector<GameObject>& Server::getGameObjects() const
-{
-	return m_gameObjects;
-}
+//eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
+//{
+//	assert(position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y);
+//	if (position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y)
+//	{
+//		return m_collisionLayer[position.y][position.x];
+//	}
+//}
 
 const std::vector<BombServer>& Server::getBombs() const
 {
@@ -400,9 +401,9 @@ void Server::update(float frameTime)
 			explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
 			for (int x = explosionPosition.x + m_tileSize.x; x <= explosionPosition.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, explosionPosition.y));
-				onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
+				explosionPosition = sf::Vector2f(x, explosionPosition.y);
+				onBombExplosion(explosionPosition);
+				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -410,9 +411,9 @@ void Server::update(float frameTime)
 
 			for (int x = explosionPosition.x - m_tileSize.x; x >= explosionPosition.x - (m_tileSize.x * explosionSize); x -= m_tileSize.x)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(x, explosionPosition.y));
-				onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
+				explosionPosition = sf::Vector2f(x, explosionPosition.y);
+				onBombExplosion(explosionPosition);
+				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -420,9 +421,9 @@ void Server::update(float frameTime)
 
 			for (int y = explosionPosition.y - m_tileSize.y; y >= explosionPosition.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(explosionPosition.x, y));
-				onBombExplosion(sf::Vector2f(explosionPosition.x, y));
-				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
+				explosionPosition = sf::Vector2f(explosionPosition.x, y);
+				onBombExplosion(explosionPosition);
+				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -430,9 +431,9 @@ void Server::update(float frameTime)
 
 			for (int y = explosionPosition.y + m_tileSize.y; y <= explosionPosition.y + (m_tileSize.y * explosionSize); y += m_tileSize.y)
 			{
-				eCollidableTile collidableTile = getCollidableTile(sf::Vector2f(explosionPosition.x, y));
-				onBombExplosion(sf::Vector2f(explosionPosition.x, y));
-				if (collidableTile == eCollidableTile::eBox || collidableTile == eCollidableTile::eWall)
+				explosionPosition = sf::Vector2f(explosionPosition.x, y);
+				onBombExplosion(explosionPosition);
+				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -470,7 +471,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 
 		m_gameObjects.erase(gameObject);
 	}
-	else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+	else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, m_tileSize))
 	{
 		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
 
@@ -603,4 +604,18 @@ eCollidableTile Server::getCollidableTile(sf::Vector2f position)
 	{
 		return m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)];
 	}
+}
+
+eTileID Server::getTileInTileLayer(const std::string& tileLayerName, sf::Vector2f position) const
+{
+	auto tileLayer = std::find_if(m_tileLayers.cbegin(), m_tileLayers.cend(), [tileLayerName](const auto& tileLayer)
+	{ return tileLayer.m_name == tileLayerName; });
+	assert(tileLayer != m_tileLayers.cend());
+	if (tileLayer != m_tileLayers.cend())
+	{
+		sf::Vector2i positionOnGrid = Utilities::convertToGridPosition(position, m_tileSize);
+		//tileLayer->m_tileLayer[positionOnGrid.y][positionOnGrid.x]
+	}
+
+	return eTileID();
 }
