@@ -75,7 +75,10 @@
     <ClCompile Include="src\GameObjectClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\Shared.cpp">
+    <ClCompile Include="src\TileLayer.cpp">
+      <Filter>Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\TileManager.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
   </ItemGroup>
@@ -152,7 +155,7 @@
     <ClInclude Include="..\Shared\TileID.h">
       <Filter>Shared</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Shared.h">
+    <ClInclude Include="..\Shared\TileManager.h">
       <Filter>Shared</Filter>
     </ClInclude>
   </ItemGroup>

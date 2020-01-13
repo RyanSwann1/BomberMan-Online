@@ -58,7 +58,7 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
-			Shared::changeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition);
+			Shared::removeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition, tileSize);
 			
 			break;
 		}
@@ -71,18 +71,18 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 	for (int x = position.x - tileSize.x; x >= position.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, position.y);
-		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition))
+		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
-			Shared::changeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition);
+			Shared::removeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition, tileSize);
 
 			break;
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -91,18 +91,18 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 	for (int y = position.y - tileSize.y; y >= position.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(position.x, y);
-		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition))
+		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
-			Shared::changeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition);
+			Shared::removeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition, tileSize);
 
 			break;
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -111,43 +111,43 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 	for (int y = position.y + tileSize.y; y <= position.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(position.x, y);
-		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition))
+		if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, tileSize))
 		{
 			addExplosionObject(explosionPosition);
-			Shared::changeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition);
+			Shared::removeTileAtPosition(m_tileLayers, m_collisionLayer, eTileID::eBlank, explosionPosition, tileSize);
 
 			break;
 		}
-		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition))
+		else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eWall, explosionPosition, tileSize))
 		{
 			break;
 		}
 	}
 }
-
-eCollidableTile Level::getCollidableTile(sf::Vector2i position) const
-{
-	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
-	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
-	{
-		return m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x];
-	}
-}
-
-void Level::changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile)
-{
-	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
-	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
-	{
-		m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x] = collidableTile;
-	}
-}
+//
+//eCollidableTile Level::getCollidableTile(sf::Vector2i position) const
+//{
+//	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+//	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
+//	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
+//	{
+//		return m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x];
+//	}
+//}
+//
+//void Level::changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile)
+//{
+//	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+//	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
+//	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
+//	{
+//		m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x] = collidableTile;
+//	}
+//}
 
 void Level::addExplosionObject(sf::Vector2f position)
 {
@@ -282,22 +282,6 @@ void Level::render(sf::RenderWindow & window) const
 			}
 		}
 	}
-
-	////Collision Layer
-	//for (int y = 0; y < m_levelSize.y; y++)
-	//{
-	//	for (int x = 0; x < m_levelSize.x; x++)
-	//	{
-	//		const auto& tileSheet = Textures::getInstance().getTileSheet();
-	//		if (getCollidableTile(sf::Vector2i(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y)) == eCollidableTile::eBox)
-	//		{
-	//			sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eBox)));
-	//			boxSprite.setPosition(sf::Vector2f(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y));
-
-	//			window.draw(boxSprite);
-	//		}
-	//	}
-	//}
 
 	//Players
 	for (const auto& player : m_players)

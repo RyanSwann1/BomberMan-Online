@@ -11,14 +11,9 @@ namespace Utilities
 {
 	int distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
 	int distance(sf::Vector2i source, sf::Vector2i target);
+
 	eDirection getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition);
 
-	bool isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2f position, eTileID tileID);
-	bool isTileOnPosition(const std::vector<TileLayer>& tileLayers, sf::Vector2i position, eTileID tileID);
-	bool isTileOnPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i leveLSize, sf::Vector2i tileSize);
-
-
-	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);
 	bool isTargetInDirectSight(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, eDirection facingDirection);
 
@@ -30,8 +25,6 @@ namespace Utilities
 	sf::Vector2f convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize);
 
 	bool traverseDirection(sf::Vector2f& position, sf::Vector2f endPosition, sf::Vector2i tileSize, eDirection direction);
-
-	bool isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSizedo);
 
 	int getRandomNumber(int min, int max);
 }

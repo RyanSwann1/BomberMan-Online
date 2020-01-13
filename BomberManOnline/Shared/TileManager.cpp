@@ -1,34 +1,5 @@
-#include "Shared.h"
-#include "TileID.h"
-#include "Utilities.h"
-#include "CollidableTile.h"
-#include <string>
-#include <algorithm>
-#include <assert.h>
+#include "TileManager.h"
 
-TileLayer* getTileLayer(std::vector<TileLayer>& tileLayers, const std::string& tileLayerName)
-{
-	auto tileLayer = std::find_if(tileLayers.begin(), tileLayers.end(), [tileLayerName](const auto& tileLayer) {return tileLayer.m_name == tileLayerName; });
-	assert(tileLayer != tileLayers.end());
-	if (tileLayer != tileLayers.end())
-	{
-		return &(*tileLayer);
-	}
-
-	return nullptr;
-}
-
-eTileID getTileAtPosition(const std::vector<TileLayer>& tileLayers, const std::string& tileLayerName, sf::Vector2i position)
-{
-	auto tileLayer = std::find_if(tileLayers.cbegin(), tileLayers.cend(), [tileLayerName](const auto& tileLayer) {return tileLayer.m_name == tileLayerName; });
-	assert(tileLayer != tileLayers.cend());
-	if (tileLayer != tileLayers.cend())
-	{
-		return tileLayer->getTile(position);
-	}
-
-	return eTileID::eBlank;
-}
 //
 //bool Shared::isTileOnPosition(const std::vector<TileLayer>& tileLayers, eTileID tile, sf::Vector2f position, sf::Vector2i tileSize)
 //{
@@ -99,3 +70,32 @@ eTileID getTileAtPosition(const std::vector<TileLayer>& tileLayers, const std::s
 //		break;
 //	}
 //}
+
+TileManager::TileManager()
+{
+}
+
+bool TileManager::isTileOnPosition(eTileID tile, sf::Vector2f position, sf::Vector2i tileSize) const
+{
+	return false;
+}
+
+bool TileManager::isTileOnPosition(eTileID tile, sf::Vector2i position) const
+{
+	return false;
+}
+
+bool TileManager::isPositionCollidable(sf::Vector2f position, sf::Vector2i tileSize) const
+{
+	return false;
+}
+
+bool TileManager::isPositionCollidable(sf::Vector2i position) const
+{
+	return false;
+}
+
+void TileManager::removeTile(eTileID tile, sf::Vector2f position, sf::Vector2i tileSize)
+{
+
+}

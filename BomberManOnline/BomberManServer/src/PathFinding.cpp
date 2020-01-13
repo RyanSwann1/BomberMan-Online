@@ -1,8 +1,9 @@
 #include "PathFinding.h"
 #include "CollidableTile.h"
 #include "Utilities.h"
-#include "Server.h"#
+#include "Server.h"
 #include "Shared.h"
+#include "TileManager.h"
 #include <math.h>
 #include <queue>
 #include <iostream>
@@ -17,13 +18,12 @@ void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vecto
 void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {	
 	sf::Vector2i adjacentPosition;
-
 	for (int x = position.x - 1; x <= position.x + 1; x += 2)
 	{
 		adjacentPosition = sf::Vector2i(x, position.y);
 
 		if (x >= 0 && x < server.getLevelSize().x && adjacentPosition != ignorePosition &&
-			!Shared::isTileCollidable(server.getCollisionLayer(), adjacentPosition))
+			 !server.getTileManager().isPositionCollidable(adjacentPosition))
 		{
 			positions.push_back(adjacentPosition);
 		}
@@ -34,7 +34,7 @@ void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2i position, const
 		adjacentPosition = sf::Vector2i(position.x, y);
 
 		if (y >= 0 && y < server.getLevelSize().y && adjacentPosition != ignorePosition &&
-			!Shared::isTileCollidable(server.getCollisionLayer(), adjacentPosition))
+			!server.getTileManager().isPositionCollidable(adjacentPosition))
 		{
 			positions.push_back(adjacentPosition);
 		}
@@ -50,7 +50,7 @@ void getNonWallAdjacentPositions(sf::Vector2i position, const Server& server, sf
 		adjacentPosition = sf::Vector2i(x, position.y);
 
 		if (x >= 0 && x < server.getLevelSize().x && adjacentPosition != ignorePosition &&
-			Shared::isTileOnPosition(server.getTileLayers(), eTileID::eWall, adjacentPosition))
+			!server.getTileManager().isTileOnPosition(eTileID::eWall, adjacentPosition))
 		{
 			positions.emplace_back(x, position.y);
 		}
@@ -61,7 +61,7 @@ void getNonWallAdjacentPositions(sf::Vector2i position, const Server& server, sf
 		adjacentPosition = sf::Vector2i(position.x, y);
 
 		if (y >= 0 && y < server.getLevelSize().x && adjacentPosition != ignorePosition &&
-			!Shared::isTileOnPosition(server.getTileLayers(), eTileID::eWall, adjacentPosition))
+			!server.getTileManager().isTileOnPosition(eTileID::eWall, adjacentPosition))
 		{
 			positions.emplace_back(position.x, y);
 		}
@@ -115,8 +115,13 @@ Graph::Graph()
 
 void Graph::addToGraph(sf::Vector2i position, sf::Vector2i lastPosition, sf::Vector2i levelSize)
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y);
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 || position.y < levelSize.y && !m_graph[position.y][position.y].isVisited())
+	assert(position.x >= 0 && position.x < levelSize.x && 
+		position.y >= 0 && position.y < levelSize.y &&
+		!m_graph[position.y][position.y].isVisited());
+	
+	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 && 
+		position.y < levelSize.y && 
+		!m_graph[position.y][position.y].isVisited())
 	{
 		m_graph[position.y][position.x] = GraphNode(lastPosition);
 	}
@@ -129,8 +134,13 @@ bool Graph::isEmpty() const
 
 sf::Vector2i Graph::getPreviousPosition(sf::Vector2i position, sf::Vector2i levelSize) const
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y && m_graph[position.y][position.x].isVisited());
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y && m_graph[position.y][position.x].isVisited())
+	assert(position.x >= 0 && position.x < levelSize.x && 
+		position.y >= 0 && position.y < levelSize.y && 
+		m_graph[position.y][position.x].isVisited());
+	
+	if (position.x >= 0 && position.x < levelSize.x && 
+		position.y >= 0 && position.y < levelSize.y && 
+		m_graph[position.y][position.x].isVisited())
 	{
 		return m_graph[position.y][position.x].getCameFrom();
 	}
@@ -138,8 +148,11 @@ sf::Vector2i Graph::getPreviousPosition(sf::Vector2i position, sf::Vector2i leve
 
 bool Graph::isPositionVisited(sf::Vector2i position, sf::Vector2i levelSize) const
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y);
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y)
+	assert(position.x >= 0 && position.x < levelSize.x && 
+		position.y >= 0 && position.y < levelSize.y);
+
+	if (position.x >= 0 && position.x < levelSize.x && 
+		position.y >= 0 && position.y < levelSize.y)
 	{
 		return m_graph[position.y][position.x].isVisited();
 	}
@@ -226,7 +239,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
-			if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize)) 
 			{
 				break;
 			}
@@ -240,7 +253,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
-			if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 			{
 				break;
 			}
@@ -254,7 +267,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
-			if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 			{
 				break;
 			}
@@ -268,7 +281,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
-			if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 			{
 				break;
 			}
@@ -293,7 +306,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
-		if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -307,7 +320,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
-		if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -321,7 +334,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
-		if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -335,7 +348,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
-		if (Shared::isTileCollidable(server.getCollisionLayer(), explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
 		{
 			break;
 		}
@@ -380,7 +393,7 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 			if (!m_graph.isPositionVisited(adjacentPositions, server.getLevelSize()))
 			{
 				if (boxSelection.size() < static_cast<size_t>(maxBoxOptions) &&
-					Shared::isTileOnPosition(server.getTileLayers(), eTileID::eBox, adjacentPositions))
+					server.getTileManager().isTileOnPosition(eTileID::eBox, adjacentPositions))
 				{
 					boxSelection.push_back(adjacentPositions);
 				}
@@ -695,19 +708,19 @@ void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const
 	sf::Vector2i positionOnGrid = Utilities::convertToGridPosition(position, server.getTileSize());
 	sf::Vector2i tileSize = server.getTileSize();
 
-	for (int x = position.x - tileSize.x; x <= position.x + tileSize.x; x += tileSize.x)
+	for (int x = positionOnGrid.x - 1; x <= positionOnGrid.x + 1; x += 2)
 	{
-		if (x >= 0 && x < server.getLevelSize().x && !Shared::isTileCollidable(server.getCollisionLayer(), { x, position.y }, tileSize))
+		if (x >= 0 && x < server.getLevelSize().x && !server.getTileManager().isPositionCollidable({ x, positionOnGrid.y }))
 		{
-			positions.emplace_back(x, position.y);
+			positions.push_back(Utilities::convertToWorldPosition({ x, positionOnGrid.y }, tileSize));
 		}
 	}
 
 	for (int y = positionOnGrid.y - 1; y <= positionOnGrid.y + 1; y += 2)
 	{
-		if (y >= 0 && y < server.getLevelSize().y && !Shared::isTileCollidable(server.getCollisionLayer(), sf::Vector2f(positionOnGrid.x, y), tileSize))
+		if (y >= 0 && y < server.getLevelSize().y && !server.getTileManager().isPositionCollidable({ positionOnGrid.x, y }))
 		{
-			positions.push_back(Utilities::convertToWorldPosition({ positionOnGrid.x, y }, server.getTileSize()));
+			positions.push_back(Utilities::convertToWorldPosition({ positionOnGrid.x, y }, tileSize));
 		}
 	}
 }
@@ -724,7 +737,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int x = sourcePosition.x; x >= sourcePosition.x - (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
-			if (!Shared::isTileCollidable(server.getCollisionLayer(), furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
 			{
 				x -= tileSize.x;
 			}
@@ -741,7 +754,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int x = sourcePosition.x; x < sourcePosition.x + (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
-			if (!Shared::isTileCollidable(server.getCollisionLayer(), furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
 			{
 				x += tileSize.x;
 			}
@@ -758,7 +771,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int y = sourcePosition.y; y >= sourcePosition.y - (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
-			if (!Shared::isTileCollidable(server.getCollisionLayer(), furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
 			{
 				y -= tileSize.y;
 			}
@@ -775,7 +788,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int y = sourcePosition.y; y < sourcePosition.y + (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
-			if (!Shared::isTileCollidable(server.getCollisionLayer(), furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
 			{
 				y += tileSize.y;
 			}

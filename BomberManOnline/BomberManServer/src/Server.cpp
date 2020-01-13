@@ -20,7 +20,6 @@ Server::Server()
 	m_players(),
 	m_clientsToRemove(),
 	m_spawnPositions(),
-	m_collisionLayer(),
 	m_gameObjects(),
 	m_levelName(),
 	m_levelSize(),
@@ -41,8 +40,8 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
-		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
-			server->m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
+		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize, server->m_tileManager.m_tileLayers, 
+			server->m_tileManager.m_collisionLayer, server->m_spawnPositions, server->m_tileSize))
 		{
 			delete server;
 			return std::unique_ptr<Server>();
@@ -103,19 +102,14 @@ const BombServer* Server::getBomb(sf::Vector2f position) const
 	return (bomb != m_bombs.cend() ? &(*bomb) : nullptr);
 }
 
+const TileManager& Server::getTileManager() const
+{
+	return m_tileManager;
+}
+
 const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 {
 	return m_players;
-}
-
-const std::vector<TileLayer>& Server::getTileLayers() const
-{
-	return m_tileLayers;
-}
-
-const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() const
-{
-	return m_collisionLayer;
 }
 
 //eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
@@ -296,7 +290,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
-	if (Utilities::isPositionCollidable(m_collisionLayer, playerMoveMessage.newPosition, m_tileSize))
+	if (m_tileManager.isPositionCollidable(playerMoveMessage.newPosition, m_tileSize)) 
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
@@ -314,7 +308,7 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	if (!Utilities::isPositionCollidable(m_collisionLayer, placementPosition, m_tileSize) && client.placeBomb())
+	if (!m_tileManager.isPositionCollidable(placementPosition, m_tileSize)  && client.placeBomb())
 	{
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << placementPosition.x << placementPosition.y;
@@ -403,7 +397,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(x, explosionPosition.y);
 				onBombExplosion(explosionPosition);
-				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -413,7 +407,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(x, explosionPosition.y);
 				onBombExplosion(explosionPosition);
-				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -423,7 +417,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(explosionPosition.x, y);
 				onBombExplosion(explosionPosition);
-				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -433,7 +427,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(explosionPosition.x, y);
 				onBombExplosion(explosionPosition);
-				if (Shared::isTileCollidable(m_collisionLayer, explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
 				{
 					break;
 				}
@@ -471,9 +465,9 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 
 		m_gameObjects.erase(gameObject);
 	}
-	else if (Shared::isTileOnPosition(m_tileLayers, eTileID::eBox, explosionPosition, m_tileSize))
+	else if(m_tileManager.isTileOnPosition(eTileID::eBox, explosionPosition, m_tileSize))
 	{
-		changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
+		m_tileManager.removeTile(eTileID::eBox, explosionPosition, m_tileSize);
 
 		//Spawn PickUp
 		if (Utilities::getRandomNumber(0, 10) >= 9)
@@ -588,34 +582,11 @@ void Server::startGame()
 	broadcastMessage(packetToSend);
 }
 
-void Server::changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile)
-{
-	assert(position.x >= 0 && position.x < m_levelSize.x * m_tileSize.x && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y);
-	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.x && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
-	{
-		m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)] = collidableTile;
-	}
-}
-
-eCollidableTile Server::getCollidableTile(sf::Vector2f position) 
-{
-	assert(position.x >= 0 && position.x < (m_levelSize.x * m_tileSize.x) && position.y >= 0 && position.y < (m_levelSize.y * m_tileSize.x));
-	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.y && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
-	{
-		return m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)];
-	}
-}
-
-eTileID Server::getTileInTileLayer(const std::string& tileLayerName, sf::Vector2f position) const
-{
-	auto tileLayer = std::find_if(m_tileLayers.cbegin(), m_tileLayers.cend(), [tileLayerName](const auto& tileLayer)
-	{ return tileLayer.m_name == tileLayerName; });
-	assert(tileLayer != m_tileLayers.cend());
-	if (tileLayer != m_tileLayers.cend())
-	{
-		sf::Vector2i positionOnGrid = Utilities::convertToGridPosition(position, m_tileSize);
-		//tileLayer->m_tileLayer[positionOnGrid.y][positionOnGrid.x]
-	}
-
-	return eTileID();
-}
+//eCollidableTile Server::getCollidableTile(sf::Vector2f position) 
+//{
+//	assert(position.x >= 0 && position.x < (m_levelSize.x * m_tileSize.x) && position.y >= 0 && position.y < (m_levelSize.y * m_tileSize.x));
+//	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.y && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
+//	{
+//		return m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)];
+//	}
+//}

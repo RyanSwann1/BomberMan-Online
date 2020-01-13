@@ -16,5 +16,6 @@ namespace XMLParser
 		std::vector<sf::Vector2f>& spawnPositions);
 
 	bool loadLevelAsServer(const std::string& levelName, sf::Vector2i& levelSize,
-		std::vector<std::vector<eCollidableTile>>& collisionLayer, std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i& tileSize);
+		std::vector<TileLayer>& tileLayers, std::vector<std::vector<eCollidableTile>>& collisionLayer,
+		std::vector<sf::Vector2f>& spawnPositions, sf::Vector2i& tileSize);
 }

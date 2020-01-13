@@ -1,16 +1,17 @@
 #pragma once
 
+#include "TileID.h"
 #include <vector>
-#include <utility>
 #include <string>
+#include <SFML/Graphics.hpp>
 
 struct TileLayer
 {
-	TileLayer(std::vector<std::vector<int>>&& tileLayer, std::string&& name)
-		: m_tileLayer(std::move(tileLayer)),
-		m_name(std::move(name))
-	{}
+	TileLayer(std::vector<std::vector<int>>&& tileLayer, std::string&& name);
 
-	const std::vector<std::vector<int>> m_tileLayer;
+	eTileID getTile(sf::Vector2i position) const;
+	void changeTile(sf::Vector2i position, eTileID newTileID);
+
+	std::vector<std::vector<int>> m_tileLayer;
 	const std::string m_name;
 };

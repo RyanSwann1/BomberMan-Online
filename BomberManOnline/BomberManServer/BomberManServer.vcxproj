@@ -128,6 +128,8 @@
     <ClCompile Include="..\Shared\Player.cpp" />
     <ClCompile Include="..\Shared\Resources.cpp" />
     <ClCompile Include="..\Shared\Texture.cpp" />
+    <ClCompile Include="..\Shared\TileLayer.cpp" />
+    <ClCompile Include="..\Shared\TileManager.cpp" />
     <ClCompile Include="..\Shared\Timer.cpp" />
     <ClCompile Include="..\Shared\Utilities.cpp" />
     <ClCompile Include="..\Shared\XMLParser\Base64.cpp" />
@@ -157,6 +159,7 @@
     <ClInclude Include="..\Shared\Texture.h" />
     <ClInclude Include="..\Shared\TileID.h" />
     <ClInclude Include="..\Shared\TileLayer.h" />
+    <ClInclude Include="..\Shared\TileManager.h" />
     <ClInclude Include="..\Shared\Timer.h" />
     <ClInclude Include="..\Shared\Utilities.h" />
     <ClInclude Include="..\Shared\XMLParser\Base64.h" />
