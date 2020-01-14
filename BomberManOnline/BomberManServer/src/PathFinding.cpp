@@ -84,8 +84,8 @@ Graph::Graph()
 
 void Graph::addToGraph(sf::Vector2i position, sf::Vector2i lastPosition, sf::Vector2i levelSize)
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y);
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 || position.y < levelSize.y && !m_graph[position.y][position.y].isVisited())
+	assert(Utilities::isPositionInLevelBounds(position, levelSize));
+	if (Utilities::isPositionInLevelBounds(position, levelSize) && !m_graph[position.y][position.x].isVisited())
 	{
 		m_graph[position.y][position.x] = GraphNode(lastPosition);
 	}
@@ -98,8 +98,8 @@ bool Graph::isEmpty() const
 
 sf::Vector2i Graph::getPreviousPosition(sf::Vector2i position, sf::Vector2i levelSize) const
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y && m_graph[position.y][position.x].isVisited());
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y && m_graph[position.y][position.x].isVisited())
+	assert(Utilities::isPositionInLevelBounds(position, levelSize) && m_graph[position.y][position.x].isVisited());
+	if (Utilities::isPositionInLevelBounds(position, levelSize) && m_graph[position.y][position.x].isVisited())
 	{
 		return m_graph[position.y][position.x].getCameFrom();
 	}
@@ -107,8 +107,8 @@ sf::Vector2i Graph::getPreviousPosition(sf::Vector2i position, sf::Vector2i leve
 
 bool Graph::isPositionVisited(sf::Vector2i position, sf::Vector2i levelSize) const
 {
-	assert(position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y);
-	if (position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y)
+	assert(Utilities::isPositionInLevelBounds(position, levelSize)); 
+	if (Utilities::isPositionInLevelBounds(position, levelSize))
 	{
 		return m_graph[position.y][position.x].isVisited();
 	}
@@ -140,6 +140,7 @@ void Graph::resetGraph(sf::Vector2i levelSize)
 	}
 }
 
+//Path Finding
 bool PathFinding::isPositionReachable(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, const Server& server)
 {
 	if (sourcePosition == targetPosition)

@@ -34,6 +34,8 @@ public:
 
 private:
 	std::vector<std::vector<GraphNode>> m_graph;
+
+
 };
 
 enum class eDirection;

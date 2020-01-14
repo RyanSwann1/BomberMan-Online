@@ -114,8 +114,8 @@ const std::vector<std::vector<eCollidableTile>>& Server::getCollisionLayer() con
 
 eCollidableTile Server::getCollidableTile(sf::Vector2i position) const
 {
-	assert(position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y);
-	if (position.x >= 0 && position.x < m_levelSize.x && position.y >= 0 && position.y < m_levelSize.y)
+	assert(Utilities::isPositionInLevelBounds(position, m_levelSize));
+	if (Utilities::isPositionInLevelBounds(position, m_levelSize))
 	{
 		return m_collisionLayer[position.y][position.x];
 	}
@@ -271,8 +271,8 @@ void Server::kickBombInDirection(sf::Vector2f bombPosition, sf::Vector2f newPosi
 
 void Server::placeBomb(sf::Vector2f position, int explosionRange)
 {
-	assert(position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y);
-	if (position.x >= 0 && position.y >= 0 && position.x <= m_levelSize.x * m_tileSize.x && position.y <= m_levelSize.y * m_tileSize.y)
+	assert(Utilities::isPositionInLevelBounds(position, m_tileSize, m_levelSize));
+	if (Utilities::isPositionInLevelBounds(position, m_tileSize, m_levelSize));
 	{
 		m_bombs.emplace_back(position, explosionRange);
 	}
@@ -589,18 +589,20 @@ void Server::startGame()
 
 void Server::changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile)
 {
-	assert(position.x >= 0 && position.x < m_levelSize.x * m_tileSize.x && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y);
-	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.x && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
+	sf::Vector2i positionOnGrid = Utilities::convertToGridPosition(position, m_tileSize);
+	assert(Utilities::isPositionInLevelBounds(positionOnGrid, m_levelSize));
+	if (Utilities::isPositionInLevelBounds(positionOnGrid, m_levelSize))
 	{
-		m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)] = collidableTile;
+		m_collisionLayer[positionOnGrid.y][positionOnGrid.x] = collidableTile;
 	}
 }
 
 eCollidableTile Server::getCollidableTile(sf::Vector2f position) 
 {
-	assert(position.x >= 0 && position.x < (m_levelSize.x * m_tileSize.x) && position.y >= 0 && position.y < (m_levelSize.y * m_tileSize.x));
-	if (position.x >= 0 && position.x < m_levelSize.x * m_tileSize.y && position.y >= 0 && position.y < m_levelSize.y * m_tileSize.y)
+	sf::Vector2i positionOnGrid = Utilities::convertToGridPosition(position, m_tileSize);
+	assert(Utilities::isPositionInLevelBounds(positionOnGrid, m_levelSize));
+	if (Utilities::isPositionInLevelBounds(positionOnGrid, m_levelSize))
 	{
-		return m_collisionLayer[static_cast<int>(position.y / m_tileSize.y)][static_cast<int>(position.x / m_tileSize.x)];
+		return m_collisionLayer[positionOnGrid.y][positionOnGrid.x];
 	}
 }

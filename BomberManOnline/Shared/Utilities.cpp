@@ -36,6 +36,17 @@ eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosi
 	}
 }
 
+bool Utilities::isPositionInLevelBounds(sf::Vector2i position, sf::Vector2i levelSize)
+{
+	return position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y;
+}
+
+bool Utilities::isPositionInLevelBounds(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i levelSize)
+{
+	return position.x >= 0 && position.x < levelSize.x * tileSize.x && 
+		position.y >= 0 && position.y < levelSize.y * tileSize.y;
+}
+
 bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize)
 {
 	sf::Vector2i roundedPosition(position.x / tileSize.x, position.y / tileSize.y);
