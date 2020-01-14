@@ -239,7 +239,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
-			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize)) 
+			if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize))) 
 			{
 				break;
 			}
@@ -253,7 +253,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 		{
 			explosionPosition = sf::Vector2f(bombPosition.x, y);
-			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 			{
 				break;
 			}
@@ -267,7 +267,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
-			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 			{
 				break;
 			}
@@ -281,7 +281,7 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 		{
 			explosionPosition = sf::Vector2f(x, bombPosition.y);
-			if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+			if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 			{
 				break;
 			}
@@ -306,7 +306,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int x = bombPosition.x; x >= bombPosition.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
-		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 		{
 			break;
 		}
@@ -320,7 +320,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int x = bombPosition.x; x <= bombPosition.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
 		explosionPosition = sf::Vector2f(x, bombPosition.y);
-		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 		{
 			break;
 		}
@@ -334,7 +334,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int y = bombPosition.y; y >= bombPosition.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
-		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 		{
 			break;
 		}
@@ -348,7 +348,7 @@ bool PathFinding::isPositionInRangeOfBombDetonation(sf::Vector2f sourcePosition,
 	for (int y = bombPosition.y; y <= bombPosition.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
 		explosionPosition = sf::Vector2f(bombPosition.x, y);
-		if (server.getTileManager().isPositionCollidable(explosionPosition, tileSize))
+		if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 		{
 			break;
 		}
@@ -737,7 +737,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int x = sourcePosition.x; x >= sourcePosition.x - (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
-			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(furthestPosition, tileSize)))
 			{
 				x -= tileSize.x;
 			}
@@ -754,7 +754,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int x = sourcePosition.x; x < sourcePosition.x + (tileSize.x * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(x, sourcePosition.y);
-			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(furthestPosition, tileSize)))
 			{
 				x += tileSize.x;
 			}
@@ -771,7 +771,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int y = sourcePosition.y; y >= sourcePosition.y - (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
-			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(furthestPosition, tileSize)))
 			{
 				y -= tileSize.y;
 			}
@@ -788,7 +788,7 @@ sf::Vector2f PathFinding::getFurthestNonCollidablePosition(sf::Vector2f sourcePo
 		for (int y = sourcePosition.y; y < sourcePosition.y + (tileSize.y * maxDistance);)
 		{
 			furthestPosition = sf::Vector2f(sourcePosition.x, y);
-			if (!server.getTileManager().isPositionCollidable(furthestPosition, tileSize))
+			if (!server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(furthestPosition, tileSize)))
 			{
 				y += tileSize.y;
 			}

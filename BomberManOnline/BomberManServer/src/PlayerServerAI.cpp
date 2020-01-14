@@ -109,8 +109,8 @@ void PlayerServerAI::handleAIStates(float frameTime)
 		}
 		else if (!isMoving() && !m_pathToTile.empty())
 		{
-			if (!m_pathToTile.empty() && !Utilities::isPositionNeighbouringBox(m_server.getCollisionLayer(), m_pathToTile.front(),
-				m_server.getLevelSize(), m_server.getTileSize()))
+			if (!m_pathToTile.empty() && 
+				m_server.getTileManager().isPositionAdjacentToBox(Utilities::convertToGridPosition(m_pathToTile.front(), m_server.getTileSize()))) 
 			{
 				m_currentState = eAIState::eMakeDecision;
 			}

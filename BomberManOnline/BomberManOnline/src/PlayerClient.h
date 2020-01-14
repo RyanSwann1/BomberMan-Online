@@ -12,6 +12,7 @@ struct MovementPoint
 	eDirection moveDirection;
 };
 
+class TileManager;
 enum class eCollidableTile;
 struct MovementPoint;
 class PlayerClient : public Player
@@ -22,7 +23,7 @@ public:
 	void update(float deltaTime) override final;
 	void render(sf::RenderWindow& window) const;
 
-	void setNewPosition(sf::Vector2f newPosition, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i tileSize,
+	void setNewPosition(sf::Vector2f newPosition, const TileManager& tileManager, sf::Vector2i tileSize,
 		std::vector<MovementPoint>& localPlayerPreviousPositions);
 	void stopAtPosition(sf::Vector2f position);
 

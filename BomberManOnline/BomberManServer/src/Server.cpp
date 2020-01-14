@@ -290,7 +290,7 @@ void Server::broadcastMessage(sf::Packet & packetToSend)
 
 void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage)
 {
-	if (m_tileManager.isPositionCollidable(playerMoveMessage.newPosition, m_tileSize)) 
+	if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(playerMoveMessage.newPosition, m_tileSize))) 
 	{
 		sf::Packet packetToSend;
 		ServerMessageInvalidMove invalidMoveMessage(playerMoveMessage.newPosition, client.getPreviousPosition());
@@ -308,7 +308,7 @@ void Server::setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayer
 
 void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPosition)
 {
-	if (!m_tileManager.isPositionCollidable(placementPosition, m_tileSize)  && client.placeBomb())
+	if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(placementPosition, m_tileSize))  && client.placeBomb())
 	{
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::ePlaceBomb << placementPosition.x << placementPosition.y;
@@ -397,7 +397,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(x, explosionPosition.y);
 				onBombExplosion(explosionPosition);
-				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 				{
 					break;
 				}
@@ -407,7 +407,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(x, explosionPosition.y);
 				onBombExplosion(explosionPosition);
-				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 				{
 					break;
 				}
@@ -417,7 +417,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(explosionPosition.x, y);
 				onBombExplosion(explosionPosition);
-				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 				{
 					break;
 				}
@@ -427,7 +427,7 @@ void Server::update(float frameTime)
 			{
 				explosionPosition = sf::Vector2f(explosionPosition.x, y);
 				onBombExplosion(explosionPosition);
-				if (m_tileManager.isPositionCollidable(explosionPosition, m_tileSize))
+				if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 				{
 					break;
 				}
@@ -465,9 +465,9 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 
 		m_gameObjects.erase(gameObject);
 	}
-	else if(m_tileManager.isTileOnPosition(eTileID::eBox, explosionPosition, m_tileSize))
+	else if(m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 	{
-		m_tileManager.removeTile(eTileID::eBox, explosionPosition, m_tileSize);
+		m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, m_tileSize));
 
 		//Spawn PickUp
 		if (Utilities::getRandomNumber(0, 10) >= 9)

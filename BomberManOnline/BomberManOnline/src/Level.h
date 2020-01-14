@@ -1,12 +1,12 @@
 #pragma once
 
 #include "NonCopyable.h"
-#include "TileLayer.h"
 #include "Box.h"
 #include "GameObjectClient.h"
 #include "PlayerClient.h"
 #include "CollidableTile.h"
 #include "Direction.h"
+#include "TileManager.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -30,9 +30,8 @@ private:
 
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;
-	std::vector<TileLayer> m_tileLayers;
+	TileManager m_tileManager;
 	std::vector<sf::Vector2f> m_spawnPositions;
-	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
 	PlayerClient* m_localPlayer;
 	std::vector<MovementPoint> m_localPlayerPreviousPositions;
 	std::vector<std::unique_ptr<PlayerClient>> m_players;

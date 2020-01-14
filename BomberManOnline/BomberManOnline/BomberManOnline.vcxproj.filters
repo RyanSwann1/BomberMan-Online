@@ -75,10 +75,10 @@
     <ClCompile Include="src\GameObjectClient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TileLayer.cpp">
+    <ClCompile Include="..\Shared\TileManager.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\TileManager.cpp">
+    <ClCompile Include="..\Shared\TileLayer.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
   </ItemGroup>
