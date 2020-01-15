@@ -272,9 +272,7 @@ void Level::update(float deltaTime)
 	{
 		gameObject->update(deltaTime);
 
-		if (gameObject->getType() == eGameObjectType::eMovementPickUp || 
-			gameObject->getType() == eGameObjectType::eExtraBombPickUp || 
-			gameObject->getType() == eGameObjectType::eBiggerExplosionPickUp) 
+		if (gameObject->isPickUp()) 
 		{
 			sf::Vector2f pickUpPosition(gameObject->getPosition());
 			auto player = std::find_if(m_players.cbegin(), m_players.cend(), [pickUpPosition](const auto& player) 

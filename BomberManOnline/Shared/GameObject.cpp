@@ -11,6 +11,13 @@ GameObject::GameObject(sf::Vector2f startingPosition, float expirationTime, eGam
 	m_lifeTimer(expirationTime, timerActive)
 {}
 
+bool GameObject::isPickUp() const
+{
+	return (m_type == eGameObjectType::eMovementPickUp ||
+		m_type == eGameObjectType::eExtraBombPickUp ||
+		m_type == eGameObjectType::eBiggerExplosionPickUp);
+}
+
 bool GameObject::isMoving() const
 {
 	return m_position != m_newPosition;
