@@ -10,8 +10,8 @@
 #include "PathFinding.h"
 #include "TileID.h"
 
-constexpr size_t MAX_PLAYERS = 4;
-constexpr int MAX_AI_PLAYERS = 3;
+constexpr size_t MAX_PLAYERS = 1;
+constexpr int MAX_AI_PLAYERS = 0;
 const sf::Time TIME_OUT_DURATION = sf::seconds(0.032f);
 
 Server::Server()
@@ -73,7 +73,7 @@ bool Server::isPickUpAtPosition(sf::Vector2f position) const
 {
 	for (const GameObject& gameObject : m_gameObjects)
 	{
-		if (gameObject.getPosition() == position && (gameObject.isPickUp()))
+		if (gameObject.getPosition() == position && gameObject.isPickUp())
 		{
 			return true;
 		}
@@ -158,78 +158,173 @@ void Server::run()
 
 void Server::placeNextCollidableTile()
 {
-	if (getCollidableTile(m_levelCollapser.startingCollidablePlacementPosition) != eCollidableTile::eWall)
+	if (m_levelCollapser.disabled)
 	{
-		changeCollidableTile(m_levelCollapser.currentCollidablePlacementPosition, eCollidableTile::eWall);
+		return;
+	}
+
+	if (m_tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_levelCollapser.startingCollidablePlacementPosition, m_tileSize)))
+	{
+		m_tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.startingCollidablePlacementPosition, m_tileSize));
 		m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
 
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eNewCollidableTile << m_levelCollapser.currentCollidablePlacementPosition;
+		packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_levelCollapser.currentCollidablePlacementPosition;
 		broadcastMessage(packetToSend);
 	}
 	else
 	{
-		sf::Packet packetToSend;
-		switch (m_levelCollapser.collidablePlacementDirection)
+		if (m_levelCollapser.firstPass)
 		{
-		case eDirection::eRight :
-			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x + m_tileSize.x, 
-				m_levelCollapser.currentCollidablePlacementPosition.y }) == eCollidableTile::eWall)
+			switch (m_levelCollapser.collidablePlacementDirection)
 			{
-				m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
-			}
-			else
+			case eDirection::eRight:
 			{
-				m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
+				}
 			}
-			
-
 			break;
-
-		case eDirection::eLeft :
-			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x - m_tileSize.x, 
-				m_levelCollapser.currentCollidablePlacementPosition.y }) == eCollidableTile::eWall)
+			case eDirection::eDown:
 			{
-				m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
+				}
 			}
-			else
-			{
-				m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
-			}
-			
-
 			break;
-
-		case eDirection::eUp :
-			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x, 
-				m_levelCollapser.currentCollidablePlacementPosition.y - m_tileSize.y }) == eCollidableTile::eWall)
+			case eDirection::eLeft:
 			{
-				m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
+				}
 			}
-			else
-			{
-				m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
-			}
-			
-
 			break;
-
-		case eDirection::eDown :
-			if (getCollidableTile({ m_levelCollapser.currentCollidablePlacementPosition.x, 
-				m_levelCollapser.currentCollidablePlacementPosition.y + m_tileSize.y }) == eCollidableTile::eWall)
+			case eDirection::eUp:
 			{
-				m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
-			}
-			else
-			{
-				m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
-			}
-			
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount - 1)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.firstPass = false;
+					--m_levelCollapser.m_incrementAmount;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
 
+				}
+			}
 			break;
+			}
+		}
+		else
+		{
+
+			switch (m_levelCollapser.collidablePlacementDirection)
+			{
+			case eDirection::eRight:
+			{
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					--m_levelCollapser.m_incrementAmount;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
+				}
+			}
+			break;
+			case eDirection::eDown:
+			{
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
+				}
+			}
+			break;
+			case eDirection::eLeft:
+			{
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
+				}
+				else
+				{
+					m_levelCollapser.m_currentAmount = 0;
+					--m_levelCollapser.m_incrementAmount;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
+				}
+			}
+			break;
+			case eDirection::eUp:
+			{
+				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
+				{
+					++m_levelCollapser.m_currentAmount;
+					m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
+				}
+				else
+				{
+					if (m_levelCollapser.m_incrementAmount == 7)
+					{
+						m_levelCollapser.disabled = true;
+					}
+					m_levelCollapser.m_currentAmount = 0;
+					m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
+				}
+			}
+			break;
+			}
 		}
 
-		std::cout << "Sent New Block\n";
+		if (m_tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize)))
+		{
+			m_tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize));
+
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_levelCollapser.currentCollidablePlacementPosition;
+			broadcastMessage(packetToSend);
+		}
+		if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize)))
+		{
+			m_tileManager.changeTile(eTileID::eBox, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize));
+		
+			sf::Packet packetToSend;
+			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBox) << m_levelCollapser.currentCollidablePlacementPosition;
+			broadcastMessage(packetToSend);
+		}
 	}
 
 	//Destroy Player, pick up or Bomb that is now occupying the same position 

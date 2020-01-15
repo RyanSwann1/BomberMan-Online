@@ -2,7 +2,7 @@
 
 enum class eTileID
 {
-	eBlank = 0,
+	eBlank = -1,
 	eBox = 204,
 	eWall = 265,
 	eBush = 198

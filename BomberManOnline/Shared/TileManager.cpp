@@ -48,6 +48,19 @@ void TileManager::removeTile(eTileID tileToRemove, sf::Vector2i position)
 	}
 }
 
+void TileManager::changeTile(eTileID oldTileID, eTileID newTileID, sf::Vector2i position)
+{
+	if (newTileID != eTileID::eBlank)
+	{
+		m_collisionLayer[position.y][position.x] = eCollidableTile::eCollidableTile;
+		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTileID, position);
+	}
+	else
+	{
+		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTileID, position);
+	}
+}
+
 void TileManager::render(sf::RenderWindow& window, sf::Vector2i levelSize) const
 {
 	//Tile Layer

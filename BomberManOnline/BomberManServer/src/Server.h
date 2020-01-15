@@ -27,14 +27,16 @@ class Server : private NonCopyable
 	struct LevelCollapser
 	{
 		const sf::Vector2f startingCollidablePlacementPosition = sf::Vector2f(3 * 16, 3 * 16);
-		int m_incrementAmount = 15;
+		int m_incrementAmount = 14;
 		int m_currentAmount = 0;
 		std::vector<sf::Vector2f> collidableTilePlacementBounds;
 		sf::Vector2f currentCollidablePlacementPosition = startingCollidablePlacementPosition;
 		eDirection collidablePlacementDirection = eDirection::eRight;
-		const float elaspedTimeUntilSpawnBlocks = 5.0f;
-		const float timeBetweenBlockPlacement = 0.2f;
+		const float elaspedTimeUntilSpawnBlocks = 1.0f;
+		const float timeBetweenBlockPlacement = 0.1f;
 		bool collidableBlocksSpawning = false;
+		bool firstPass = true;
+		bool disabled = false;
 	};
 
 public:
