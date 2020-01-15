@@ -2,12 +2,18 @@
 
 #include <vector>
 #include <utility>
+#include <string>
+#include <SFML/Graphics.hpp>
 
+enum class eTileID;
 struct TileLayer
 {
-	TileLayer(std::vector<std::vector<int>>&& tileLayer)
-		: m_tileLayer(std::move(tileLayer))
-	{}
+	TileLayer(std::vector<std::vector<int>>&& tileLayer, std::string&& name);
 
-	const std::vector<std::vector<int>> m_tileLayer;
+
+	int getTileID(sf::Vector2i position) const;
+	void removeTile(eTileID tileToRemove, sf::Vector2i position);
+
+	std::vector<std::vector<int>> m_tileLayer;
+	const std::string m_name;
 };
