@@ -36,26 +36,15 @@ eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosi
 	}
 }
 
-bool Utilities::isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize)
+bool Utilities::isPositionInLevelBounds(sf::Vector2i position, sf::Vector2i levelSize)
 {
-	sf::Vector2i roundedPosition(position.x / tileSize.x, position.y / tileSize.y);
-	for (int x = roundedPosition.x - 1; x <= roundedPosition.x + 1; x += 2)
-	{
-		if (x >= 0 && x < levelSize.x && collisionLayer[roundedPosition.y][x] == eCollidableTile::eBox) 
-		{
-			return true;
-		}
-	}
+	return position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y;
+}
 
-	for (int y = roundedPosition.y - 1; y <= roundedPosition.y + 1; y += 2)
-	{
-		if (y >= 0 && y < levelSize.y && collisionLayer[y][roundedPosition.x] == eCollidableTile::eBox)
-		{
-			return true;
-		}
-	}
-
-	return false;
+bool Utilities::isPositionInLevelBounds(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i levelSize)
+{
+	return position.x >= 0 && position.x < levelSize.x * tileSize.x &&
+		position.y >= 0 && position.y < levelSize.y * tileSize.y;
 }
 
 bool Utilities::isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize)
@@ -152,11 +141,6 @@ bool Utilities::traverseDirection(sf::Vector2f& position, sf::Vector2f endPositi
 	}
 
 	return position == endPosition;
-}
-
-bool Utilities::isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSize)
-{
-	return collisionLayer[static_cast<int>(position.y / tileSize.y)][static_cast<int>(position.x / tileSize.x)] != eCollidableTile::eNonCollidable;
 }
 
 int Utilities::getRandomNumber(int min, int max)

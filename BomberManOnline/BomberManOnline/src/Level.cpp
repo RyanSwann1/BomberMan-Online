@@ -3,6 +3,7 @@
 #include "Resources.h"
 #include "NetworkHandler.h"
 #include "ServerMessages.h"
+#include "TileID.h"
 #include <assert.h>
 #include <utility>
 #include "Utilities.h"
@@ -14,9 +15,7 @@ constexpr size_t MAX_PREVIOUS_POINTS = 10;
 Level::Level(std::string&& levelName)
 	: m_levelName(std::move(levelName)),
 	m_levelSize(),
-	m_tileLayers(),
 	m_spawnPositions(),
-	m_collisionLayer(),
 	m_localPlayer(nullptr),
 	m_players(),
 	m_gameObjects()
@@ -47,100 +46,81 @@ void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 
 	for (int x = position.x + tileSize.x; x <= position.x + (tileSize.x * explosionSize); x += tileSize.x)
 	{
-		sf::Vector2f explosionPosition = sf::Vector2f(x, position.y);
-		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
+
+		if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f( x, position.y ), tileSize)))
 		{
-			addExplosionObject(explosionPosition);
+			addExplosionObject(sf::Vector2f(x, position.y));
 		}
-		else if(getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+		else
 		{
-			addExplosionObject(explosionPosition);
-			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
-			break;
-		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
-		{
+			if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, position.y), tileSize)))
+			{
+				addExplosionObject(sf::Vector2f(x, position.y));
+				m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, position.y), tileSize));
+			}
+
 			break;
 		}
 	}
 
 	for (int x = position.x - tileSize.x; x >= position.x - (tileSize.x * explosionSize); x -= tileSize.x)
 	{
-		sf::Vector2f explosionPosition = sf::Vector2f(x, position.y);
-		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
+
+		if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(x, position.y), tileSize)))
 		{
-			addExplosionObject(explosionPosition);
+			addExplosionObject(sf::Vector2f(x, position.y));
 		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+		else
 		{
-			addExplosionObject(explosionPosition);
-			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
-			break;
-		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
-		{
+			if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, position.y), tileSize)))
+			{
+				addExplosionObject(sf::Vector2f(x, position.y));
+				m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, position.y), tileSize));
+			}
+
 			break;
 		}
 	}
 
 	for (int y = position.y - tileSize.y; y >= position.y - (tileSize.y * explosionSize); y -= tileSize.y)
 	{
-		sf::Vector2f explosionPosition = sf::Vector2f(position.x, y);
-		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
+
+		if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f( position.x, y ), tileSize)))
 		{
-			addExplosionObject(explosionPosition);
+			addExplosionObject(sf::Vector2f(position.x, y));
 		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+		else
 		{
-			addExplosionObject(explosionPosition);
-			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
-			break;
-		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
-		{
+			if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(position.x, y), tileSize)))
+			{
+				addExplosionObject(sf::Vector2f(position.x, y));
+				m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(position.x, y), tileSize));
+			}
+
 			break;
 		}
 	}
 
 	for (int y = position.y + tileSize.y; y <= position.y + (tileSize.y * explosionSize); y += tileSize.y)
 	{
-		sf::Vector2f explosionPosition = sf::Vector2f(position.x, y);
-		if (getCollidableTile(explosionPosition) == eCollidableTile::eNonCollidable)
+
+		if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(position.x, y), tileSize)))
 		{
-			addExplosionObject(explosionPosition);
+			addExplosionObject(sf::Vector2f(position.x, y));
 		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eBox)
+		else
 		{
-			addExplosionObject(explosionPosition);
-			changeCollidableTile(explosionPosition, eCollidableTile::eNonCollidable);
-			break;
-		}
-		else if (getCollidableTile(explosionPosition) == eCollidableTile::eWall)
-		{
+			if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(position.x, y), tileSize)))
+			{
+				addExplosionObject(sf::Vector2f(position.x, y));
+				m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(position.x, y), tileSize));
+			}
+
 			break;
 		}
 	}
 }
 
-eCollidableTile Level::getCollidableTile(sf::Vector2f position) const
-{
-	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
-	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
-	{
-		return m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x];
-	}
-}
-
-void Level::changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile)
-{
-	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-	assert(position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y);
-	if (position.x >= 0 && position.y >= 0 && position.x < m_levelSize.x * tileSize.x && position.y < m_levelSize.y * tileSize.y)
-	{
-		m_collisionLayer[position.y / tileSize.y][position.x / tileSize.x] = collidableTile;
-	}
-}
 
 void Level::addExplosionObject(sf::Vector2f position)
 {
@@ -174,8 +154,8 @@ std::unique_ptr<Level> Level::create(int localClientID, ServerMessageInitialGame
 {
 	//Load Level
 	Level* level = new Level(std::move(initialGameData.levelName));
-	if (!XMLParser::loadLevelAsClient(level->m_levelName, level->m_levelSize, level->m_tileLayers,
-		level->m_collisionLayer, level->m_spawnPositions))
+	if (!XMLParser::loadLevelAsClient(level->m_levelName, level->m_levelSize, level->m_tileManager.m_tileLayers,
+		level->m_tileManager.m_collisionLayer, level->m_spawnPositions))
 	{
 		delete level;
 		return std::unique_ptr<Level>();
@@ -210,25 +190,25 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 	{
 	case sf::Keyboard::A:
 		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x - tileSize.x, localPlayerPosition.y),
-			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
+			m_tileManager, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::D:
 		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x + tileSize.x, localPlayerPosition.y),
-			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
+			m_tileManager, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::W:
 		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y - tileSize.y),
-			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
+			m_tileManager, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
 	case sf::Keyboard::S:
 		m_localPlayer->setNewPosition(sf::Vector2f(localPlayerPosition.x, localPlayerPosition.y + tileSize.y),
-			m_collisionLayer, tileSize, m_localPlayerPreviousPositions);
+			m_tileManager, tileSize, m_localPlayerPreviousPositions);
 
 		break;
 
@@ -256,49 +236,9 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 
 void Level::render(sf::RenderWindow & window) const
 {
-	//Tile Layer
-	for (const auto& tileLayer : m_tileLayers)
-	{
-		for (int y = 0; y < m_levelSize.y; ++y)
-		{
-			for (int x = 0; x < m_levelSize.x; ++x)
-			{
-				int tileID = tileLayer.m_tileLayer[y][x];
-				if (tileID > 0)
-				{
-					const auto& tileSheet = Textures::getInstance().getTileSheet();
-					sf::Sprite tileSprite(tileSheet.getTexture(), tileSheet.getFrameRect(tileID));
-					tileSprite.setPosition(x * tileSheet.getTileSize().x, y * tileSheet.getTileSize().y);
 
-					window.draw(tileSprite);
-				}
-			}
-		}
-	}
+	m_tileManager.render(window, m_levelSize);
 
-	//Collision Layer
-	for (int y = 0; y < m_levelSize.y; y++)
-	{
-		for (int x = 0; x < m_levelSize.x; x++)
-		{
-			const auto& tileSheet = Textures::getInstance().getTileSheet();
-			sf::Vector2i tileSize = tileSheet.getTileSize();
-			if (getCollidableTile(sf::Vector2f(x * tileSize.x, y * tileSize.y)) == eCollidableTile::eBox)
-			{
-				sf::Sprite boxSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eBox)));
-				boxSprite.setPosition(sf::Vector2f(x * tileSize.x, y * tileSize.y));
-
-				window.draw(boxSprite);
-			}
-			else if (getCollidableTile(sf::Vector2f(x * tileSize.x, y * tileSize.y)) == eCollidableTile::eWall)
-			{
-				sf::Sprite wallSprite(tileSheet.getTexture(), tileSheet.getFrameRect(static_cast<int>(eFrameID::eWall)));
-				wallSprite.setPosition(sf::Vector2f(x * tileSize.x, y * tileSize.y));
-
-				window.draw(wallSprite);
-			}
-		}
-	}
 
 	//Players
 	for (const auto& player : m_players)
@@ -434,7 +374,7 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 			auto remotePlayer = std::find_if(m_players.begin(), m_players.end(), [playerID](const auto& player) { return player->getID() == playerID; });
 			assert(remotePlayer != m_players.end());
 
-			(*remotePlayer)->setNewPosition(newPosition, m_collisionLayer, Textures::getInstance().getTileSheet().getTileSize(),
+			(*remotePlayer)->setNewPosition(newPosition, m_tileManager, Textures::getInstance().getTileSheet().getTileSize(),
 				m_localPlayerPreviousPositions);
 		}
 	}

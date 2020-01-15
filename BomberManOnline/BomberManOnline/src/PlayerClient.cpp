@@ -3,6 +3,7 @@
 #include "ServerMessageType.h"
 #include "ServerMessages.h"
 #include "NetworkHandler.h"
+#include "TileManager.h"
 #include <SFML/Network.hpp>
 #include <assert.h>
 
@@ -42,12 +43,12 @@ void PlayerClient::render(sf::RenderWindow& window) const
 	m_sprite.render(window);
 }
 
-void PlayerClient::setNewPosition(sf::Vector2f newPosition, const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2i tileSize, 
+void PlayerClient::setNewPosition(sf::Vector2f newPosition, const TileManager& tileManager, sf::Vector2i tileSize, 
 	std::vector<MovementPoint>& localPlayerPreviousPositions)
 {
 	if (m_playerType == ePlayerType::eLocal)
 	{
-		if (!isMoving() && !Utilities::isPositionCollidable(collisionLayer, newPosition, tileSize))
+		if (!isMoving() && !tileManager.isPositionCollidable(Utilities::convertToGridPosition(newPosition, tileSize)))
 		{
 			m_newPosition = newPosition;
 			m_previousPosition = m_position;

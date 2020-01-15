@@ -4,6 +4,7 @@
 #include "CollidableTile.h"
 #include "PlayerServer.h"
 #include "BombServer.h"
+#include "TileManager.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
@@ -44,8 +45,7 @@ public:
 	const PlayerServer* getPlayer(int ID) const;
 	const BombServer* getBomb(sf::Vector2f position) const;
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
-	const std::vector<std::vector<eCollidableTile>>& getCollisionLayer() const;
-	eCollidableTile getCollidableTile(sf::Vector2i position) const;
+	const TileManager& getTileManager() const;
 	const std::vector<GameObject>& getGameObjects() const;
 	const std::vector<BombServer>& getBombs() const;
 	sf::Vector2i getTileSize() const;
@@ -63,7 +63,7 @@ private:
 	std::vector<std::unique_ptr<PlayerServer>> m_players;
 	std::vector<int> m_clientsToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
-	std::vector<std::vector<eCollidableTile>> m_collisionLayer;
+	TileManager m_tileManager;
 	std::vector<GameObject> m_gameObjectQueue;
 	std::vector<GameObject> m_gameObjects;
 	std::vector<BombServer> m_bombs;
@@ -88,6 +88,4 @@ private:
 	void onBombKick(sf::Vector2f playerPosition, eDirection kickDirection);
 	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);
 	void startGame();
-	void changeCollidableTile(sf::Vector2f position, eCollidableTile collidableTile);
-	eCollidableTile getCollidableTile(sf::Vector2f position);
 };
