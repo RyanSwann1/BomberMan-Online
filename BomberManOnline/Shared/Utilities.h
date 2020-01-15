@@ -13,7 +13,6 @@ namespace Utilities
 
 	bool isPositionInLevelBounds(sf::Vector2i position, sf::Vector2i levelSize);
 	bool isPositionInLevelBounds(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i levelSize);
-	bool isPositionNeighbouringBox(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i levelSize, sf::Vector2i tileSize);
 	bool isPositionAdjacent(sf::Vector2f origin, sf::Vector2f neighbour, sf::Vector2i tileSize);
 	bool isTargetInDirectSight(sf::Vector2f sourcePosition, sf::Vector2f targetPosition, eDirection facingDirection);
 
@@ -24,8 +23,5 @@ namespace Utilities
 	sf::Vector2f convertToWorldPosition(sf::Vector2i position, sf::Vector2i tileSize);
 
 	bool traverseDirection(sf::Vector2f& position, sf::Vector2f endPosition, sf::Vector2i tileSize, eDirection direction);
-
-	bool isPositionCollidable(const std::vector<std::vector<eCollidableTile>>& collisionLayer, sf::Vector2f position, sf::Vector2i tileSizedo);
-
 	int getRandomNumber(int min, int max);
 }
