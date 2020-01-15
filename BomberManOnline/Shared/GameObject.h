@@ -18,7 +18,8 @@ class GameObject
 {
 public:
 	GameObject(sf::Vector2f startingPosition, float expirationTime, eGameObjectType type, eTimerActive timerActive = eTimerActive::eTrue);
-
+	
+	bool isPickUp() const;
 	bool isMoving() const;
 	eGameObjectType getType() const;
 	const Timer& getTimer() const;

@@ -73,10 +73,7 @@ bool Server::isPickUpAtPosition(sf::Vector2f position) const
 {
 	for (const GameObject& gameObject : m_gameObjects)
 	{
-		if (gameObject.getPosition() == position
-			&& (gameObject.getType() == eGameObjectType::eMovementPickUp ||
-				gameObject.getType() == eGameObjectType::eExtraBombPickUp ||
-				gameObject.getType() == eGameObjectType::eBiggerExplosionPickUp))
+		if (gameObject.getPosition() == position && (gameObject.isPickUp()))
 		{
 			return true;
 		}
@@ -444,9 +441,7 @@ void Server::update(float frameTime)
 		gameObject->update(frameTime);
 
 		bool gameObjectDestroyed = false;
-		if (gameObject->getType() == eGameObjectType::eMovementPickUp ||
-			gameObject->getType() == eGameObjectType::eExtraBombPickUp ||
-			gameObject->getType() == eGameObjectType::eBiggerExplosionPickUp)
+		if (gameObject->isPickUp())
 		{
 			sf::Vector2f pickUpPosition = gameObject->getPosition();
 			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
