@@ -5,6 +5,7 @@
 #include "PlayerServer.h"
 #include "BombServer.h"
 #include "TileManager.h"
+#include "LevelCollapser.h"
 #include <SFML/Network.hpp>
 #include <memory>
 #include <vector>
@@ -24,24 +25,10 @@ class Server : private NonCopyable
 		eGame
 	};
 
-	struct LevelCollapser
-	{
-		const sf::Vector2f startingCollidablePlacementPosition = sf::Vector2f(3 * 16, 3 * 16);
-		int m_incrementAmount = 14;
-		int m_currentAmount = 0;
-		std::vector<sf::Vector2f> collidableTilePlacementBounds;
-		sf::Vector2f currentCollidablePlacementPosition = startingCollidablePlacementPosition;
-		eDirection collidablePlacementDirection = eDirection::eRight;
-		const float elaspedTimeUntilSpawnBlocks = 1.0f;
-		const float timeBetweenBlockPlacement = 0.1f;
-		bool collidableBlocksSpawning = false;
-		bool firstPass = true;
-		bool disabled = false;
-	};
-
 public:
 	static std::unique_ptr<Server> create(const sf::IpAddress& ipAddress, unsigned short portNumber);
 
+	float getElaspedTime() const;
 	bool isPickUpAtPosition(sf::Vector2f position) const;
 	bool isBombAtPosition(sf::Vector2f position) const;
 	const PlayerServer* getPlayer(int ID) const;
@@ -77,8 +64,6 @@ private:
 	bool m_running;
 	float m_elaspedTime = 0.0f;
 	LevelCollapser m_levelCollapser;
-
-	void placeNextCollidableTile();
 
 	void addNewClient();
 	void listen();

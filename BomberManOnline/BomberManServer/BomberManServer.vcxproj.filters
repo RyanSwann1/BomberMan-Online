@@ -81,6 +81,9 @@
     <ClCompile Include="..\Shared\TileLayer.cpp">
       <Filter>Shared</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelCollapser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Shared\ServerMessageType.h">
@@ -157,6 +160,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\TileID.h">
       <Filter>Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelCollapser.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

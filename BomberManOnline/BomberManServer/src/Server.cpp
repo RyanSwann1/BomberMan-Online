@@ -37,6 +37,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	Server* server = new Server;
 	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
+		server->m_levelCollapser.activate({ 16 * 3, 16 * 3 });
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
@@ -67,6 +68,11 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 		delete server;
 		return std::unique_ptr<Server>();
 	}
+}
+
+float Server::getElaspedTime() const
+{
+	return m_elaspedTime;
 }
 
 bool Server::isPickUpAtPosition(sf::Vector2f position) const
@@ -154,181 +160,6 @@ void Server::run()
 			}
 		}
 	}
-}
-
-void Server::placeNextCollidableTile()
-{
-	if (m_levelCollapser.disabled)
-	{
-		return;
-	}
-
-	if (m_tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_levelCollapser.startingCollidablePlacementPosition, m_tileSize)))
-	{
-		m_tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.startingCollidablePlacementPosition, m_tileSize));
-		m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
-
-		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_levelCollapser.currentCollidablePlacementPosition;
-		broadcastMessage(packetToSend);
-	}
-	else
-	{
-		if (m_levelCollapser.firstPass)
-		{
-			switch (m_levelCollapser.collidablePlacementDirection)
-			{
-			case eDirection::eRight:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
-				}
-			}
-			break;
-			case eDirection::eDown:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
-				}
-			}
-			break;
-			case eDirection::eLeft:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
-				}
-			}
-			break;
-			case eDirection::eUp:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount - 1)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.firstPass = false;
-					--m_levelCollapser.m_incrementAmount;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
-
-				}
-			}
-			break;
-			}
-		}
-		else
-		{
-
-			switch (m_levelCollapser.collidablePlacementDirection)
-			{
-			case eDirection::eRight:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.x += m_tileSize.x;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					--m_levelCollapser.m_incrementAmount;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eDown;
-				}
-			}
-			break;
-			case eDirection::eDown:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.y += m_tileSize.y;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eLeft;
-				}
-			}
-			break;
-			case eDirection::eLeft:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.x -= m_tileSize.x;
-				}
-				else
-				{
-					m_levelCollapser.m_currentAmount = 0;
-					--m_levelCollapser.m_incrementAmount;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eUp;
-				}
-			}
-			break;
-			case eDirection::eUp:
-			{
-				if (m_levelCollapser.m_currentAmount < m_levelCollapser.m_incrementAmount)
-				{
-					++m_levelCollapser.m_currentAmount;
-					m_levelCollapser.currentCollidablePlacementPosition.y -= m_tileSize.y;
-				}
-				else
-				{
-					if (m_levelCollapser.m_incrementAmount == 7)
-					{
-						m_levelCollapser.disabled = true;
-					}
-					m_levelCollapser.m_currentAmount = 0;
-					m_levelCollapser.collidablePlacementDirection = eDirection::eRight;
-				}
-			}
-			break;
-			}
-		}
-
-		if (m_tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize)))
-		{
-			m_tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize));
-
-			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_levelCollapser.currentCollidablePlacementPosition;
-			broadcastMessage(packetToSend);
-		}
-		if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize)))
-		{
-			m_tileManager.changeTile(eTileID::eBox, eTileID::eWall, Utilities::convertToGridPosition(m_levelCollapser.currentCollidablePlacementPosition, m_tileSize));
-		
-			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBox) << m_levelCollapser.currentCollidablePlacementPosition;
-			broadcastMessage(packetToSend);
-		}
-	}
-
-	//Destroy Player, pick up or Bomb that is now occupying the same position 
-	//as newly spawned collidable tile
 }
 
 void Server::addNewClient()
@@ -489,17 +320,8 @@ void Server::placeBomb(PlayerServerHuman & client, sf::Vector2f placementPositio
 
 void Server::update(float frameTime)
 {
-	//Update LevelCollapser
 	m_elaspedTime += frameTime;
-	if (!m_levelCollapser.collidableBlocksSpawning && m_elaspedTime >= m_levelCollapser.elaspedTimeUntilSpawnBlocks)
-	{
-		m_levelCollapser.collidableBlocksSpawning = true;
-	}
-	else if (m_levelCollapser.collidableBlocksSpawning && m_elaspedTime >= m_levelCollapser.timeBetweenBlockPlacement)
-	{
-		m_elaspedTime = 0.0f;
-		placeNextCollidableTile();
-	}
+	m_levelCollapser.update(*this, m_tileManager, frameTime);
 
 	//Clients To Remove
 	for (auto clientToRemove = m_clientsToRemove.begin(); clientToRemove != m_clientsToRemove.end();)
