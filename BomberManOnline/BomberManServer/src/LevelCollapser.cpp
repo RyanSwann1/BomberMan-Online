@@ -14,7 +14,7 @@ LevelCollapser::LevelCollapser()
 	m_placementDirection(eDirection::eRight),
 	m_firstPass(true),
 	m_disabled(true),
-	m_placementTimer(0.5f)
+	m_placementTimer(0.1f)
 {}
 
 void LevelCollapser::activate(sf::Vector2f startingPosition)

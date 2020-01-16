@@ -25,7 +25,7 @@ Server::Server()
 	m_levelSize(),
 	m_clock(),
 	m_currentState(eServerState::eLobby),
-	m_running(false)
+	m_running(true)
 {
 	m_players.reserve(MAX_PLAYERS);
 	m_clientsToRemove.reserve(MAX_PLAYERS);
@@ -39,7 +39,6 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	{
 		server->m_levelCollapser.activate({ 16 * 3, 16 * 3 });
 		server->m_socketSelector.add(server->m_tcpListener);
-		server->m_running = true;
 		server->m_levelName = "Level1.tmx";
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
 			server->m_tileManager.m_tileLayers, server->m_tileManager.m_collisionLayer, 
