@@ -16,6 +16,5 @@ int TileLayer::getTileID(sf::Vector2i position) const
 void TileLayer::removeTile(eTileID tileToRemove, sf::Vector2i position)
 {
 	assert(m_tileLayer[position.y][position.x] == static_cast<int>(tileToRemove));
-	std::cout << m_tileLayer[position.y][position.x] << "\n";
 	m_tileLayer[position.y][position.x] = static_cast<int>(eTileID::eBlank);
 }

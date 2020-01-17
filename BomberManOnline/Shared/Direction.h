@@ -6,5 +6,6 @@ enum class eDirection
 	eLeft,
 	eRight,
 	eUp,
-	eDown
+	eDown,
+	eTotal = eDown
 };
