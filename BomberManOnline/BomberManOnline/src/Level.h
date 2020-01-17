@@ -40,8 +40,6 @@ private:
 	void spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType);
 	void onBombExplosion(sf::Vector2f position, int explosionSize);
 
-	eCollidableTile getCollidableTile(sf::Vector2i position) const;
-	void changeCollidableTile(sf::Vector2i position, eCollidableTile collidableTile);
 	void addExplosionObject(sf::Vector2f position);
 	void kickBombToPosition(sf::Vector2f bombPosition, sf::Vector2f kickToPosition);
 	PlayerClient* getPlayer(int ID);
