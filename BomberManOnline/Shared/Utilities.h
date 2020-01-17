@@ -2,6 +2,8 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include "Direction.h"
+#include <array>
 
 enum class eDirection;
 enum class eCollidableTile;
@@ -10,6 +12,8 @@ namespace Utilities
 	int distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize);
 	int distance(sf::Vector2i source, sf::Vector2i target);
 	eDirection getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosition, sf::Vector2f targetPosition);
+	std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> getAllDirections();
+	sf::Vector2f scale(sf::Vector2i tileSize, sf::Vector2i v, int i);
 
 	bool isPositionInLevelBounds(sf::Vector2i position, sf::Vector2i levelSize);
 	bool isPositionInLevelBounds(sf::Vector2f position, sf::Vector2i tileSize, sf::Vector2i levelSize);
