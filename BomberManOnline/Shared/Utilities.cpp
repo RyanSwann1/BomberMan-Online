@@ -36,6 +36,24 @@ eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosi
 	}
 }
 
+std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> Utilities::getAllDirections()
+{
+	static std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> directions
+	{
+		sf::Vector2i(-1, 0),
+		sf::Vector2i(1, 0),
+		sf::Vector2i(0, -1),
+		sf::Vector2i(0, 1)
+	};
+
+	return directions;
+}
+
+sf::Vector2f Utilities::scale(sf::Vector2i tileSize, sf::Vector2i v, int i)
+{
+	return sf::Vector2f(v.x * tileSize.x * i, v.y * tileSize.y * i);
+}
+
 bool Utilities::isPositionInLevelBounds(sf::Vector2i position, sf::Vector2i levelSize)
 {
 	return position.x >= 0 && position.x < levelSize.x && position.y >= 0 && position.y < levelSize.y;

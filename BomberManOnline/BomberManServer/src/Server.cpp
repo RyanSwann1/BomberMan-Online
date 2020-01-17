@@ -384,80 +384,32 @@ void Server::update(float frameTime)
 		if (bomb->getTimer().isExpired())
 		{
 			int explosionSize = bomb->getExplosionSize();
-			sf::Vector2f explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
+			sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
 
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eBombExplosion << explosionPosition.x << explosionPosition.y << explosionSize;
+			packetToSend << eServerMessageType::eBombExplosion << bombPosition.x << bombPosition.y << explosionSize;
 			broadcastMessage(packetToSend);
 
-			onBombExplosion(explosionPosition);
+			onBombExplosion(bombPosition);
 
-			explosionPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
-			for (int x = explosionPosition.x + m_tileSize.x; x <= explosionPosition.x + (m_tileSize.x * explosionSize); x += m_tileSize.x)
+			for (sf::Vector2i direction : Utilities::getAllDirections())
 			{
-				if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, explosionPosition.y), m_tileSize)))
+				for (int i = 1; i <= explosionSize; ++i)
 				{
-					onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-					break;
-				}
-				else if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(x, explosionPosition.y), m_tileSize)))
-				{
-					break;
-				}
-				else
-				{
-					onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-				}				
-			}
-
-			for (int x = explosionPosition.x - m_tileSize.x; x >= explosionPosition.x - (m_tileSize.x * explosionSize); x -= m_tileSize.x)
-			{
-				if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(x, explosionPosition.y), m_tileSize)))
-				{
-					onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-					break;
-				}
-				else if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(x, explosionPosition.y), m_tileSize)))
-				{
-					break;
-				}
-				else
-				{
-					onBombExplosion(sf::Vector2f(x, explosionPosition.y));
-				}
-			}
-
-			for (int y = explosionPosition.y - m_tileSize.y; y >= explosionPosition.y - (m_tileSize.y * explosionSize); y -= m_tileSize.y)
-			{
-				if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(explosionPosition.x, y), m_tileSize)))
-				{
-					onBombExplosion(sf::Vector2f(explosionPosition.x, y));
-					break;
-				}
-				else if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(explosionPosition.x, y), m_tileSize)))
-				{
-					break;
-				}
-				else
-				{
-					onBombExplosion(sf::Vector2f(explosionPosition.x, y));
-				}				
-			}
-
-			for (int y = explosionPosition.y + m_tileSize.y; y <= explosionPosition.y + (m_tileSize.y * explosionSize); y += m_tileSize.y)
-			{
-				if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(sf::Vector2f(explosionPosition.x, y), m_tileSize)))
-				{
-					onBombExplosion(sf::Vector2f(explosionPosition.x, y));
-					break;
-				}
-				else if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(sf::Vector2f(explosionPosition.x, y), m_tileSize)))
-				{
-					break;
-				}
-				else
-				{
-					onBombExplosion(sf::Vector2f(explosionPosition.x, y));
+					sf::Vector2f explosionPosition = bombPosition + Utilities::scale(m_tileSize, direction, i);
+					if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
+					{
+						onBombExplosion(explosionPosition);
+						break;
+					}
+					else if (m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
+					{
+						break;
+					}
+					else
+					{
+						onBombExplosion(explosionPosition);
+					}
 				}
 			}
 

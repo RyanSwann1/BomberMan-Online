@@ -70,7 +70,6 @@ private:
 	void setNewPlayerPosition(PlayerServerHuman& client, ServerMessagePlayerMove playerMoveMessage);
 	void placeBomb(PlayerServerHuman& client, sf::Vector2f placementPosition);
 	void update(float frameTime);
-
 	void onBombExplosion(sf::Vector2f explosionPosition);
 	void onBombKick(sf::Vector2f playerPosition, eDirection kickDirection);
 	void handlePickUpCollision(PlayerServer& player, eGameObjectType gameObjectType);
