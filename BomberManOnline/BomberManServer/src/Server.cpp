@@ -456,17 +456,17 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			switch (Utilities::getRandomNumber(0, 2))
 			{
 			case 0:
-				packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition.x << explosionPosition.y;
+				packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition;
 				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eExtraBombPickUp);
 
 				break;
 			case 1:
-				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition.x << explosionPosition.y;
+				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition;
 				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
 				break;
 			case 2:
-				packetToSend << eServerMessageType::eSpawnBiggerExplosionPickUp << explosionPosition.x << explosionPosition.y;
+				packetToSend << eServerMessageType::eSpawnBiggerExplosionPickUp << explosionPosition;
 				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eBiggerExplosionPickUp);
 
 				break;
@@ -479,8 +479,8 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 	//Damage colliding players
 	for (const auto& player : m_players)
 	{
-		sf::Vector2i playerPosition(static_cast<int>(player->getPosition().x / m_tileSize.x), static_cast<int>(player->getPosition().y / m_tileSize.y));
-		if (sf::Vector2i(static_cast<int>(explosionPosition.x / m_tileSize.x), static_cast<int>(explosionPosition.y / m_tileSize.y)) == playerPosition)
+		if (Utilities::convertToGridPosition(player->getPosition(), m_tileSize) == 
+			Utilities::convertToGridPosition(explosionPosition, m_tileSize))
 		{
 			m_clientsToRemove.push_back(player->getID());
 		}

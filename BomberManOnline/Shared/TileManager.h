@@ -20,7 +20,7 @@ public:
 	bool isPositionCollidable(sf::Vector2i position) const;
 
 	void removeTile(eTileID tileToRemove, sf::Vector2i position);
-	void changeTile(eTileID oldTileID, eTileID newTileID, sf::Vector2i position);
+	void changeTile(eTileID newTile, sf::Vector2i position);
 	void render(sf::RenderWindow& window, sf::Vector2i levelSize) const;
 
 private:
