@@ -3,6 +3,7 @@
 #include <assert.h>
 #include "Texture.h"
 #include "Resources.h"
+#include "Utilities.h"
 
 const std::string GAME_OBJECT_LAYER = "Game Object Layer";
 const std::string GROUND_LAYER = "Ground Layer";
@@ -19,17 +20,10 @@ const std::vector<std::vector<eCollidableTile>>& TileManager::getCollisionLayer(
 
 bool TileManager::isPositionAdjacentToBox(sf::Vector2i position) const
 {
-	for (int x = position.x - 1; x <= position.x + 1; ++x)
+	for (sf::Vector2i direction : Utilities::getAllDirections())
 	{
-		if (getTileLayer(GAME_OBJECT_LAYER).getTileID({ x, position.y }) == static_cast<int>(eTileID::eBox))
-		{
-			return true;
-		}
-	}
-
-	for (int y = position.y - 1; y <= position.y + 1; ++y)
-	{
-		if (getTileLayer(GAME_OBJECT_LAYER).getTileID({ position.x, y }) == static_cast<int>(eTileID::eBox))
+		sf::Vector2i adjacentPosition = position + direction;
+		if (getTileLayer(GAME_OBJECT_LAYER).getTileID(adjacentPosition) == static_cast<int>(eTileID::eBox))
 		{
 			return true;
 		}

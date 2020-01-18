@@ -6,6 +6,14 @@
 #include <assert.h>
 #include <random>
 
+static std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> directions
+{
+	sf::Vector2i(-1, 0),
+	sf::Vector2i(1, 0),
+	sf::Vector2i(0, -1),
+	sf::Vector2i(0, 1)
+};
+
 int Utilities::distance(sf::Vector2f source, sf::Vector2f target, sf::Vector2i tileSize)
 {
 	sf::Vector2i sourcePositionOnGrid(Utilities::convertToGridPosition(source, tileSize));
@@ -38,14 +46,6 @@ eDirection Utilities::getDirectionToAdjacentFromPosition(sf::Vector2f sourcePosi
 
 std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> Utilities::getAllDirections()
 {
-	static std::array<sf::Vector2i, static_cast<size_t>(eDirection::eTotal)> directions
-	{
-		sf::Vector2i(-1, 0),
-		sf::Vector2i(1, 0),
-		sf::Vector2i(0, -1),
-		sf::Vector2i(0, 1)
-	};
-
 	return directions;
 }
 
