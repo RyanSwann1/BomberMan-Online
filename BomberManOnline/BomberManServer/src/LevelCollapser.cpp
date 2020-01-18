@@ -52,10 +52,10 @@ void LevelCollapser::placeNextCollidableTile(Server& server, TileManager& tileMa
 	sf::Vector2i tileSize = server.getTileSize();
 	if (tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_startingPosition, tileSize)))
 	{
-		tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_startingPosition, tileSize));
+		tileManager.changeTile(eTileID::eWall, Utilities::convertToGridPosition(m_startingPosition, tileSize));
 
 		sf::Packet packetToSend;
-		packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_currentPlacementPosition;
+		packetToSend << eServerMessageType::eNewCollidableTile << m_currentPlacementPosition;
 		server.broadcastMessage(packetToSend);
 	}
 	else
@@ -194,20 +194,13 @@ void LevelCollapser::placeNextCollidableTile(Server& server, TileManager& tileMa
 			}
 		}
 
-		if (tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize)))
+		if (tileManager.isTileOnPosition(eTileID::eBlank, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize)) ||
+			tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize)))
 		{
-			tileManager.changeTile(eTileID::eBlank, eTileID::eWall, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize));
+			tileManager.changeTile(eTileID::eWall, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize));
 
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBlank) << m_currentPlacementPosition;
-			server.broadcastMessage(packetToSend);
-		}
-		if (tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize)))
-		{
-			tileManager.changeTile(eTileID::eBox, eTileID::eWall, Utilities::convertToGridPosition(m_currentPlacementPosition, tileSize));
-
-			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::eNewCollidableTile << static_cast<int>(eTileID::eBox) << m_currentPlacementPosition;
+			packetToSend << eServerMessageType::eNewCollidableTile << m_currentPlacementPosition;
 			server.broadcastMessage(packetToSend);
 		}
 	}

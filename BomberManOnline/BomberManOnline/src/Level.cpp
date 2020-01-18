@@ -373,13 +373,11 @@ void Level::onReceivedServerMessage(eServerMessageType receivedMessageType, sf::
 
 	case eServerMessageType::eNewCollidableTile :
 	{
-		int tileID = 0;
-		receivedMessage >> tileID;
 		sf::Vector2f spawnLocation;
 		receivedMessage >> spawnLocation;
 
 		sf::Vector2i tileSize(Textures::getInstance().getTileSheet().getTileSize());
-		m_tileManager.changeTile(static_cast<eTileID>(tileID), eTileID::eWall, Utilities::convertToGridPosition(spawnLocation, tileSize));
+		m_tileManager.changeTile(eTileID::eWall, Utilities::convertToGridPosition(spawnLocation, tileSize));
 	}
 	break;
 

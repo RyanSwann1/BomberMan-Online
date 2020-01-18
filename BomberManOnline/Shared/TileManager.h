@@ -29,4 +29,5 @@ private:
 
 	const TileLayer& getTileLayer(const std::string& name) const;
 	TileLayer& getTileLayer(const std::string& name);
+	void changeCollidableTile(sf::Vector2i position, eCollidableTile newCollidableType);
 };

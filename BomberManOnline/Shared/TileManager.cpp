@@ -38,27 +38,29 @@ void TileManager::removeTile(eTileID tileToRemove, sf::Vector2i position)
 
 	if (m_collisionLayer[position.y][position.x] == eCollidableTile::eCollidableTile)
 	{
-		m_collisionLayer[position.y][position.x] = eCollidableTile::eNonCollidable;
+		changeCollidableTile(position, eCollidableTile::eNonCollidable);
 	}
 }
 
-//<<<<<<< HEAD
-//void TileManager::changeTile(eTileID oldTileID, eTileID newTileID, sf::Vector2i position)
-//{
-//	if (newTileID != eTileID::eBlank)
-//	{
-//		m_collisionLayer[position.y][position.x] = eCollidableTile::eCollidableTile;
-//		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTileID, position);
-//	}
-//	else
-//	{
-//		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTileID, position);
-//=======
 void TileManager::changeTile(eTileID newTile, sf::Vector2i position)
 {
-	if (newTile == eTileID::eDirt)
+	switch (newTile)
 	{
+	case eTileID::eBox:
+	case eTileID::eWall:
+	case eTileID::eBush:
+		changeCollidableTile(position, eCollidableTile::eCollidableTile);
+		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTile, position);
+		break;
+	case eTileID::eBlank :
+		changeCollidableTile(position, eCollidableTile::eNonCollidable);
+		getTileLayer(GAME_OBJECT_LAYER).changeTile(newTile, position);
+		break;
+	case eTileID::eGrass:
+	case eTileID::eDirt:
+		changeCollidableTile(position, eCollidableTile::eNonCollidable);
 		getTileLayer(GROUND_LAYER).changeTile(newTile, position);
+		break;
 	}
 }
 
@@ -93,6 +95,11 @@ TileLayer& TileManager::getTileLayer(const std::string& name)
 	return (*tileLayer);
 }
 
+void TileManager::changeCollidableTile(sf::Vector2i position, eCollidableTile newCollidableType)
+{
+	m_collisionLayer[position.y][position.x] = newCollidableType;
+}
+
 const TileLayer& TileManager::getTileLayer(const std::string& name) const
 {
 	auto tileLayer = std::find_if(m_tileLayers.cbegin(), m_tileLayers.cend(), [name](const auto& tileLayer) { return tileLayer.m_name == name; });
@@ -103,13 +110,16 @@ const TileLayer& TileManager::getTileLayer(const std::string& name) const
 
 bool TileManager::isTileOnPosition(eTileID tile, sf::Vector2i position) const
 {
-	if (tile == eTileID::eGrass)
+	switch (tile)
 	{
-		return getTileLayer(GROUND_LAYER).getTileID(position) == static_cast<int>(tile);
-	}
-	else
-	{
+	case eTileID::eBlank:
+	case eTileID::eBox:
+	case eTileID::eBush:
+	case eTileID::eWall:
 		return getTileLayer(GAME_OBJECT_LAYER).getTileID(position) == static_cast<int>(tile);
+	case eTileID::eDirt:
+	case eTileID::eGrass:
+		return getTileLayer(GROUND_LAYER).getTileID(position) == static_cast<int>(tile);
 	}
 }
 
