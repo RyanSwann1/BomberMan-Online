@@ -10,8 +10,8 @@ struct TileLayer
 {
 	TileLayer(std::vector<std::vector<int>>&& tileLayer, std::string&& name);
 
-
 	int getTileID(sf::Vector2i position) const;
+	void changeTile(eTileID newTile, sf::Vector2i position);
 	void removeTile(eTileID tileToRemove, sf::Vector2i position);
 
 	std::vector<std::vector<int>> m_tileLayer;

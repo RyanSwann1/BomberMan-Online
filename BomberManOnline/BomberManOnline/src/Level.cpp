@@ -42,23 +42,34 @@ void Level::spawnPickUp(sf::Vector2f position, eGameObjectType gameObjectType)
 void Level::onBombExplosion(sf::Vector2f position, int explosionSize)
 {
 	addExplosionObject(position);
-
 	sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+	if (m_tileManager.isTileOnPosition(eTileID::eGrass, Utilities::convertToGridPosition(position, tileSize)))
+	{
+		m_tileManager.changeTile(eTileID::eDirt, Utilities::convertToGridPosition(position, tileSize));
+	}
+
 	for (sf::Vector2i direction : Utilities::getAllDirections())
 	{
 		for (int i = 1; i <= explosionSize; ++i)
 		{
 			sf::Vector2f explosionPosition = position + Utilities::scale(tileSize, direction, i);
-			if (!m_tileManager.isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
+			sf::Vector2i explosionPositionOnGrid = Utilities::convertToGridPosition(explosionPosition, tileSize);
+			if (m_tileManager.isTileOnPosition(eTileID::eGrass, explosionPositionOnGrid) &&
+				!m_tileManager.isTileOnPosition(eTileID::eBush, explosionPositionOnGrid))
+			{
+				m_tileManager.changeTile(eTileID::eDirt, explosionPositionOnGrid);
+			}
+
+			if (!m_tileManager.isPositionCollidable(explosionPositionOnGrid))
 			{
 				addExplosionObject(explosionPosition);
 			}
 			else
 			{
-				if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, tileSize)))
+				if (m_tileManager.isTileOnPosition(eTileID::eBox, explosionPositionOnGrid))
 				{
 					addExplosionObject(explosionPosition);
-					m_tileManager.removeTile(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, tileSize));
+					m_tileManager.removeTile(eTileID::eBox, explosionPositionOnGrid);
 				}
 
 				break;

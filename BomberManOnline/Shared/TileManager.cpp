@@ -5,12 +5,12 @@
 #include "Resources.h"
 
 const std::string GAME_OBJECT_LAYER = "Game Object Layer";
+const std::string GROUND_LAYER = "Ground Layer";
 
 TileManager::TileManager()
 	: m_collisionLayer(),
 	m_tileLayers()
-{
-}
+{}
 
 const std::vector<std::vector<eCollidableTile>>& TileManager::getCollisionLayer() const
 {
@@ -45,6 +45,14 @@ void TileManager::removeTile(eTileID tileToRemove, sf::Vector2i position)
 	if (m_collisionLayer[position.y][position.x] == eCollidableTile::eCollidableTile)
 	{
 		m_collisionLayer[position.y][position.x] = eCollidableTile::eNonCollidable;
+	}
+}
+
+void TileManager::changeTile(eTileID newTile, sf::Vector2i position)
+{
+	if (newTile == eTileID::eDirt)
+	{
+		getTileLayer(GROUND_LAYER).changeTile(newTile, position);
 	}
 }
 
@@ -89,7 +97,14 @@ const TileLayer& TileManager::getTileLayer(const std::string& name) const
 
 bool TileManager::isTileOnPosition(eTileID tile, sf::Vector2i position) const
 {
-	return getTileLayer(GAME_OBJECT_LAYER).getTileID(position) == static_cast<int>(tile);
+	if (tile == eTileID::eGrass)
+	{
+		return getTileLayer(GROUND_LAYER).getTileID(position) == static_cast<int>(tile);
+	}
+	else
+	{
+		return getTileLayer(GAME_OBJECT_LAYER).getTileID(position) == static_cast<int>(tile);
+	}
 }
 
 bool TileManager::isPositionCollidable(sf::Vector2i position) const
