@@ -16,43 +16,25 @@ void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vecto
 
 void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {
-	const auto& tileManager = server.getTileManager();
-	for (int x = position.x - 1; x <= position.x + 1; x += 2)
+	for (sf::Vector2i direction : Utilities::getAllDirections())
 	{
-		if (x >= 0 && x < server.getLevelSize().x && 
-			!tileManager.isPositionCollidable({ x, position.y }) &&
-			sf::Vector2i(x, position.y) != ignorePosition)
+		sf::Vector2i adjacentPosition = position + direction;
+		if (!server.getTileManager().isPositionCollidable(adjacentPosition) &&
+			adjacentPosition != ignorePosition)
 		{
-			positions.emplace_back(x, position.y);
-		}
-	}
-
-	for (int y = position.y - 1; y <= position.y + 1; y += 2)
-	{
-		if (y >= 0 && y < server.getLevelSize().y && 
-			!tileManager.isPositionCollidable({ position.x, y }) &&
-			sf::Vector2i(position.x, y) != ignorePosition)
-		{
-			positions.emplace_back(position.x, y);
+			positions.push_back(adjacentPosition);
 		}
 	}
 }
 
 void getAdjacentPositions(sf::Vector2i position, const Server& server, sf::Vector2i ignorePosition, std::vector<sf::Vector2i>& positions)
 {
-	for (int x = position.x - 1; x <= position.x + 1; x += 2)
+	for (sf::Vector2i direction : Utilities::getAllDirections())
 	{
-		if (x >= 0 && x < server.getLevelSize().x && sf::Vector2i(x, position.y) != ignorePosition)
+		sf::Vector2i adjacentPosition = position + direction;
+		if (adjacentPosition != ignorePosition)
 		{
-			positions.emplace_back(x, position.y);
-		}
-	}
-
-	for (int y = position.y - 1; y <= position.y + 1; y += 2)
-	{
-		if (y >= 0 && y < server.getLevelSize().y && sf::Vector2i(position.x, y) != ignorePosition)
-		{
-			positions.emplace_back(position.x, y);
+			positions.push_back(adjacentPosition);
 		}
 	}
 }
