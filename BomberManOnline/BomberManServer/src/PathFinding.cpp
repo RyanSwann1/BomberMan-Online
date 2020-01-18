@@ -581,20 +581,12 @@ void PathFinding::getSafePathToTile(sf::Vector2f sourcePosition, sf::Vector2f ta
 void PathFinding::getNonCollidableAdjacentPositions(sf::Vector2f position, const Server& server, std::vector<sf::Vector2f>& positions)
 {
 	sf::Vector2i sourcePositionOnGrid = Utilities::convertToGridPosition(position, server.getTileSize());
-
-	for (int x = sourcePositionOnGrid.x - 1; x <= sourcePositionOnGrid.x + 1; x += 2)
+	for (sf::Vector2i direction : Utilities::getAllDirections())
 	{
-		if (x >= 0 && x < server.getLevelSize().x && !server.getTileManager().isPositionCollidable({ x, sourcePositionOnGrid.y }))
+		sf::Vector2i adjacentPosition = sourcePositionOnGrid + direction;
+		if (!server.getTileManager().isPositionCollidable(adjacentPosition))
 		{
-			positions.push_back(Utilities::convertToWorldPosition({ x, sourcePositionOnGrid.y }, server.getTileSize()));
-		}
-	}
-
-	for (int y = sourcePositionOnGrid.y - 1; y <= sourcePositionOnGrid.y + 1; y += 2)
-	{
-		if (y >= 0 && y < server.getLevelSize().y && !server.getTileManager().isPositionCollidable({ sourcePositionOnGrid.x, y }))
-		{
-			positions.push_back(Utilities::convertToWorldPosition({ sourcePositionOnGrid.x, y }, server.getTileSize()));
+			positions.push_back(Utilities::convertToWorldPosition(adjacentPosition, server.getTileSize()));
 		}
 	}
 }
