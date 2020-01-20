@@ -14,8 +14,13 @@ LevelCollapser::LevelCollapser()
 	m_placementDirection(eDirection::eRight),
 	m_firstPass(true),
 	m_disabled(true),
-	m_placementTimer(0.1f)
+	m_placementTimer(0.5f)
 {}
+
+bool LevelCollapser::isActive() const
+{
+	return !m_disabled;
+}
 
 void LevelCollapser::activate(sf::Vector2f startingPosition)
 {
@@ -42,9 +47,6 @@ void LevelCollapser::update(Server& server, TileManager& tileManager, float fram
 		m_placementTimer.resetElaspedTime();
 		placeNextCollidableTile(server, tileManager);
 	}
-
-	//Destroy Player, pick up or Bomb that is now occupying the same position 
-	//as newly spawned collidable tile
 }
 
 void LevelCollapser::placeNextCollidableTile(Server& server, TileManager& tileManager)

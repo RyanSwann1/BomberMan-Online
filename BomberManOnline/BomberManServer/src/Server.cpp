@@ -18,9 +18,9 @@ Server::Server()
 	: m_tcpListener(),
 	m_socketSelector(),
 	m_players(),
-	m_clientsToRemove(),
+	m_playersToRemove(),
 	m_spawnPositions(),
-	m_gameObjects(),
+	m_pickUps(),
 	m_levelName(),
 	m_levelSize(),
 	m_clock(),
@@ -28,7 +28,7 @@ Server::Server()
 	m_running(true)
 {
 	m_players.reserve(MAX_PLAYERS);
-	m_clientsToRemove.reserve(MAX_PLAYERS);
+	m_playersToRemove.reserve(MAX_PLAYERS);
 	m_spawnPositions.reserve(MAX_PLAYERS);
 }
 
@@ -37,7 +37,7 @@ std::unique_ptr<Server> Server::create(const sf::IpAddress & ipAddress, unsigned
 	Server* server = new Server;
 	if (server->m_tcpListener.listen(portNumber, ipAddress) == sf::Socket::Done)
 	{
-		server->m_levelCollapser.activate({ 16 * 3, 16 * 3 });
+		//server->m_levelCollapser.activate({ 16 * 3, 16 * 3 });
 		server->m_socketSelector.add(server->m_tcpListener);
 		server->m_levelName = "Level1.tmx";
 		if (!XMLParser::loadLevelAsServer(server->m_levelName, server->m_levelSize,
@@ -76,7 +76,7 @@ float Server::getElaspedTime() const
 
 bool Server::isPickUpAtPosition(sf::Vector2f position) const
 {
-	for (const GameObject& gameObject : m_gameObjects)
+	for (const GameObject& gameObject : m_pickUps)
 	{
 		if (gameObject.getPosition() == position && gameObject.isPickUp())
 		{
@@ -113,11 +113,6 @@ const TileManager& Server::getTileManager() const
 const std::vector<std::unique_ptr<PlayerServer>>& Server::getPlayers() const
 {
 	return m_players;
-}
-
-const std::vector<GameObject>& Server::getGameObjects() const
-{
-	return m_gameObjects;
 }
 
 const std::vector<BombServer>& Server::getBombs() const
@@ -229,7 +224,7 @@ void Server::listen()
 
 				case eServerMessageType::eRequestDisconnection:
 				{
-					m_clientsToRemove.push_back(client.getID());
+					m_playersToRemove.push_back(client.getID());
 				}
 				break;
 				
@@ -323,14 +318,14 @@ void Server::update(float frameTime)
 	m_levelCollapser.update(*this, m_tileManager, frameTime);
 
 	//Clients To Remove
-	for (auto clientToRemove = m_clientsToRemove.begin(); clientToRemove != m_clientsToRemove.end();)
+	for (auto playerToRemove = m_playersToRemove.begin(); playerToRemove != m_playersToRemove.end();)
 	{
-		int clientIDToRemove = (*clientToRemove);
-		auto client = std::find_if(m_players.begin(), m_players.end(), [clientIDToRemove](const auto& player) { return player->getID() == clientIDToRemove; });
+		int playerIDToRemove = (*playerToRemove);
+		auto client = std::find_if(m_players.begin(), m_players.end(), [playerIDToRemove](const auto& player) { return player->getID() == playerIDToRemove; });
 		if (client != m_players.end())
 		{
 			sf::Packet packetToSend;
-			packetToSend << eServerMessageType::ePlayerDisconnected << clientIDToRemove;
+			packetToSend << eServerMessageType::ePlayerDisconnected << playerIDToRemove;
 			broadcastMessage(packetToSend);
 
 			if ((*client)->getControllerType() == ePlayerControllerType::eHuman)
@@ -338,40 +333,41 @@ void Server::update(float frameTime)
 				m_socketSelector.remove(*static_cast<PlayerServerHuman*>((*client).get())->getTCPSocket());
 			}
 
-			std::cout << "Client Removed\n";
+			std::cout << "Player Removed\n";
 			m_players.erase(client);
 		}
 
-		clientToRemove = m_clientsToRemove.erase(clientToRemove);
-	}
-
-	//Players
-	for (auto& player : m_players)
-	{
-		player->update(frameTime);
+		playerToRemove = m_playersToRemove.erase(playerToRemove);
 	}
 
 	//Game Objects
-	for (auto gameObject = m_gameObjects.begin(); gameObject != m_gameObjects.end();)
+	for (auto pickUp = m_pickUps.begin(); pickUp != m_pickUps.end();)
 	{
-		gameObject->update(frameTime);
+		pickUp->update(frameTime);
 
 		bool gameObjectDestroyed = false;
-		if (gameObject->isPickUp())
+
+		if (m_levelCollapser.isActive() &&
+			m_tileManager.isTileOnPosition(eTileID::eWall, Utilities::convertToGridPosition(pickUp->getPosition(), m_tileSize)))
 		{
-			sf::Vector2f pickUpPosition = gameObject->getPosition();
+			pickUp = m_pickUps.erase(pickUp);
+			gameObjectDestroyed = true;
+		}
+		else 
+		{
+			sf::Vector2f pickUpPosition = pickUp->getPosition();
 			auto player = std::find_if(m_players.begin(), m_players.end(), [pickUpPosition](const auto& player) { return player->getPosition() == pickUpPosition; });
 			if (player != m_players.end())
 			{
-				handlePickUpCollision(*player->get(), gameObject->getType());
-				gameObject = m_gameObjects.erase(gameObject);
+				handlePickUpCollision(*player->get(), pickUp->getType());
+				pickUp = m_pickUps.erase(pickUp);
 				gameObjectDestroyed = true;
 			}
 		}
 		
 		if(!gameObjectDestroyed)
 		{
-			++gameObject;
+			++pickUp;
 		}
 	}
 
@@ -380,8 +376,14 @@ void Server::update(float frameTime)
 	{
 		bomb->update(frameTime);
 
+		sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
+		if (m_levelCollapser.isActive() && 
+			m_tileManager.isTileOnPosition(eTileID::eWall, Utilities::convertToGridPosition(bombPosition, m_tileSize)))
+		{
+			bomb = m_bombs.erase(bomb);
+		}
 		//Bomb Explosion
-		if (bomb->getTimer().isExpired())
+		else if (bomb->getTimer().isExpired())
 		{
 			int explosionSize = bomb->getExplosionSize();
 			sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb->getPosition(), m_tileSize);
@@ -421,29 +423,42 @@ void Server::update(float frameTime)
 		}
 	}
 
-	//Game Object Queue
-	if (!m_gameObjectQueue.empty())
+	//Players
+	for (auto& player : m_players)
 	{
-		for (const auto& i : m_gameObjectQueue)
+		player->update(frameTime);
+
+		sf::Vector2f playerPosition = Utilities::getClosestGridPosition(player->getPosition(), m_tileSize);
+		if (m_levelCollapser.isActive() &&
+			m_tileManager.isTileOnPosition(eTileID::eWall, Utilities::convertToGridPosition(playerPosition, m_tileSize)))
 		{
-			m_gameObjects.push_back(i);
+			m_playersToRemove.push_back(player->getID());
+		}
+	}
+
+	//Game Object Queue
+	if (!m_pickUpQueue.empty())
+	{
+		for (const auto& i : m_pickUpQueue)
+		{
+			m_pickUps.push_back(i);
 		}
 
-		m_gameObjectQueue.clear();
+		m_pickUpQueue.clear();
 	}
 }
 
 void Server::onBombExplosion(sf::Vector2f explosionPosition)
 {
-	auto gameObject = std::find_if(m_gameObjects.begin(), m_gameObjects.end(), [explosionPosition](const auto& gameObject)
+	auto gameObject = std::find_if(m_pickUps.begin(), m_pickUps.end(), [explosionPosition](const auto& gameObject)
 		{ return gameObject.getPosition() == explosionPosition; });
-	if (gameObject != m_gameObjects.cend())
+	if (gameObject != m_pickUps.cend())
 	{
 		sf::Packet packetToSend;
 		packetToSend << eServerMessageType::eRemovePickUpAtLocation << explosionPosition;
 		broadcastMessage(packetToSend);
 
-		m_gameObjects.erase(gameObject);
+		m_pickUps.erase(gameObject);
 	}
 	else if (m_tileManager.isTileOnPosition(eTileID::eBox, Utilities::convertToGridPosition(explosionPosition, m_tileSize)))
 	{
@@ -457,17 +472,17 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 			{
 			case 0:
 				packetToSend << eServerMessageType::eSpawnExtraBombPickUp << explosionPosition;
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eExtraBombPickUp);
+				m_pickUpQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eExtraBombPickUp);
 
 				break;
 			case 1:
 				packetToSend << eServerMessageType::eSpawnMovementPickUp << explosionPosition;
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
+				m_pickUpQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eMovementPickUp);
 
 				break;
 			case 2:
 				packetToSend << eServerMessageType::eSpawnBiggerExplosionPickUp << explosionPosition;
-				m_gameObjectQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eBiggerExplosionPickUp);
+				m_pickUpQueue.emplace_back(explosionPosition, 0.0f, eGameObjectType::eBiggerExplosionPickUp);
 
 				break;
 			}
@@ -482,7 +497,7 @@ void Server::onBombExplosion(sf::Vector2f explosionPosition)
 		if (Utilities::convertToGridPosition(player->getPosition(), m_tileSize) == 
 			Utilities::convertToGridPosition(explosionPosition, m_tileSize))
 		{
-			m_clientsToRemove.push_back(player->getID());
+			m_playersToRemove.push_back(player->getID());
 		}
 	}
 }

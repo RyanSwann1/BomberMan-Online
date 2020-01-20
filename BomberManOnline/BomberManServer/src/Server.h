@@ -35,7 +35,6 @@ public:
 	const BombServer* getBomb(sf::Vector2f position) const;
 	const std::vector<std::unique_ptr<PlayerServer>>& getPlayers() const;
 	const TileManager& getTileManager() const;
-	const std::vector<GameObject>& getGameObjects() const;
 	const std::vector<BombServer>& getBombs() const;
 	sf::Vector2i getTileSize() const;
 	sf::Vector2i getLevelSize() const;
@@ -50,11 +49,11 @@ private:
 	sf::TcpListener m_tcpListener;
 	sf::SocketSelector m_socketSelector;
 	std::vector<std::unique_ptr<PlayerServer>> m_players;
-	std::vector<int> m_clientsToRemove;
+	std::vector<int> m_playersToRemove;
 	std::vector<sf::Vector2f> m_spawnPositions;
 	TileManager m_tileManager;
-	std::vector<GameObject> m_gameObjectQueue;
-	std::vector<GameObject> m_gameObjects;
+	std::vector<GameObject> m_pickUpQueue;
+	std::vector<GameObject> m_pickUps;
 	std::vector<BombServer> m_bombs;
 	std::string m_levelName;
 	sf::Vector2i m_levelSize;

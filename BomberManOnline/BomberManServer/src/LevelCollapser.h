@@ -12,6 +12,7 @@ class LevelCollapser : private NonCopyable
 public:
 	LevelCollapser();
 
+	bool isActive() const;
 	void activate(sf::Vector2f startingPosition);
 	void update(Server& server, TileManager& tileManager, float frameTime);
 
