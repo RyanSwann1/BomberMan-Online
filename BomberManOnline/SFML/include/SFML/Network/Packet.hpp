@@ -29,6 +29,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Network/Export.hpp>
+#include <SFML/Network.hpp>
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>

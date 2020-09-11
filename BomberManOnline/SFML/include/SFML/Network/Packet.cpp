@@ -1,5 +1,7 @@
 #include "Packet.hpp"
 #include "ServerMessages.h"
+#include "ServerMessageType.h"
+#include "Direction.h"
 #include <string>
 
 sf::Packet& sf::operator>>(Packet& receivedPacket, std::vector<sf::Vector2f>& path)
