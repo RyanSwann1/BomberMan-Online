@@ -127,18 +127,14 @@ void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 
 	if (!path.empty())
 	{
-		for (sf::Vector2f i : path)
-		{
-			sf::RectangleShape shape;
-			shape.setPosition(i);
-			shape.setFillColor(sf::Color::Red);
-			sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
-			shape.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+		sf::RectangleShape shape;
+		shape.setPosition(path.front());
 
-			m_path.push_back(shape);
-		}
-
-		m_path.front().setFillColor(sf::Color::Green);
+		shape.setFillColor(sf::Color::Green);
+		sf::Vector2i tileSize = Textures::getInstance().getTileSheet().getTileSize();
+		shape.setSize(sf::Vector2f(tileSize.x, tileSize.y));
+		
+		m_path.push_back(shape);
 	}
 }
 #endif // DEBUG
