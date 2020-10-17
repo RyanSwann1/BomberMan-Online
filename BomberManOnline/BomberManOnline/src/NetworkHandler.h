@@ -30,10 +30,10 @@ public:
 private:
 	NetworkHandler();
 	std::queue<sf::Packet> m_receivedPackets;
-	std::unique_ptr<sf::TcpSocket> m_tcpSocket;
+	sf::TcpSocket m_tcpSocket;
 	std::atomic<bool> m_connectedToServer;
 	std::thread m_listenThread;
 	std::mutex m_mutex;
 
-	void listen();
+	void listen(sf::TcpSocket& tcpSocket);
 };
