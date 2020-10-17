@@ -172,7 +172,6 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 	{
 		sf::Vector2i tileSize = server.getTileSize();
 		sf::Vector2f bombPosition = bomb.getPosition();
-		//sf::Vector2f bombPosition = Utilities::getClosestGridPosition(bomb.getPosition(), tileSize);
 		int explosionSize = bomb.getExplosionSize();
 
 		if (bombPosition == sourcePosition)
@@ -184,12 +183,12 @@ bool PathFinding::isPositionInRangeOfAllExplosions(sf::Vector2f sourcePosition, 
 		{
 			for (int i = 1; i <= explosionSize; ++i)
 			{
-				sf::Vector2f explosionPosition = bombPosition + Utilities::scale(tileSize, direction, explosionSize);
+				sf::Vector2f explosionPosition = bombPosition + Utilities::scale(tileSize, direction, i);
 				if (server.getTileManager().isPositionCollidable(Utilities::convertToGridPosition(explosionPosition, tileSize)))
 				{
 					break;
 				}
-				else if (explosionPosition == sourcePosition)
+				else if(explosionPosition == sourcePosition)
 				{
 					return true;
 				}
