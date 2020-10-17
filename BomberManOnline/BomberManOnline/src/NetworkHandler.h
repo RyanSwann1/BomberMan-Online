@@ -19,6 +19,7 @@ public:
 		return instance;
 	}
 
+	std::mutex& getListenMutex();
 	bool isReceivedPackets() const;
 	sf::Packet getLatestPacket();
 

@@ -10,6 +10,11 @@ NetworkHandler::NetworkHandler()
 	m_mutex()
 {}
 
+std::mutex& NetworkHandler::getListenMutex()
+{
+	return m_mutex;
+}
+
 bool NetworkHandler::isReceivedPackets() const
 {
 	return !m_receivedPackets.empty();
@@ -17,14 +22,9 @@ bool NetworkHandler::isReceivedPackets() const
 
 sf::Packet NetworkHandler::getLatestPacket()
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-	sf::Packet packetReceived;
 	assert(!m_receivedPackets.empty());
-	if (!m_receivedPackets.empty())
-	{
-		packetReceived = m_receivedPackets.front();
-		m_receivedPackets.pop();
-	}
+	sf::Packet packetReceived = m_receivedPackets.front();
+	m_receivedPackets.pop();
 
 	return packetReceived;
 }
@@ -48,14 +48,13 @@ void NetworkHandler::disconnectFromServer()
 {
 	if (m_connectedToServer)
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
 		m_connectedToServer = false;
 
 		sf::Packet disconnectPacket;
 		disconnectPacket << eServerMessageType::eRequestDisconnection;
 		m_tcpSocket->send(disconnectPacket);
-		m_tcpSocket->disconnect();
 		m_listenThread.join();
+		m_tcpSocket->disconnect();
 	}
 }
 

@@ -45,7 +45,8 @@ int main()
 	while (window.isOpen())
 	{
 		//Handle Server Messages
-		if (NetworkHandler::getInstance().isReceivedPackets())
+		std::unique_lock<std::mutex> lock(NetworkHandler::getInstance().getListenMutex());
+		while (NetworkHandler::getInstance().isReceivedPackets())
 		{
 			sf::Packet receivedMessage = NetworkHandler::getInstance().getLatestPacket();
 
@@ -76,6 +77,7 @@ int main()
 				break;
 			}
 		}
+		lock.unlock();
 
 		//Input Handling
 		sf::Event sfmlEvent;
