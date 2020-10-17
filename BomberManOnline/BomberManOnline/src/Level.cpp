@@ -193,6 +193,11 @@ void Level::handleInput(const sf::Event & sfmlEvent)
 void Level::render(sf::RenderWindow & window) const
 {
 	m_tileManager.render(window, m_levelSize);
+	
+	for (const auto& player : m_players)
+	{
+		player->renderPath(window);
+	}
 
 	//Players
 	for (const auto& player : m_players)

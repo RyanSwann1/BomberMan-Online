@@ -33,13 +33,6 @@ void PlayerClient::update(float deltaTime)
 
 void PlayerClient::render(sf::RenderWindow& window) const
 {
-#ifdef RENDER_PATHING
-	for (const auto& i : m_path)
-	{
-		window.draw(i);
-	}
-#endif // RENDER_PATHING
-
 	m_sprite.render(window);
 }
 
@@ -120,6 +113,14 @@ void PlayerClient::stopAtPosition(sf::Vector2f position)
 }
 
 #ifdef RENDER_PATHING
+void PlayerClient::renderPath(sf::RenderWindow& window) const
+{
+	for (const auto& node : m_path)
+	{
+		window.draw(node);
+	}
+}
+
 void PlayerClient::setPathToRender(const std::vector<sf::Vector2f>& path)
 {
 	m_path.clear();

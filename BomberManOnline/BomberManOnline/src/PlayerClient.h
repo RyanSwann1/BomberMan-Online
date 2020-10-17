@@ -28,6 +28,7 @@ public:
 	void stopAtPosition(sf::Vector2f position);
 
 #ifdef RENDER_PATHING
+	void renderPath(sf::RenderWindow& window) const;
 	void setPathToRender(const std::vector<sf::Vector2f>& path);
 #endif // RENDER_PATHING
 
