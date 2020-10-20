@@ -225,14 +225,6 @@ void PlayerServerAI::handleAIStates(float frameTime)
 			PathFinding::getInstance().getPathToRandomLocalSafePosition(m_position, m_pathToTile, m_server, MAX_SAFE_POSITIONS);
 			assert(!m_pathToTile.empty());
 
-			for (const auto& bomb : m_server.getBombs())
-			{
-				if (Utilities::isPositionAdjacent(bomb.getPosition(), m_pathToTile.front(), m_server.getTileSize()))
-				{
-					int i = 0;
-				}
-			}
-
 			if (!m_pathToTile.empty())
 			{
 #ifdef RENDER_PATHING

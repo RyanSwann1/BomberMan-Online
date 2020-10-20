@@ -285,7 +285,6 @@ void PathFinding::getPathToClosestBox(sf::Vector2f sourcePosition, std::vector<s
 
 	if (!boxSelection.empty())
 	{
-		std::cout << boxSelection.size() << "\n";
 		int randNumb = Utilities::getRandomNumber(0, static_cast<int>(boxSelection.size() - 1));
 		sf::Vector2i targetPosition = m_graph.getPreviousPosition(boxSelection[randNumb], server.getLevelSize());
 
